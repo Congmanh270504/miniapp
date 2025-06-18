@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Genre{
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+  Songs Songs[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Songs {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  GenreId String @db.ObjectId
+  artistId String @db.ObjectId
+  playlistId String @db.ObjectId @default("")
+  commentId String @db.ObjectId @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Comments Comments[]
+  Genre Genre @relation(fields: [GenreId], references: [id])
+  Artists Artists @relation(fields: [artistId], references: [id])
+  Playlists Playlists @relation(fields: [playlistId], references: [id])
+  imageId String @unique @db.ObjectId @default("")
+  image Images @relation(fields: [imageId], references: [id])
+}
+
+model Artists {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+  bio String @default("")
+  country String @default("")
+  debutYear String @default("")
+  imageId String @unique @db.ObjectId @default("")
+  followId String @db.ObjectId @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Follows Follows[] 
+  image Images @relation(fields: [imageId], references: [id])
+  Songs Songs[]
+}
+
+model Images {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  artistId   String   @db.ObjectId
+  Artists    Artists?
+  url        String
+  Users      Users?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  songId    String   @db.ObjectId
+  Songs     Songs?
+}
+
+model Users {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  email String @unique
+  password String
+  name String 
+  role String @default("user")
+  phone String @unique @default("")
+  address String @default("")
+  provider String @default("")
+  imageId String @unique @db.ObjectId @default("")
+  wishlistId String @db.ObjectId @default("")
+  commentId String @db.ObjectId @default("")
+  followId String @db.ObjectId @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Follows Follows[]
+  Comments Comments[]
+  image Images @relation(fields: [imageId], references: [id])
+  Playlists Playlists[]
+}
+
+model Playlists {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  description String @default("")
+  songId String @db.ObjectId
+  userId String @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Users Users @relation(fields: [userId], references: [id])
+  Songs Songs[]
+}
+
+model Comments {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  songId String @db.ObjectId
+  comment String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Users Users @relation(fields: [userId], references: [id])
+  Songs Songs @relation(fields: [songId], references: [id])
+}
+
+model Follows {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  artistId String @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Users Users @relation(fields: [userId], references: [id])
+  Artists Artists @relation(fields: [artistId], references: [id])
+}
