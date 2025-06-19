@@ -16,9 +16,9 @@ datasource db {
 model Genre{
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   name String @unique
-  Songs Songs[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Songs Songs[]
 }
 
 model Songs {
@@ -28,14 +28,15 @@ model Songs {
   artistId String @db.ObjectId
   playlistId String @db.ObjectId @default("")
   commentId String @db.ObjectId @default("")
+  imageId String @unique @db.ObjectId @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   Comments Comments[]
   Genre Genre @relation(fields: [GenreId], references: [id])
   Artists Artists @relation(fields: [artistId], references: [id])
   Playlists Playlists @relation(fields: [playlistId], references: [id])
-  imageId String @unique @db.ObjectId @default("")
-  image Images @relation(fields: [imageId], references: [id])
+  Image Images @relation(fields: [imageId], references: [id])
 }
 
 model Artists {
@@ -55,31 +56,24 @@ model Artists {
 
 model Images {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  artistId   String   @db.ObjectId
-  Artists    Artists?
   url        String
-  Users      Users?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  songId    String   @db.ObjectId
-  Songs     Songs?
+  Artists    Artists?
+  Users      Users?
+  Songs      Songs?
 }
 
 model Users {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId String @unique 
   email String @unique
-  password String
   name String 
   role String @default("user")
-  phone String @unique @default("")
-  address String @default("")
-  provider String @default("")
-  imageId String @unique @db.ObjectId @default("")
-  wishlistId String @db.ObjectId @default("")
-  commentId String @db.ObjectId @default("")
-  followId String @db.ObjectId @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  imageId String @unique @db.ObjectId @default("")
+
   Follows Follows[]
   Comments Comments[]
   image Images @relation(fields: [imageId], references: [id])
@@ -90,7 +84,6 @@ model Playlists {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   name String
   description String @default("")
-  songId String @db.ObjectId
   userId String @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
