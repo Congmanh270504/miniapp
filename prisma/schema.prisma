@@ -36,7 +36,7 @@ model Songs {
   Genre Genre @relation(fields: [GenreId], references: [id])
   Artists Artists @relation(fields: [artistId], references: [id])
   Playlists Playlists @relation(fields: [playlistId], references: [id])
-  Image Images @relation(fields: [imageId], references: [id])
+  Image ImagesSongs @relation(fields: [imageId], references: [id])
 }
 
 model Artists {
@@ -50,34 +50,36 @@ model Artists {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Follows Follows[] 
-  image Images @relation(fields: [imageId], references: [id])
+  image ImagesArtists @relation(fields: [imageId], references: [id])
   Songs Songs[]
 }
 
-model Images {
+model ImagesArtists {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   url        String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   Artists    Artists?
-  Users      Users?
+}
+model ImagesSongs {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  url        String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
   Songs      Songs?
 }
 
 model Users {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   clerkId String @unique 
-  email String @unique
-  name String 
   role String @default("user")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  imageId String @unique @db.ObjectId @default("")
 
   Follows Follows[]
   Comments Comments[]
-  image Images @relation(fields: [imageId], references: [id])
   Playlists Playlists[]
+  CommentsReplies CommentsReplies[] @relation("UserToReplies")
 }
 
 model Playlists {
@@ -98,8 +100,22 @@ model Comments {
   comment String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  Replies CommentsReplies[] @relation("CommentToReplies")
   Users Users @relation(fields: [userId], references: [id])
   Songs Songs @relation(fields: [songId], references: [id])
+}
+
+model CommentsReplies {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  commentId String @db.ObjectId
+  reply String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Users Users @relation(fields: [userId], references: [id], name: "UserToReplies")
+  Comments Comments @relation(fields: [commentId], references: [id], name: "CommentToReplies")
 }
 
 model Follows {

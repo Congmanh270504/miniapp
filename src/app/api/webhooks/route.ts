@@ -1,4 +1,4 @@
-import { createUser } from "@/lib/actions/users";
+import { createUser, deleteUser } from "@/lib/actions/users";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import { NextRequest } from "next/server";
 
@@ -17,21 +17,10 @@ export async function POST(req: NextRequest) {
     console.log("Webhook payload:", evt.data);
 
     if (evt.type === "user.created") {
-      const { id, email_addresses, first_name, last_name, image_url } =
-        evt.data;
+      const { id } = evt.data;
       try {
-        if (!first_name || !last_name) {
-          console.error("No first name or last name found in webhook data");
-          return new Response("No first name or last name found", {
-            status: 400,
-          });
-        }
         await createUser({
           id,
-          email_addresses: email_addresses[0].email_address,
-          first_name,
-          last_name,
-          image_url,
         });
         return new Response("User created successfully", { status: 200 });
       } catch (error) {
@@ -39,8 +28,19 @@ export async function POST(req: NextRequest) {
         return new Response("Error creating user", { status: 500 });
       }
     }
+
     if (evt.type === "user.deleted") {
-      console.log("user.deleted");
+      const { id } = evt.data;
+      try {
+        if (!id) {
+          return new Response("User ID is required", { status: 400 });
+        }
+        await deleteUser({ id });
+        return new Response("User deleted successfully", { status: 200 });
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        return new Response("Error deleting user", { status: 500 });
+      }
     }
 
     return new Response("Webhook received", { status: 200 });
