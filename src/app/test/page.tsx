@@ -1,7 +1,14 @@
+import { clerkClient } from "@clerk/nextjs/server";
 import Image from "next/image";
 import React from "react";
 
-const page = () => {
+const page = async () => {
+  const client = await clerkClient();
+  const { data, totalCount } = await client.users.getUserList({
+    orderBy: "-created_at",
+    limit: 10,
+  });
+  console.log("Users:", data, totalCount);
   return (
     <div className="min-h-[50vh] flex-1 rounded-xl bg-muted/50 md:min-h-min relative">
       {" "}
