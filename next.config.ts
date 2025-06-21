@@ -1,7 +1,21 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: ["red-tough-takin-185.mypinata.cloud"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+      },
+    ],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "1gb",
+    },
+  },
+  devIndicators: false
 };
 
 export default nextConfig;
