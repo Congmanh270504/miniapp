@@ -1,6 +1,8 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Playwrite+IS:wght@100..400&display=swap");
+@import 'tailwindcss';
+@import "tailwindcss-animated";
+@plugin "daisyui";
+@plugin "tailwindcss-motion";
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -112,10 +114,31 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@layer utilities {
+  body {
+    font-family: "Geist", sans-serif;
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

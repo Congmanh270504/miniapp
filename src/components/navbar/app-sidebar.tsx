@@ -1,6 +1,6 @@
-"use client"
-
-import * as React from "react"
+"use client";
+import { useTheme } from "next-themes";
+import * as React from "react";
 import {
   AudioWaveform,
   BookOpen,
@@ -12,7 +12,7 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
-} from "lucide-react"
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -20,11 +20,13 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { TeamSwitcher } from "./team-switcher"
-import { NavMain } from "./nav-main"
-import { NavProjects } from "./nav-projects"
-import { NavUser } from "./nav-user"
+} from "@/components/ui/sidebar";
+import { TeamSwitcher } from "./team-switcher";
+import { NavMain } from "./nav-main";
+import { NavProjects } from "./nav-projects";
+import { NavUser } from "./nav-user";
+import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
 
 // This is sample data.
 const data = {
@@ -154,9 +156,12 @@ const data = {
       icon: Map,
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { setTheme } = useTheme();
+
+  const [isLight, setIsLight] = React.useState(true);
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -167,9 +172,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser  />
+        <div className="flex items-center space-x-2 ml-[7px]">
+          <Switch
+            id="theme-mode"
+            onClick={() => {
+              isLight ? setTheme("dark") : setTheme("light");
+              setIsLight(!isLight);
+            }}
+          />
+          <Label htmlFor="theme-mode">{isLight ? "Dark" : "Light"} Mode</Label>
+        </div>
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

@@ -37,6 +37,7 @@ import { useUser } from "@clerk/nextjs";
 export function NavUser() {
   const { isMobile } = useSidebar();
   const { isSignedIn, user, isLoaded } = useUser();
+
   return (
     <>
       {user ? (
@@ -75,7 +76,7 @@ export function NavUser() {
                     <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarImage
                         src={user.imageUrl}
-                        alt={user.fullName ? user.fullName : "aaa"}
+                        alt={user.fullName ? user.fullName : "User"}
                       />
                       <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                     </Avatar>
@@ -99,12 +100,6 @@ export function NavUser() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
-                    <span className="flex items-center gap-2">
-                      <BadgeCheck />
-                      Account
-                    </span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
                     <CreditCard />
                     Billing
                   </DropdownMenuItem>
@@ -127,7 +122,9 @@ export function NavUser() {
           </SidebarMenuItem>
         </SidebarMenu>
       ) : (
-        <div className="flex items-center gap-2"></div>
+        <div className="flex items-center gap-2">
+          
+        </div>
       )}
     </>
   );

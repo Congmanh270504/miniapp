@@ -23,6 +23,7 @@ model Genre{
 
 model Songs {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
+  cid String @unique
   title String
   GenreId String @db.ObjectId
   artistId String @db.ObjectId

@@ -10,6 +10,7 @@ export type GenreType = {
 
 export type SongsType = {
   id: string;
+  cid: string;
   title: string;
   GenreId: string;
   artistId: string;
