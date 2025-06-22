@@ -68,7 +68,7 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
               </Breadcrumb>
             </div>
           </header>
-          <div className="w-full h-[calc(100vh-var(--spacing)*16)] overflow-hidden">
+          <div className="w-full h-[calc(100vh-var(--spacing)*16)] ">
             {children}
           </div>
         </SidebarInset>
