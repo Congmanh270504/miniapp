@@ -4,7 +4,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { removeRole, setRole } from "./_actions";
 import { checkRole } from "../../../utils/role";
 
-export default async function AdminDashboard(params: {
+export default async function Page(params: {
   searchParams: Promise<{ search?: string }>;
 }) {
   if (!checkRole("admin")) {
