@@ -19,6 +19,7 @@ import {
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { store } from "@/store/store";
+import ActionSearchBar from "@/components/action-sreach-bar";
 interface ClientProviderProps {
   children: React.ReactNode;
 }
@@ -37,7 +38,7 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
         <AppSidebar />
         <SidebarInset>
           <header className="sticky top-0 z-10 backdrop-blur-2xl flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-            <div className="flex items-center gap-2 px-4">
+            <div className="flex items-center gap-2 px-4 w-full">
               <SidebarTrigger className="-ml-1" />
               <Separator orientation="vertical" className="mr-2 h-4" />
               <Breadcrumb>
@@ -66,6 +67,7 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
                   ))}
                 </BreadcrumbList>
               </Breadcrumb>
+              <ActionSearchBar />
             </div>
           </header>
           <div className="w-full h-[calc(100vh-var(--spacing)*16)] ">

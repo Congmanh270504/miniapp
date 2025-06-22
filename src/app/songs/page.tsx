@@ -122,12 +122,14 @@ export default function MusicLayout() {
   const [hoveredSong, setHoveredSong] = useState<number | null>(null);
 
   return (
-    <div className="min-h-screen  text-white p-6">
+    <div className="h-full text-white p-6">
       {/* Trending Songs Section */}
       <div className="mb-12">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Trending songs</h1>
-          <Button variant="ghost" className="text-gray-400 hover:text-white">
+          <h1 className="text-2xl font-bold text-foreground dark:text-white">
+            Trending songs
+          </h1>
+          <Button variant="ghost" className="text-gray-400 hover:text-gray-700">
             Show all
           </Button>
         </div>
@@ -149,7 +151,7 @@ export default function MusicLayout() {
                   className="pl-4 basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
                 >
                   <Card
-                    className="bg-gray-800 border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer group"
+                    className="h-full shadow-lg transition-colors cursor-pointer group"
                     onMouseEnter={() => setHoveredSong(song.id)}
                     onMouseLeave={() => setHoveredSong(null)}
                   >
@@ -162,7 +164,7 @@ export default function MusicLayout() {
                         />
                         {/* Hover overlay with play and next buttons */}
                         {hoveredSong === song.id && (
-                          <div className="absolute inset-0 bg-black/60 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="absolute inset-0  rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                             <div className="flex items-center gap-2">
                               <Button
                                 size="sm"
@@ -194,16 +196,18 @@ export default function MusicLayout() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="absolute left-2 h-10 w-10 bg-gray-800 border-gray-700 text-white hover:bg-gray-700" />
-            <CarouselNext className="absolute right-2 h-10 w-10 bg-gray-800 border-gray-700 text-white hover:bg-gray-700" />
+            <CarouselPrevious className="absolute left-2 h-10 w-10 bg-gray-800 border-gray-700 text-white " />
+            <CarouselNext className="absolute right-2 h-10 w-10 bg-gray-800 border-gray-700 text-white " />
           </Carousel>
         </div>
       </div>
       {/* Popular Artists Section */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">Popular artists</h2>
-          <Button variant="ghost" className="text-gray-400 hover:text-white">
+          <h2 className="text-2xl font-bold text-black dark:text-white">
+            Popular artists
+          </h2>
+          <Button variant="ghost" className="text-gray-400 hover:text-gray-700">
             Show all
           </Button>
         </div>
@@ -224,12 +228,12 @@ export default function MusicLayout() {
                   key={index}
                   className="pl-4 basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
                 >
-                  <Card className="bg-gray-800 border-gray-700 hover:bg-gray-700 transition-colors cursor-pointer">
+                  <Card className="shadow-lg transition-colors cursor-pointer">
                     <CardContent className="p-4">
                       <div className="text-center">
                         <div className="mb-3">
                           <img
-                            src={artist.image || "/placeholder.svg"}
+                            src={"/twice.png"}
                             alt={artist.name}
                             className="w-full aspect-square mx-auto object-cover rounded-full"
                           />

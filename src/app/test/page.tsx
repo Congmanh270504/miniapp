@@ -69,7 +69,7 @@ export default function Page() {
     },
   ];
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-4 p-4">
+    <div className="w-full flex flex-col items-center justify-center gap-4 p-4 ">
       <Carousel
         opts={{
           align: "center",
