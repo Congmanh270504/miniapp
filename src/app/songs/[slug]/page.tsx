@@ -5,7 +5,7 @@ import Image from "next/image";
 import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
 
-export default function Home() {
+export default function Page() {
   // //   const params = useParams();
   // //   const { slug } = params;
   return (
