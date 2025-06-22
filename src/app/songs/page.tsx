@@ -118,7 +118,7 @@ const popularArtists = [
   },
 ];
 
-export default function MusicLayout() {
+export default function Page() {
   const [hoveredSong, setHoveredSong] = useState<number | null>(null);
 
   return (
