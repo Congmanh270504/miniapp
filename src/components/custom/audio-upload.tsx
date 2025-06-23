@@ -19,7 +19,7 @@ export default function AudioUpload() {
       const file = acceptedFiles[0];
       try {
         const metadata = await parseBlob(file);
-        setArtist(metadata.common.artist || "Không tìm thấy tác giả");
+        setArtist(metadata.common.artist || "");
       } catch (err) {
         setError("Không đọc được metadata");
       }
@@ -42,7 +42,6 @@ export default function AudioUpload() {
     maxFiles: 1,
     multiple: false,
   });
-  console.log("uploadedFiles", uploadedFiles);
 
   return (
     <div className="h-fit text-white p-6 ">

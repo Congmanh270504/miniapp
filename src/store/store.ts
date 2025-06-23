@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import modifyItemReducer from "./modify/modifyItem";
+import { genreSlice } from "./genres/genres";
 
 export const store = configureStore({
   reducer: {
     modifyItem: modifyItemReducer,
+    genreSlice: genreSlice.reducer,
   },
 });
 

@@ -1,8 +1,7 @@
 import React from "react";
-import MusicLayout from "./music-layout";
 
 const Page = () => {
-  return <MusicLayout />;
+  return <div></div>;
 };
 
 export default Page;

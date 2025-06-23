@@ -12,18 +12,30 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { Music4 } from "lucide-react";
+import { Info, Music4 } from "lucide-react";
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
   SelectValue,
+  SelectGroup,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import UploadImageSong from "./upload-image-song";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/store/store";
+import { fetchGenres } from "@/store/genres/genres";
+import { useEffect, useState } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useUser } from "@clerk/nextjs";
+import { toSlug } from "@/lib/hepper";
+import { TypographyH2 } from "@/components/ui/typography";
 
 interface SongDetailsProps {
   uploadedFiles: File[];
@@ -34,6 +46,15 @@ export default function SongDetails({
   uploadedFiles,
   artist,
 }: SongDetailsProps) {
+  const dispatch = useDispatch<AppDispatch>();
+  const genres = useSelector((state: RootState) => state.genreSlice);
+  const { isSignedIn, user, isLoaded } = useUser();
+
+  useEffect(() => {
+    dispatch(fetchGenres());
+  }, [dispatch]);
+  console.log(genres);
+
   const formSchema = z.object({
     title: z
       .string()
@@ -55,18 +76,26 @@ export default function SongDetails({
     album: z.string(),
     songsImages: z.instanceof(File),
   });
+
   const [isPending, setIsPending] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: uploadedFiles[0].name.replace(/\.[^/.]+$/, ""),
       artistName: artist,
-      trackLink: "http://localhost:3000/songs/",
+      trackLink: `http://localhost:3000/${toSlug(user?.fullName ?? "")}/`,
       genre: "",
       album: "",
       songsImages: undefined,
     },
   });
+
+  useEffect(() => {
+    if (artist) {
+      form.setValue("artistName", artist);
+    }
+  }, [artist, form]);
+
   const handleFileUpload = async (file: File) => {
     try {
       const data = new FormData();
@@ -83,6 +112,7 @@ export default function SongDetails({
       toast.error("Error uploading file");
     }
   };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsPending(true);
@@ -98,8 +128,6 @@ export default function SongDetails({
       setIsPending(false);
       toast.error("Failed to upload song");
     }
-
-    // console.log(values);
   }
 
   function onReset() {
@@ -119,16 +147,8 @@ export default function SongDetails({
             control={form.control}
             name="songsImages"
             render={({ field }) => (
-              <FormItem className="w-full">
+              <FormItem className="w-full ">
                 <FormControl>
-                  {/* <UploadFile
-                    field={field} // Pass the field object to the UploadFile component
-                    randomColor={randomColor}
-                    isLoadingFile={isLoadingFile}
-                    setIsLoadingFile={setIsLoadingFile}
-                    setFiles={setFiles}
-                    files={files}
-                  /> */}
                   <UploadImageSong field={field} />
                 </FormControl>
                 <FormMessage />
@@ -140,25 +160,26 @@ export default function SongDetails({
             <div
               key="text-0"
               id="text-0"
-              className=" col-span-12 col-start-auto"
+              className=" col-span-12 col-start-auto items-center"
             >
-              <h1
+              {/* <h1
                 style={{ textAlign: "center" }}
                 className="scroll-m-20 text-4xl font-extrabold tracking-tight @5xl:text-5xl"
               >
                 <span className="text-sm font-medium leading-none">
                   Upload song file
                 </span>
-              </h1>
+              </h1> */}
+              <TypographyH2 text="Upload song file" />
             </div>
 
-            <div
+            {/* <div
               key="text-1"
               id="text-1"
               className=" col-span-12 col-start-auto"
             >
               Text
-            </div>
+            </div> */}
 
             <FormField
               control={form.control}
@@ -168,6 +189,7 @@ export default function SongDetails({
                   <FormLabel className="flex shrink-0 text-black">
                     Song title
                   </FormLabel>
+
                   <div className="w-full">
                     <FormControl>
                       <div className="relative w-full">
@@ -199,7 +221,6 @@ export default function SongDetails({
               render={({ field }) => (
                 <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                   <FormLabel className="flex shrink-0">Artist</FormLabel>
-
                   <div className="w-full">
                     <FormControl>
                       <div className="relative w-full">
@@ -223,8 +244,17 @@ export default function SongDetails({
               name="trackLink"
               render={({ field }) => (
                 <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
-                  <FormLabel className="flex shrink-0">Track link</FormLabel>
-
+                  <div className="flex gap-1.5 w-full">
+                    <FormLabel className="flex shrink-0">Track link</FormLabel>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="size-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Your song link </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                   <div className="w-full">
                     <FormControl>
                       <div className="relative w-full">
@@ -237,7 +267,6 @@ export default function SongDetails({
                         />
                       </div>
                     </FormControl>
-
                     <FormMessage />
                   </div>
                 </FormItem>
@@ -248,7 +277,17 @@ export default function SongDetails({
               name="genre"
               render={({ field }) => (
                 <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
-                  <FormLabel className="flex shrink-0">Genre</FormLabel>
+                  <div className="flex gap-1.5 w-full">
+                    <FormLabel className="flex shrink-0">Genre</FormLabel>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="size-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Style of your song</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                   <div className="w-full">
                     <FormControl>
                       <Select
@@ -257,20 +296,25 @@ export default function SongDetails({
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger className="w-full ">
-                          <SelectValue placeholder="" />
+                          <SelectValue placeholder="Choose genre song type" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem key="option1" value="option1">
-                            Option 1
-                          </SelectItem>
-
-                          <SelectItem key="option2" value="option2">
-                            Don't know
-                          </SelectItem>
+                          <SelectGroup className="max-h-60 overflow-y-auto">
+                            {genres.map((genre) => (
+                              <SelectItem key={genre.id} value={genre.id}>
+                                {genre.name}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
                         </SelectContent>
                       </Select>
                     </FormControl>
-
+                    <FormDescription className="text-sm text-black mt-1 ml-1">
+                      {
+                        genres.find((genre) => genre.id === field.value)
+                          ?.description
+                      }
+                    </FormDescription>
                     <FormMessage />
                   </div>
                 </FormItem>
@@ -332,8 +376,16 @@ export default function SongDetails({
                   className="w-full bg-gray-600 hover:bg-gray-500"
                   type="submit"
                   variant="default"
+                  disabled={isPending}
                 >
-                  Submit
+                  {isPending ? (
+                    <div className="flex items-center justify-center gap-1">
+                      Submitting{" "}
+                      <span className="loading loading-dots loading-xs"></span>{" "}
+                    </div>
+                  ) : (
+                    "Submit"
+                  )}
                 </Button>
               </div>
             </div>

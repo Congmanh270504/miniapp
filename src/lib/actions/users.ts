@@ -1,8 +1,6 @@
 "use server";
 import { prisma } from "@/utils/prisma";
-import { ObjectId } from "mongodb";
 import { pinata } from "@/utils/config";
-import { UsersType } from "../../../types/users";
 
 export async function createUser(data: { id: string }) {
   const user = await prisma.users.upsert({

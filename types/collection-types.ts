@@ -1,8 +1,9 @@
 // src/lib/types/users.ts
 
-export type GenreType = {
+export type GenresType = {
   id: string;
   name: string;
+  description: string;
   createdAt: Date;
   updatedAt: Date;
   Songs: SongsType[];
@@ -20,7 +21,7 @@ export type SongsType = {
   createdAt: Date;
   updatedAt: Date;
   Comments: CommentsType[];
-  Genre: GenreType;
+  Genre: GenresType;
   Artists: ArtistsType;
   Playlists: PlaylistsType;
   Image: ImagesType;

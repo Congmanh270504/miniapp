@@ -13,9 +13,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Genre{
+model Genres{
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   name String @unique
+  description String @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Songs Songs[]
@@ -26,7 +27,7 @@ model Songs {
   cid String @unique
   title String
   GenreId String @db.ObjectId
-  artistId String @db.ObjectId
+  userId String @db.ObjectId
   playlistId String @db.ObjectId @default("")
   commentId String @db.ObjectId @default("")
   imageId String @unique @db.ObjectId @default("")
@@ -34,34 +35,12 @@ model Songs {
   updatedAt DateTime @updatedAt
 
   Comments Comments[]
-  Genre Genre @relation(fields: [GenreId], references: [id])
-  Artists Artists @relation(fields: [artistId], references: [id])
+  Genre Genres @relation(fields: [GenreId], references: [id])
   Playlists Playlists @relation(fields: [playlistId], references: [id])
   Image ImagesSongs @relation(fields: [imageId], references: [id])
+  Users Users @relation(fields: [userId], references: [id])
 }
 
-model Artists {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  name String @unique
-  bio String @default("")
-  country String @default("")
-  debutYear String @default("")
-  imageId String @unique @db.ObjectId @default("")
-  followId String @db.ObjectId @default("")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Follows Follows[] 
-  image ImagesArtists @relation(fields: [imageId], references: [id])
-  Songs Songs[]
-}
-
-model ImagesArtists {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  url        String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  Artists    Artists?
-}
 model ImagesSongs {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   url        String
@@ -76,6 +55,7 @@ model Users {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  Songs Songs[]
   Follows Follows[]
   Comments Comments[]
   Playlists Playlists[]
@@ -121,9 +101,7 @@ model CommentsReplies {
 model Follows {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   userId String @db.ObjectId
-  artistId String @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Users Users @relation(fields: [userId], references: [id])
-  Artists Artists @relation(fields: [artistId], references: [id])
 }
