@@ -1,5 +1,3 @@
-// src/lib/types/users.ts
-
 export type GenresType = {
   id: string;
   name: string;
@@ -9,62 +7,24 @@ export type GenresType = {
   Songs: SongsType[];
 };
 
-export type SongsType = {
+export type ImagesSongsType = {
   id: string;
   cid: string;
-  title: string;
-  GenreId: string;
-  artistId: string;
-  playlistId: string;
-  commentId: string;
-  imageId: string;
   createdAt: Date;
   updatedAt: Date;
-  Comments: CommentsType[];
-  Genre: GenresType;
-  Artists: ArtistsType;
-  Playlists: PlaylistsType;
-  Image: ImagesType;
-};
-
-export type ArtistsType = {
-  id: string;
-  name: string;
-  bio: string;
-  country: string;
-  debutYear: string;
-  imageId: string;
-  followId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  Follows: FollowsType[];
-  image: ImagesType;
-  Songs: SongsType[];
-};
-
-export type ImagesType = {
-  id: string;
-  url: string;
-  createdAt: Date;
-  updatedAt: Date;
-  Artists?: ArtistsType;
-  Users?: UsersType;
   Songs?: SongsType;
 };
 
 export type UsersType = {
   id: string;
   clerkId: string;
-  email: string;
-  name: string;
-  role: string;
   createdAt: Date;
   updatedAt: Date;
-  imageId: string;
+  Songs: SongsType[];
   Follows: FollowsType[];
   Comments: CommentsType[];
-  image: ImagesType;
   Playlists: PlaylistsType[];
+  CommentsReplies: CommentsRepliesType[];
 };
 
 export type PlaylistsType = {
@@ -78,6 +38,24 @@ export type PlaylistsType = {
   Songs: SongsType[];
 };
 
+export type SongsType = {
+  id: string;
+  title: string;
+  artist: string;
+  imageId: string;
+  genreId: string;
+  userId: string;
+  playlistId: string;
+  commentId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  Comments: CommentsType[];
+  Genre: GenresType;
+  Playlists: PlaylistsType;
+  Image: ImagesSongsType;
+  Users: UsersType;
+};
+
 export type CommentsType = {
   id: string;
   userId: string;
@@ -85,16 +63,26 @@ export type CommentsType = {
   comment: string;
   createdAt: Date;
   updatedAt: Date;
+  Replies: CommentsRepliesType[];
   Users: UsersType;
   Songs: SongsType;
+};
+
+export type CommentsRepliesType = {
+  id: string;
+  userId: string;
+  commentId: string;
+  reply: string;
+  createdAt: Date;
+  updatedAt: Date;
+  Users: UsersType;
+  Comments: CommentsType;
 };
 
 export type FollowsType = {
   id: string;
   userId: string;
-  artistId: string;
   createdAt: Date;
   updatedAt: Date;
   Users: UsersType;
-  Artists: ArtistsType;
 };

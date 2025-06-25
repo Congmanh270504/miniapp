@@ -36,6 +36,12 @@ import {
 import { useUser } from "@clerk/nextjs";
 import { toSlug } from "@/lib/hepper";
 import { TypographyH2 } from "@/components/ui/typography";
+import { getUser } from "@/lib/actions/users";
+import { current } from "@reduxjs/toolkit";
+import { UsersType } from "../../../../types/collection-types";
+import { currentUser } from "@clerk/nextjs/server";
+import { createSong } from "@/lib/actions/songs";
+import { Textarea } from "@/components/ui/textarea";
 
 interface SongDetailsProps {
   uploadedFiles: File[];
@@ -53,7 +59,6 @@ export default function SongDetails({
   useEffect(() => {
     dispatch(fetchGenres());
   }, [dispatch]);
-  console.log(genres);
 
   const formSchema = z.object({
     title: z
@@ -66,14 +71,14 @@ export default function SongDetails({
       .min(1, { message: "This field is required" })
       .min(1, { message: "Must be at least 1 characters" })
       .max(30, { message: "Must be at most 30 characters" }),
-    trackLink: z
+    description: z
       .string()
-      .min(1, { message: "This field is required" })
-      .includes("http://localhost:3000/songs", {
-        message: 'Must contain "http://localhost:3000/songs"',
-      }),
-    genre: z.string(),
-    album: z.string(),
+      .min(1, { message: "Must be at least 1 characters" })
+      .max(60, { message: "Must be at most 60 characters" })
+      .optional()
+      .or(z.literal("")),
+    genreId: z.string().min(1, { message: "Please select a genre song" }),
+    album: z.string().optional().or(z.literal("")),
     songsImages: z.instanceof(File),
   });
 
@@ -83,8 +88,8 @@ export default function SongDetails({
     defaultValues: {
       title: uploadedFiles[0].name.replace(/\.[^/.]+$/, ""),
       artistName: artist,
-      trackLink: `http://localhost:3000/${toSlug(user?.fullName ?? "")}/`,
-      genre: "",
+      description: "",
+      genreId: "",
       album: "",
       songsImages: undefined,
     },
@@ -112,17 +117,30 @@ export default function SongDetails({
       toast.error("Error uploading file");
     }
   };
-
+  console.log(user?.id);
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsPending(true);
-      const cid = await handleFileUpload(uploadedFiles[0]);
-      if (cid.status !== 200) {
-        toast.success("Song uploaded successfully");
-      } else {
-        toast.error("Failed to upload song");
+      if (user?.id) {
+        const fileUpload = await handleFileUpload(uploadedFiles[0]);
+        const { songsCid, imagesCid } = fileUpload;
+
+        if (!songsCid || !imagesCid) {
+          toast.error("Failed to upload song or image");
+          setIsPending(false);
+          return;
+        }
+
+        const req = await createSong(songsCid, imagesCid, user.id, values);
+
+        if (req.ok) {
+          toast.success(req.message || "Song uploaded successfully");
+          // form.reset();
+          // form.clearErrors();
+        } else {
+          toast.error(req.message || "Failed to upload song");
+        }
       }
-      console.log(values, cid);
       setIsPending(false);
     } catch (error) {
       setIsPending(false);
@@ -160,26 +178,10 @@ export default function SongDetails({
             <div
               key="text-0"
               id="text-0"
-              className=" col-span-12 col-start-auto items-center"
+              className="col-span-12 col-start-auto justify-self-center"
             >
-              {/* <h1
-                style={{ textAlign: "center" }}
-                className="scroll-m-20 text-4xl font-extrabold tracking-tight @5xl:text-5xl"
-              >
-                <span className="text-sm font-medium leading-none">
-                  Upload song file
-                </span>
-              </h1> */}
               <TypographyH2 text="Upload song file" />
             </div>
-
-            {/* <div
-              key="text-1"
-              id="text-1"
-              className=" col-span-12 col-start-auto"
-            >
-              Text
-            </div> */}
 
             <FormField
               control={form.control}
@@ -239,42 +241,10 @@ export default function SongDetails({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
-              name="trackLink"
-              render={({ field }) => (
-                <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
-                  <div className="flex gap-1.5 w-full">
-                    <FormLabel className="flex shrink-0">Track link</FormLabel>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="size-4 text-muted-foreground cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Your song link </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                  <div className="w-full">
-                    <FormControl>
-                      <div className="relative w-full">
-                        <Input
-                          key="text-input-2"
-                          placeholder="http://localhost:3000/songs"
-                          type="text"
-                          className=" "
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="genre"
+              name="genreId"
               render={({ field }) => (
                 <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                   <div className="flex gap-1.5 w-full">
@@ -329,26 +299,57 @@ export default function SongDetails({
 
                   <div className="w-full">
                     <FormControl>
-                      <Select
-                        key="select-0"
-                        {...field}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger className="w-full ">
-                          <SelectValue placeholder="" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem key="option1" value="option1">
-                            Option 1
-                          </SelectItem>
-
-                          <SelectItem key="option2" value="option2">
-                            Don't know
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="relative w-full">
+                        <Input
+                          key="text-input-3"
+                          placeholder="http://localhost:3000/songs"
+                          type="text"
+                          className=" "
+                          {...field}
+                        />
+                      </div>
                     </FormControl>
 
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
+                  <div className="flex gap-1.5 w-full">
+                    <FormLabel className="flex shrink-0">
+                      Description your song
+                    </FormLabel>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="size-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Maybe why you choose this song?</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <div className="w-full">
+                    <FormControl>
+                      {/* <div className="relative w-full">
+                        <Input
+                          key="text-input-2"
+                          placeholder="http://localhost:3000/songs"
+                          type="text"
+                          className=" "
+                          {...field}
+                        />
+                      </div> */}
+                      <Textarea
+                        placeholder="Tell us a little bit about yourself"
+                        className="resize-none"
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </div>
                 </FormItem>

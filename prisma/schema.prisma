@@ -24,26 +24,28 @@ model Genres{
 
 model Songs {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
-  cid String @unique
   title String
-  GenreId String @db.ObjectId
+  artist String @default("")
+  description String @default("")
+  fileCid String @unique
+  genreId String @db.ObjectId
   userId String @db.ObjectId
-  playlistId String @db.ObjectId @default("")
-  commentId String @db.ObjectId @default("")
-  imageId String @unique @db.ObjectId @default("")
+  playlistId String? @db.ObjectId @default("")
+  commentId String? @db.ObjectId
+  imageId String @unique @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  
   Comments Comments[]
-  Genre Genres @relation(fields: [GenreId], references: [id])
-  Playlists Playlists @relation(fields: [playlistId], references: [id])
+  Genre Genres @relation(fields: [genreId], references: [id])
+  Playlists Playlists? @relation(fields: [playlistId], references: [id])
   Image ImagesSongs @relation(fields: [imageId], references: [id])
   Users Users @relation(fields: [userId], references: [id])
 }
 
 model ImagesSongs {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  url        String
+  cid        String @unique
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   Songs      Songs?
