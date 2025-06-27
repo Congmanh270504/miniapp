@@ -80,7 +80,7 @@ export default async function Page() {
         <SimpleMusicPlayer songs={songData} />
       </div>
       {/* Global Audio Player to handle Redux state */}
-      <GlobalAudioPlayer songs={songData} />
+      {/* <GlobalAudioPlayer songs={songData} /> */}
     </div>
   );
 }

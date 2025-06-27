@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import { setPlaySong, togglePlaySong } from "@/store/playSong/state";
 import Image from "next/image";
+import { useRef } from "react";
 
 interface TrackCellProps {
   track: {
@@ -28,7 +29,9 @@ interface TrackCellProps {
 export function TrackCell({ track }: TrackCellProps) {
   const dispatch = useDispatch<AppDispatch>();
   const playState = useSelector((state: RootState) => state.playSong);
-  
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   const isCurrentSong = playState.id === track.songId;
   const isPlaying = isCurrentSong && playState.isPlaying;
 
@@ -41,6 +44,21 @@ export function TrackCell({ track }: TrackCellProps) {
       dispatch(setPlaySong({ id: track.songId, isPlaying: true }));
     }
   };
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play().catch((error) => {
+        console.error("Error playing audio:", error);
+      });
+    }
+    dispatch(setPlaySong({ id: track.songId, isPlaying: true }));
+
+    // setIsPlaying(!playSong.isPlaying);
+  };
 
   return (
     <div className="flex items-center gap-3">
@@ -52,8 +70,13 @@ export function TrackCell({ track }: TrackCellProps) {
           className="object-cover"
         />
         <Button
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full text-black transition-all duration-200 active:scale-95 hover:bg-white group-hover:opacity-100 opacity-0 inline-flex h-8 w-8 items-center justify-center overflow-hidden shadow-md"
-          onClick={handlePlayPause}
+          className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full text-black transition-all duration-200 active:scale-95 hover:bg-white group-hover:opacity-100 inline-flex h-8 w-8 items-center justify-center overflow-hidden shadow-md ${
+            track.songId === playState.id ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={() => {
+            handlePlayPause();
+            togglePlay();
+          }}
           variant="ghost"
         >
           <div className="transition duration-700 group-hover:rotate-[360deg]">
@@ -63,7 +86,6 @@ export function TrackCell({ track }: TrackCellProps) {
       </div>
       <div className="flex flex-col">
         <span className="font-medium text-gray-900">{track.title}</span>
-        <span className="text-sm text-gray-500">{track.artist}</span>
       </div>
     </div>
   );

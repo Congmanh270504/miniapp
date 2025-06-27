@@ -17,7 +17,7 @@ import { GrChapterPrevious } from "react-icons/gr";
 import { HorizontalVolumeControl } from "@/components/custom/horizontal-volume-control";
 
 interface MusicControlsProps {
-  isPlaying: boolean;
+  playSong: boolean;
   isShuffle: boolean;
   isRepeatOne: boolean;
   currentVolume: number;
@@ -32,7 +32,7 @@ interface MusicControlsProps {
 }
 
 export default function MusicControls({
-  isPlaying,
+  playSong,
   isShuffle,
   isRepeatOne,
   currentVolume,
@@ -87,7 +87,7 @@ export default function MusicControls({
           onClick={onTogglePlay}
         >
           <div className="transition duration-700 group-hover:rotate-[360deg]">
-            {isPlaying ? <Pause size={24} /> : <Play size={24} />}
+            {playSong ? <Pause size={24} /> : <Play size={24} />}
           </div>
         </Button>
         <Button

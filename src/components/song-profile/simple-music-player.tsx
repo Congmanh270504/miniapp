@@ -7,6 +7,10 @@ import { Button } from "../ui/button";
 import { X } from "lucide-react";
 import { CircleXButton } from "../custom/circle-x-button";
 import { Songs } from "@prisma/client";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { setPlaySong } from "@/store/playSong/state";
 
 type SongWithUrls = {
   songId: string;
@@ -36,21 +40,69 @@ export default function SimpleMusicPlayer({
   const [isShuffle, setIsShuffle] = useState(false);
   const [isRepeatOne, setIsRepeatOne] = useState(false);
   const [currentVolume, setCurrentVolume] = useState(50);
-  const [currentSong, setCurrentSong] = useState<SongWithUrls>(songs[0]);
 
-  useEffect(() => {
-    console.log("Next song:", currentSong);
-  }, [currentSong]);
+  const playSong = useSelector((state: RootState) => state.playSong);
+
+  const [currentSong, setCurrentSong] = useState<SongWithUrls>(
+    songs.find((song) => song.songId === playSong.id) || songs[0]
+  );
+
+  console.log(currentSong);
+  console.log(playSong);
+
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.load(); // Đảm bảo load lại source mới
-    if (isPlaying) {
-      audio.play().catch((error) => {
-        console.error("Error playing audio:", error);
-      });
+
+    const currentSong = songs.find((song) => song.songId === playSong.id);
+
+    if (currentSong && playSong.id) {
+      // Set the audio source if it's different
+      if (audio.src !== currentSong.musicFile.url) {
+        audio.src = currentSong.musicFile.url;
+        audio.load();
+        
+        // Wait for the audio to be ready before playing
+        if (playSong.isPlaying) {
+          const playWhenReady = () => {
+            audio.play().catch((error) => {
+              console.error("Error playing audio:", error);
+            });
+          };
+          
+          // If already loaded, play immediately
+          if (audio.readyState >= 2) {
+            playWhenReady();
+          } else {
+            // Wait for canplay event
+            audio.addEventListener('canplay', playWhenReady, { once: true });
+          }
+        }
+      } else {
+        // Same source, just play or pause
+        if (playSong.isPlaying) {
+          audio.play().catch((error) => {
+            console.error("Error playing audio:", error);
+          });
+        } else {
+          audio.pause();
+        }
+      }
     }
+  }, [playSong.id, playSong.isPlaying, songs]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    
+    // Only load if the source has changed
+    if (audio.src !== currentSong.musicFile.url) {
+      audio.src = currentSong.musicFile.url;
+      audio.load();
+    }
+    
     setCurrentTime(0);
   }, [currentSong]);
 
@@ -73,8 +125,7 @@ export default function SimpleMusicPlayer({
           console.error("Error playing audio:", error);
         });
       } else {
-        setIsPlaying(false);
-        setCurrentTime(0);
+        handleNextSong(); // Automatically go to next song
       }
     };
 
@@ -93,14 +144,17 @@ export default function SimpleMusicPlayer({
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (isPlaying) {
+    if (playSong.isPlaying) {
       audio.pause();
     } else {
       audio.play().catch((error) => {
         console.error("Error playing audio:", error);
       });
     }
-    setIsPlaying(!isPlaying);
+    dispatch(
+      setPlaySong({ id: currentSong.songId, isPlaying: !playSong.isPlaying })
+    );
+    // setIsPlaying(!playSong.isPlaying);
   };
 
   const handleForward10s = () => {
@@ -141,10 +195,13 @@ export default function SimpleMusicPlayer({
       (song) => song.songId === currentSong.songId
     );
     const prevIndex = (currentIndex - 1 + songs.length) % songs.length;
-    if (prevIndex < 0) return;
-    setCurrentSong(songs[prevIndex]);
-    setIsPlaying(true);
+    
+    const prevSong = songs[prevIndex];
+    setCurrentSong(prevSong);
     setCurrentTime(0);
+    
+    // Set the play state first, then let useEffect handle the audio
+    dispatch(setPlaySong({ id: prevSong.songId, isPlaying: true }));
   };
 
   const handleNextSong = () => {
@@ -152,10 +209,14 @@ export default function SimpleMusicPlayer({
       (song) => song.songId === currentSong.songId
     );
     const nextIndex = (currentIndex + 1) % songs.length;
-    if (nextIndex > songs.length) return;
-    setCurrentSong(songs[nextIndex]);
+    if (nextIndex >= songs.length) return;
+    
+    const nextSong = songs[nextIndex];
+    setCurrentSong(nextSong);
     setCurrentTime(0);
-    setIsPlaying(true);
+    
+    // Set the play state first, then let useEffect handle the audio
+    dispatch(setPlaySong({ id: nextSong.songId, isPlaying: true }));
   };
   const [isHidden, setIsHidden] = useState(false);
   return isHidden ? (
@@ -186,7 +247,7 @@ export default function SimpleMusicPlayer({
       />
       {/* Controls */}
       <MusicControls
-        isPlaying={isPlaying}
+        playSong={playSong.isPlaying}
         isShuffle={isShuffle}
         isRepeatOne={isRepeatOne}
         currentVolume={currentVolume}
@@ -212,6 +273,7 @@ export default function SimpleMusicPlayer({
         ref={audioRef}
         src={currentSong.musicFile.url}
         loop={isRepeatOne}
+        onEnded={handleNextSong}
       />
     </div>
   );

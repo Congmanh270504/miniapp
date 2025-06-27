@@ -31,6 +31,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DataTableFilter } from "./data-table-filter";
+import { useState } from "react";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -39,8 +40,8 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   );
   const [columnVisibility, setColumnVisibility] =
@@ -65,7 +66,7 @@ export function DataTable<TData, TValue>({
     },
   });
   return (
-    <div className="w-full">
+    <div className="w-full p-4">
       <DataTableFilter table={table} />
       <div className="rounded-md border">
         <Table>

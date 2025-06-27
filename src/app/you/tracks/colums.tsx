@@ -70,9 +70,10 @@ export const columns: ColumnDef<SongWithUrls>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
-  },  {
+  },
+  {
     accessorKey: "title",
-    header: "TRACKS",
+    header: "Tracks",
     cell: ({ row }) => {
       const track = row.original;
       return <TrackCell track={track} />;
@@ -161,6 +162,7 @@ export const columns: ColumnDef<SongWithUrls>[] = [
               <DropdownMenuSeparator />
               <DropdownMenuItem>View details</DropdownMenuItem>
               <DropdownMenuItem>Edit song</DropdownMenuItem>
+              <DropdownMenuItem>Delete song</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
