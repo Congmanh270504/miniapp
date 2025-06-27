@@ -21,26 +21,11 @@ import { GrChapterPrevious } from "react-icons/gr";
 import { FaHeart } from "react-icons/fa";
 import { Volume, Volume1, Volume2, VolumeX } from "lucide-react";
 import { HorizontalVolumeControl } from "@/components/custom/horizontal-volume-control";
+import { SongsType } from "../../../types/collection-types";
+import MusicControls from "./music-controls";
+import MusicProgressBar from "./music-progress-bar";
 
-interface MusicPlayerProps {
-  title: string;
-  artist: string;
-  albumArt: string;
-  audioSrc: string;
-}
-interface songType {
-  id: string;
-  title: string;
-  url: string;
-  artist: string;
-  album: string;
-  genre: string;
-  releaseDate: Date;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export default function MusicPlayer({ albumArt }: MusicPlayerProps) {
+export default function MusicPlayer({ songs }: { songs: SongsType[] }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audio = audioRef.current;
   const [isPlaying, setIsPlaying] = useState(false);
@@ -50,42 +35,42 @@ export default function MusicPlayer({ albumArt }: MusicPlayerProps) {
   const [isRepeatOne, setIsRepeatOne] = useState(false);
   const [isHearted, setIsHearted] = useState(false);
   const [currentVolume, setCurrentVolume] = useState(50);
-  const songs: songType[] = [
-    {
-      id: "1",
-      title: "TT",
-      artist: "Twice",
-      album: "Album 1",
-      genre: "Genre 1",
-      releaseDate: new Date(2020, 2, 1), // year, month (0-indexed), day
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      url: "/TT.mp3",
-    },
-    {
-      id: "2",
-      title: "What is love",
-      artist: "Twice",
-      album: "Album 2",
-      genre: "Genre 2",
-      releaseDate: new Date(2021, 5, 15),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      url: "/What-is-love.mp3",
-    },
-    {
-      id: "3",
-      title: "I Can't Stop Me",
-      artist: "Twice",
-      album: "Album 3",
-      genre: "Genre 3",
-      releaseDate: new Date(2022, 8, 20),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      url: "/ICantStopMe.mp3",
-    },
-  ];
-  const [currentSong, setCurrentSong] = useState<songType>(songs[0]);
+  // const songs: songType[] = [
+  //   {
+  //     id: "1",
+  //     title: "TT",
+  //     artist: "Twice",
+  //     album: "Album 1",
+  //     genre: "Genre 1",
+  //     releaseDate: new Date(2020, 2, 1), // year, month (0-indexed), day
+  //     createdAt: new Date(),
+  //     updatedAt: new Date(),
+  //     url: "/TT.mp3",
+  //   },
+  //   {
+  //     id: "2",
+  //     title: "What is love",
+  //     artist: "Twice",
+  //     album: "Album 2",
+  //     genre: "Genre 2",
+  //     releaseDate: new Date(2021, 5, 15),
+  //     createdAt: new Date(),
+  //     updatedAt: new Date(),
+  //     url: "/What-is-love.mp3",
+  //   },
+  //   {
+  //     id: "3",
+  //     title: "I Can't Stop Me",
+  //     artist: "Twice",
+  //     album: "Album 3",
+  //     genre: "Genre 3",
+  //     releaseDate: new Date(2022, 8, 20),
+  //     createdAt: new Date(),
+  //     updatedAt: new Date(),
+  //     url: "/ICantStopMe.mp3",
+  //   },
+  // ];
+  const [currentSong, setCurrentSong] = useState<SongsType>(songs[0]);
   useEffect(() => {
     console.log("Next song:", currentSong);
   }, [currentSong]);
@@ -119,6 +104,7 @@ export default function MusicPlayer({ albumArt }: MusicPlayerProps) {
         handleNextSong();
       }
     };
+
     // const handleEnded = () => {
     //   handleNextSong();
     // };
@@ -283,7 +269,7 @@ export default function MusicPlayer({ albumArt }: MusicPlayerProps) {
       <div className="mt-2">
         <div className="h-[55vh] w-full relative justify-items-center mx-auto min-[1900px]:h-[65vh]">
           <Image
-            src={albumArt}
+            src={"/twice.png"}
             alt={`${currentSong.title} by ${currentSong.artist}`}
             fill
             className="object-cover p-4 rounded-[2em]"
@@ -296,104 +282,29 @@ export default function MusicPlayer({ albumArt }: MusicPlayerProps) {
           <h2 className="text-xl font-bold ">{currentSong.title}</h2>
           <p className="text-red-200 text-sm">{currentSong.artist}</p>
         </div>
-      </div>
-
-      {/* Controls */}
+      </div>      {/* Controls */}
       <div className="px-6 pb-6 absolute bottom-0 left-0 right-0 rounded-b-lg">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex">
-            {isShuffle ? (
-              <Button onClick={() => setIsShuffle(false)}>
-                <IoMdShuffle size={20} />
-              </Button>
-            ) : (
-              <Button onClick={() => setIsShuffle(true)}>
-                <Shuffle size={20} />
-              </Button>
-            )}
-            <div className="flex items-center gap-2 opacity-0">
-              <button className="flex items-center justify-center p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                <VolumeX className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <Button
-              className="group relative inline-flex items-center justify-center overflow-hidden shadow-neutral-500/20 transition active:scale-95 "
-              onClick={handlePrevSong}
-            >
-              <div className="transition duration-700 group-hover:rotate-[360deg]">
-                <GrChapterPrevious />
-              </div>
-            </Button>
-            <Button
-              className="group relative inline-flex items-center justify-center overflow-hidden shadow-neutral-500/20 transition active:scale-95 "
-              onClick={handleBackward10s}
-            >
-              <div className="transition duration-700 group-hover:rotate-[360deg]">
-                <SkipBack size={24} />
-              </div>
-            </Button>
-
-            <Button
-              className="bg-white rounded-full outline-solid border p-3 text-red-600 shadow-neutral-500/20 transition active:scale-95  hover:bg-gray-100 group relative inline-flex h-12 w-12 items-center justify-center overflow-hidden "
-              onClick={togglePlay}
-            >
-              <div className="transition duration-700 group-hover:rotate-[360deg]">
-                {isPlaying ? <Pause size={24} /> : <Play size={24} />}
-              </div>
-            </Button>
-            <Button
-              className="group relative inline-flex items-center justify-center overflow-hidden shadow-neutral-500/20 transition active:scale-95 "
-              onClick={handleForward10s}
-            >
-              <div className="transition duration-700 group-hover:rotate-[360deg]">
-                <SkipForward size={24} />
-              </div>
-            </Button>
-
-            <Button
-              className="group relative inline-flex items-center justify-center overflow-hidden shadow-neutral-500/20 transition active:scale-95 "
-              onClick={handleNextSong}
-            >
-              <div className="transition duration-700 group-hover:rotate-[360deg]">
-                <GrChapterNext />
-              </div>
-            </Button>
-          </div>
-
-          <div className="flex">
-            {isRepeatOne ? (
-              <Button onClick={() => setIsRepeatOne(false)}>
-                <Repeat1 size={20} />
-              </Button>
-            ) : (
-              <Button onClick={() => setIsRepeatOne(true)}>
-                <Repeat size={20} />
-              </Button>
-            )}
-            <HorizontalVolumeControl
-              initialVolume={currentVolume}
-              onVolumeChange={handleVolumeChange}
-            />
-          </div>
-        </div>
-
+        <MusicControls
+          isPlaying={isPlaying}
+          isShuffle={isShuffle}
+          isRepeatOne={isRepeatOne}
+          currentVolume={currentVolume}
+          onTogglePlay={togglePlay}
+          onPrevSong={handlePrevSong}
+          onNextSong={handleNextSong}
+          onBackward10s={handleBackward10s}
+          onForward10s={handleForward10s}
+          onToggleShuffle={() => setIsShuffle(!isShuffle)}
+          onToggleRepeat={() => setIsRepeatOne(!isRepeatOne)}
+          onVolumeChange={handleVolumeChange}
+        />
+        
         {/* Progress Bar */}
-        <div className="space-y-2">
-          <Slider
-            value={[currentTime]}
-            max={audio?.duration} // Đảm bảo max là duration thực tế
-            step={0.1}
-            onValueChange={handleProgressChange}
-            className="cursor-pointer"
-          />
-          <div className="flex justify-between text-xs ">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(audio?.duration ?? 0)}</span>
-          </div>
-        </div>
+        <MusicProgressBar
+          currentTime={currentTime}
+          duration={audio?.duration || 0}
+          onProgressChange={handleProgressChange}
+        />
       </div>
 
       {/* Hidden Audio Element */}

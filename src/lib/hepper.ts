@@ -8,3 +8,11 @@ export function toSlug(str: string) {
     .replace(/\-+/g, "-") // bỏ trùng dấu -
     .replace(/^\-+|\-+$/g, ""); // bỏ - ở đầu/cuối
 }
+export function convertToVNDay(date: Date) {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  };
+  return date.toLocaleDateString("vi-VN", options).replace(/\//g, "/");
+}

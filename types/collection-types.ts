@@ -42,16 +42,16 @@ export type SongsType = {
   id: string;
   title: string;
   artist: string;
+  fileCid: string;
   imageId: string;
   genreId: string;
   userId: string;
-  playlistId: string;
-  commentId: string;
   createdAt: Date;
   updatedAt: Date;
+  
   Comments: CommentsType[];
   Genre: GenresType;
-  Playlists: PlaylistsType;
+  Playlists: PlaylistsType[];
   Image: ImagesSongsType;
   Users: UsersType;
 };

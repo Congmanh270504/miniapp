@@ -1,27 +1,34 @@
-"use server";
 import { Button } from "@/components/ui/button";
-import { createManyGenres } from "@/lib/actions/genre";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/store/store";
-import { fetchGenres } from "@/store/genres/genres";
-import { getUser } from "@/lib/actions/users";
-import { useUser } from "@clerk/nextjs";
-import { prisma } from "@/utils/prisma";
+import { pinata } from "@/utils/config";
+import Image from "next/image";
 
 const Page = async () => {
-  // const { isSignedIn, user, isLoaded } = useUser();
-  // console.log(user?.id);
-  // if (user?.id) {
-  // }
-  const currentUser = await prisma.users.findUnique({
-    where: { clerkId: "user_2ylA2VRmswaaPExCbfER7v5uzyk" },
+  const cid = "bafkreieqqy6tlfouuwlz3uvculj5fg4yen23iy46nnxzdltztzbpx5vkse";
+
+  // Lấy thông tin metadata của ảnh
+  const imageUrl = await pinata.gateways.private.createAccessLink({
+    cid: "bafkreieqqy6tlfouuwlz3uvculj5fg4yen23iy46nnxzdltztzbpx5vkse",
+    expires: 3600, // Link sẽ hết hạn sau 1 giờ
   });
-  console.log(currentUser);
+
+  console.log("imageUrl", imageUrl);
+
   return (
-    <div>
-      {/* <Button onClick={createManyGenres}>aa</Button> */}
-      aaaa
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Pinata Image Display</h1>
+
+      {/* Hiển thị ảnh sử dụng Next.js Image component */}
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold mb-2">Using Next.js Image:</h2>
+        <Image
+          src={imageUrl}
+          alt="Pinata Image"
+          width={400}
+          height={300}
+          className="rounded-lg shadow-lg"
+        />
+      </div>
     </div>
   );
 };

@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import modifyItemReducer from "./modify/modifyItem";
-import { genreSlice } from "./genres/genres";
+import { genreSlice } from "./genres/state";
+import { playSongSlice } from "./playSong/state";
 
 export const store = configureStore({
   reducer: {
     modifyItem: modifyItemReducer,
     genreSlice: genreSlice.reducer,
+    playSong: playSongSlice.reducer,
   },
 });
 

@@ -30,15 +30,13 @@ model Songs {
   fileCid String @unique
   genreId String @db.ObjectId
   userId String @db.ObjectId
-  playlistId String? @db.ObjectId @default("")
-  commentId String? @db.ObjectId
   imageId String @unique @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
   Comments Comments[]
+  Playlists Playlists[]
   Genre Genres @relation(fields: [genreId], references: [id])
-  Playlists Playlists? @relation(fields: [playlistId], references: [id])
   Image ImagesSongs @relation(fields: [imageId], references: [id])
   Users Users @relation(fields: [userId], references: [id])
 }
@@ -67,25 +65,27 @@ model Users {
 model Playlists {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   name String
-  description String @default("")
+  songId String? @db.ObjectId
   userId String @db.ObjectId
+  description String @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   Users Users @relation(fields: [userId], references: [id])
-  Songs Songs[]
+  Songs Songs? @relation(fields: [songId], references: [id])
 }
 
 model Comments {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   userId String @db.ObjectId
-  songId String @db.ObjectId
+  songId String? @db.ObjectId
   comment String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   Replies CommentsReplies[] @relation("CommentToReplies")
   Users Users @relation(fields: [userId], references: [id])
-  Songs Songs @relation(fields: [songId], references: [id])
+  Songs Songs? @relation(fields: [songId], references: [id])
 }
 
 model CommentsReplies {

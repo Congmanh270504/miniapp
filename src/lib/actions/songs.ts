@@ -18,11 +18,11 @@ export async function createSong(
     const currentUser = await prisma.users.findUnique({
       where: { clerkId: userId },
     });
-    console.log(currentUser);
+    // console.log(currentUser);
     if (!currentUser) {
       return { ok: false, message: "User not found" };
     }
-    console.log(songsCid, imagesCid);
+    // console.log(songsCid, imagesCid);
 
     // Tạo image trước
     const image = await prisma.imagesSongs.create({

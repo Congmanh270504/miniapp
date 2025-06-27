@@ -76,3 +76,19 @@ export async function createManyGenres() {
 
   return genre;
 }
+
+export async function getGenres() {
+  return prisma.genres.findMany({
+    select: {
+      id: true,
+      name: true,
+      description: true,
+    },
+  });
+}
+
+export async function getGenreById(id: string) {
+  return prisma.genres.findUnique({
+    where: { id },
+  });
+}

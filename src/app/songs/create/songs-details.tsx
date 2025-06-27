@@ -26,7 +26,7 @@ import UploadImageSong from "./upload-image-song";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
-import { fetchGenres } from "@/store/genres/genres";
+import { fetchGenres } from "@/store/genres/state";
 import { useEffect, useState } from "react";
 import {
   Tooltip,
@@ -42,6 +42,7 @@ import { UsersType } from "../../../../types/collection-types";
 import { currentUser } from "@clerk/nextjs/server";
 import { createSong } from "@/lib/actions/songs";
 import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
 
 interface SongDetailsProps {
   uploadedFiles: File[];
@@ -55,7 +56,7 @@ export default function SongDetails({
   const dispatch = useDispatch<AppDispatch>();
   const genres = useSelector((state: RootState) => state.genreSlice);
   const { isSignedIn, user, isLoaded } = useUser();
-
+  const router = useRouter();
   useEffect(() => {
     dispatch(fetchGenres());
   }, [dispatch]);
@@ -135,8 +136,8 @@ export default function SongDetails({
 
         if (req.ok) {
           toast.success(req.message || "Song uploaded successfully");
-          // form.reset();
-          // form.clearErrors();
+          form.reset();
+          router.push("/songs");
         } else {
           toast.error(req.message || "Failed to upload song");
         }
