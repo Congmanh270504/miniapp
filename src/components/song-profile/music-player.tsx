@@ -35,41 +35,7 @@ export default function MusicPlayer({ songs }: { songs: SongsType[] }) {
   const [isRepeatOne, setIsRepeatOne] = useState(false);
   const [isHearted, setIsHearted] = useState(false);
   const [currentVolume, setCurrentVolume] = useState(50);
-  // const songs: songType[] = [
-  //   {
-  //     id: "1",
-  //     title: "TT",
-  //     artist: "Twice",
-  //     album: "Album 1",
-  //     genre: "Genre 1",
-  //     releaseDate: new Date(2020, 2, 1), // year, month (0-indexed), day
-  //     createdAt: new Date(),
-  //     updatedAt: new Date(),
-  //     url: "/TT.mp3",
-  //   },
-  //   {
-  //     id: "2",
-  //     title: "What is love",
-  //     artist: "Twice",
-  //     album: "Album 2",
-  //     genre: "Genre 2",
-  //     releaseDate: new Date(2021, 5, 15),
-  //     createdAt: new Date(),
-  //     updatedAt: new Date(),
-  //     url: "/What-is-love.mp3",
-  //   },
-  //   {
-  //     id: "3",
-  //     title: "I Can't Stop Me",
-  //     artist: "Twice",
-  //     album: "Album 3",
-  //     genre: "Genre 3",
-  //     releaseDate: new Date(2022, 8, 20),
-  //     createdAt: new Date(),
-  //     updatedAt: new Date(),
-  //     url: "/ICantStopMe.mp3",
-  //   },
-  // ];
+
   const [currentSong, setCurrentSong] = useState<SongsType>(songs[0]);
   useEffect(() => {
     console.log("Next song:", currentSong);
@@ -264,7 +230,6 @@ export default function MusicPlayer({ songs }: { songs: SongsType[] }) {
           />
         </Button>
       </div>
-
       {/* Album Art */}
       <div className="mt-2">
         <div className="h-[55vh] w-full relative justify-items-center mx-auto min-[1900px]:h-[65vh]">
@@ -282,7 +247,8 @@ export default function MusicPlayer({ songs }: { songs: SongsType[] }) {
           <h2 className="text-xl font-bold ">{currentSong.title}</h2>
           <p className="text-red-200 text-sm">{currentSong.artist}</p>
         </div>
-      </div>      {/* Controls */}
+      </div>{" "}
+      {/* Controls */}
       <div className="px-6 pb-6 absolute bottom-0 left-0 right-0 rounded-b-lg">
         <MusicControls
           isPlaying={isPlaying}
@@ -298,7 +264,7 @@ export default function MusicPlayer({ songs }: { songs: SongsType[] }) {
           onToggleRepeat={() => setIsRepeatOne(!isRepeatOne)}
           onVolumeChange={handleVolumeChange}
         />
-        
+
         {/* Progress Bar */}
         <MusicProgressBar
           currentTime={currentTime}
@@ -306,7 +272,6 @@ export default function MusicPlayer({ songs }: { songs: SongsType[] }) {
           onProgressChange={handleProgressChange}
         />
       </div>
-
       {/* Hidden Audio Element */}
       <audio ref={audioRef} src={currentSong.url} loop={isRepeatOne} />
     </div>

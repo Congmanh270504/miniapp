@@ -61,8 +61,8 @@ export function TrackCell({ track }: TrackCellProps) {
   };
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="relative h-12 w-12 rounded overflow-hidden bg-gray-100 group">
+    <div className="flex items-center gap-3 w-full">
+      <div className="relative h-12 w-12 rounded overflow-hidden bg-gray-100 group flex-shrink-0">
         <Image
           src={track.imageFile.url || "/twice.png"}
           alt={track.title}
@@ -84,8 +84,10 @@ export function TrackCell({ track }: TrackCellProps) {
           </div>
         </Button>
       </div>
-      <div className="flex flex-col">
-        <span className="font-medium text-gray-900">{track.title}</span>
+      <div className="flex flex-col min-w-0 flex-1">
+        <span className="font-medium text-gray-900 truncate">
+          {track.title}
+        </span>
       </div>
     </div>
   );

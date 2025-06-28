@@ -60,11 +60,12 @@ export default function NavUser() {
     <SidebarMenu>
       {user ? (
         <SidebarMenuItem className="flex items-center justify-between">
-          {/* <div>
+          <div>
             <SignedIn>
               <UserButton />
             </SignedIn>
-          </div> */}
+          </div>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton

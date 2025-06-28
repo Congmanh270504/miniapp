@@ -48,7 +48,7 @@ export type SongsType = {
   userId: string;
   createdAt: Date;
   updatedAt: Date;
-  
+
   Comments: CommentsType[];
   Genre: GenresType;
   Playlists: PlaylistsType[];
@@ -85,4 +85,21 @@ export type FollowsType = {
   createdAt: Date;
   updatedAt: Date;
   Users: UsersType;
+};
+
+export type SongWithUrls = {
+  songId: string;
+  title: string;
+  artist: string;
+  musicFile: {
+    cid: string;
+    url: string;
+  };
+  imageFile: {
+    cid: string;
+    url: string;
+  };
+  genre: string;
+  createdAt: Date;
+  hearted: number;
 };

@@ -11,22 +11,9 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { setPlaySong } from "@/store/playSong/state";
+import { SongWithUrls } from "../../../types/collection-types";
 
-type SongWithUrls = {
-  songId: string;
-  title: string;
-  artist: string;
-  musicFile: {
-    cid: string;
-    url: string;
-  };
-  imageFile: {
-    cid: string;
-    url: string;
-  };
-  genre: string;
-  createdAt: Date;
-};
+
 export default function SimpleMusicPlayer({
   songs,
 }: {
@@ -34,7 +21,6 @@ export default function SimpleMusicPlayer({
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audio = audioRef.current;
-  const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isShuffle, setIsShuffle] = useState(false);
@@ -46,10 +32,6 @@ export default function SimpleMusicPlayer({
   const [currentSong, setCurrentSong] = useState<SongWithUrls>(
     songs.find((song) => song.songId === playSong.id) || songs[0]
   );
-
-  console.log(currentSong);
-  console.log(playSong);
-
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -63,7 +45,7 @@ export default function SimpleMusicPlayer({
       if (audio.src !== currentSong.musicFile.url) {
         audio.src = currentSong.musicFile.url;
         audio.load();
-        
+
         // Wait for the audio to be ready before playing
         if (playSong.isPlaying) {
           const playWhenReady = () => {
@@ -71,13 +53,13 @@ export default function SimpleMusicPlayer({
               console.error("Error playing audio:", error);
             });
           };
-          
+
           // If already loaded, play immediately
           if (audio.readyState >= 2) {
             playWhenReady();
           } else {
             // Wait for canplay event
-            audio.addEventListener('canplay', playWhenReady, { once: true });
+            audio.addEventListener("canplay", playWhenReady, { once: true });
           }
         }
       } else {
@@ -96,13 +78,13 @@ export default function SimpleMusicPlayer({
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    
+
     // Only load if the source has changed
     if (audio.src !== currentSong.musicFile.url) {
       audio.src = currentSong.musicFile.url;
       audio.load();
     }
-    
+
     setCurrentTime(0);
   }, [currentSong]);
 
@@ -195,11 +177,11 @@ export default function SimpleMusicPlayer({
       (song) => song.songId === currentSong.songId
     );
     const prevIndex = (currentIndex - 1 + songs.length) % songs.length;
-    
+
     const prevSong = songs[prevIndex];
     setCurrentSong(prevSong);
     setCurrentTime(0);
-    
+
     // Set the play state first, then let useEffect handle the audio
     dispatch(setPlaySong({ id: prevSong.songId, isPlaying: true }));
   };
@@ -210,41 +192,20 @@ export default function SimpleMusicPlayer({
     );
     const nextIndex = (currentIndex + 1) % songs.length;
     if (nextIndex >= songs.length) return;
-    
+
     const nextSong = songs[nextIndex];
     setCurrentSong(nextSong);
     setCurrentTime(0);
-    
+
     // Set the play state first, then let useEffect handle the audio
     dispatch(setPlaySong({ id: nextSong.songId, isPlaying: true }));
   };
-  const [isHidden, setIsHidden] = useState(false);
-  return isHidden ? (
-    <div>
-      <Button onClick={() => setIsHidden(false)}>Show Player</Button>
-    </div>
-  ) : (
+  return (
     <div
       className={
         "bg-white dark:bg-gray-900 rounded-lg p-4 shadow-lg border relative animate-fade-down animate-once"
       }
     >
-      {/* Song Info */}
-      {/* <div className="mb-4">
-        <h3 className="font-semibold text-lg">{currentSong.title}</h3>
-        <p className="text-gray-600 dark:text-gray-400">{currentSong.artist}</p>
-      </div> */}
-
-      <CircleXButton
-        size="sm"
-        variant="ghost"
-        onClick={() => {
-          setIsHidden(true);
-          togglePlay();
-        }} // Uncomment to hide player
-        // onClick={() => removeNotification(notification.id)}
-        className="absolute top-0 right-1 text-blue-600 hover:text-blue-800 hover:bg-blue-100"
-      />
       {/* Controls */}
       <MusicControls
         playSong={playSong.isPlaying}

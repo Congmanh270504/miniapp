@@ -109,7 +109,7 @@ export default function MusicControls({
         </Button>
       </div>
 
-      <div className="flex">
+      <div className="flex gap-1">
         {isRepeatOne ? (
           <Button onClick={() => onToggleRepeat()}>
             <Repeat1 size={20} />

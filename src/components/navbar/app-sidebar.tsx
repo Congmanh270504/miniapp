@@ -27,6 +27,7 @@ import { NavProjects } from "./nav-projects";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 import NavUser from "./nav-user";
+import { Suspense } from "react";
 
 // This is sample data.
 const data = {
@@ -182,7 +183,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           />
           <Label htmlFor="theme-mode">{isLight ? "Dark" : "Light"} Mode</Label>
         </div>
-        {/* <NavUser /> */}
+        {/* <Suspense
+          fallback={
+            <div className="h-8 w-8 rounded-lg bg-gray-200 animate-pulse" />
+          }
+        >
+          <NavUser />
+        </Suspense> */}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

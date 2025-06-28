@@ -36,6 +36,7 @@ model Songs {
   
   Comments Comments[]
   Playlists Playlists[]
+  HeartedSongs HeartedSongs[]
   Genre Genres @relation(fields: [genreId], references: [id])
   Image ImagesSongs @relation(fields: [imageId], references: [id])
   Users Users @relation(fields: [userId], references: [id])
@@ -59,6 +60,7 @@ model Users {
   Follows Follows[]
   Comments Comments[]
   Playlists Playlists[]
+  HeartedSongs HeartedSongs[]
   CommentsReplies CommentsReplies[] @relation("UserToReplies")
 }
 
@@ -106,4 +108,15 @@ model Follows {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Users Users @relation(fields: [userId], references: [id])
+}
+
+model HeartedSongs {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  songId String @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Users Users @relation(fields: [userId], references: [id])
+  Songs Songs @relation(fields: [songId], references: [id])
 }

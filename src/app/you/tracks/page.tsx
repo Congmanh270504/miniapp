@@ -6,6 +6,8 @@ import { currentUser } from "@clerk/nextjs/server";
 import { pinata } from "@/utils/config";
 import SimpleMusicPlayer from "@/components/song-profile/simple-music-player";
 import GlobalAudioPlayer from "@/components/song-profile/global-audio-player";
+import { Suspense } from "react";
+import Loading from "@/components/ui/loading";
 
 export default async function Page() {
   const user = await currentUser();
@@ -26,6 +28,7 @@ export default async function Page() {
         include: {
           Genre: true,
           Image: true,
+          HeartedSongs: true, // Include hearted songs
         },
         orderBy: {
           createdAt: "desc",
@@ -70,17 +73,18 @@ export default async function Page() {
         },
         genre: song.Genre.name,
         createdAt: song.createdAt,
+        hearted: song.HeartedSongs.length , // Kiểm tra xem bài hát có được yêu thích không
       };
     })
   );
   return (
-    <div className="container mx-auto py-10 flex flex-col gap-4">
-      <DataTable columns={columns} data={songData} />
-      <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-900 rounded-lg shadow-lg">
-        <SimpleMusicPlayer songs={songData} />
+    <Suspense fallback={<Loading />}>
+      <div className="container mx-auto py-10 flex flex-col gap-4 ">
+        <DataTable columns={columns} data={songData} />
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-900 rounded-lg shadow-lg">
+          <SimpleMusicPlayer songs={songData} />
+        </div>
       </div>
-      {/* Global Audio Player to handle Redux state */}
-      {/* <GlobalAudioPlayer songs={songData} /> */}
-    </div>
+    </Suspense>
   );
 }
