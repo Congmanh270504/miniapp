@@ -21,11 +21,23 @@ import { GrChapterPrevious } from "react-icons/gr";
 import { FaHeart } from "react-icons/fa";
 import { Volume, Volume1, Volume2, VolumeX } from "lucide-react";
 import { HorizontalVolumeControl } from "@/components/custom/horizontal-volume-control";
-import { SongsType } from "../../../types/collection-types";
 import MusicControls from "./music-controls";
 import MusicProgressBar from "./music-progress-bar";
+import {
+  ProcessedSongData,
+  SongsData,
+  SongWithIncludes,
+  ProcessedSongsData,
+  ProcessedSongWithPinata,
+} from "../../../types/song-types";
 
-export default function MusicPlayer({ songs }: { songs: SongsType[] }) {
+export default function MusicPlayer({ songs }: { songs: ProcessedSongsData }) {
+  const [currentSong, setCurrentSong] = useState<ProcessedSongWithPinata>(
+    songs[0]
+  );
+  const hearted = currentSong.hearted.find(
+    (hearted) => hearted.songId === currentSong.songId
+  );
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audio = audioRef.current;
   const [isPlaying, setIsPlaying] = useState(false);
@@ -33,13 +45,8 @@ export default function MusicPlayer({ songs }: { songs: SongsType[] }) {
   const [duration, setDuration] = useState(0);
   const [isShuffle, setIsShuffle] = useState(false);
   const [isRepeatOne, setIsRepeatOne] = useState(false);
-  const [isHearted, setIsHearted] = useState(false);
+  const [isHearted, setIsHearted] = useState(hearted ? true : false);
   const [currentVolume, setCurrentVolume] = useState(50);
-
-  const [currentSong, setCurrentSong] = useState<SongsType>(songs[0]);
-  useEffect(() => {
-    console.log("Next song:", currentSong);
-  }, [currentSong]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -71,19 +78,16 @@ export default function MusicPlayer({ songs }: { songs: SongsType[] }) {
       }
     };
 
-    // const handleEnded = () => {
-    //   handleNextSong();
-    // };
-
     audio.addEventListener("ended", handleEnded);
 
     return () => {
       audio.removeEventListener("ended", handleEnded);
     };
   }, [currentSong, isRepeatOne, songs]);
+
   const handleNextSong = () => {
     const currentIndex = songs.findIndex(
-      (song) => song.url === currentSong.url
+      (song) => song.musicFile.url === currentSong.musicFile.url
     );
     const nextIndex = (currentIndex + 1) % songs.length;
     if (nextIndex > songs.length) return;
@@ -91,9 +95,10 @@ export default function MusicPlayer({ songs }: { songs: SongsType[] }) {
     setIsPlaying(true);
     setCurrentTime(0);
   };
+
   const handlePrevSong = () => {
     const currentIndex = songs.findIndex(
-      (song) => song.url === currentSong.url
+      (song) => song.musicFile.url === currentSong.musicFile.url
     );
     const prevIndex = (currentIndex - 1 + songs.length) % songs.length;
     if (prevIndex < 0) return;
@@ -231,27 +236,26 @@ export default function MusicPlayer({ songs }: { songs: SongsType[] }) {
         </Button>
       </div>
       {/* Album Art */}
-      <div className="mt-2">
+      <div className="h-full">
         <div className="h-[55vh] w-full relative justify-items-center mx-auto min-[1900px]:h-[65vh]">
           <Image
-            src={"/twice.png"}
+            src={currentSong.imageFile.url}
             alt={`${currentSong.title} by ${currentSong.artist}`}
             fill
             className="object-cover p-4 rounded-[2em]"
             quality={100}
           />
         </div>
-
         {/* Song Info */}
-        <div className="text-center px-4 py-6">
+        <div className="text-center px-4 min-[2100px]:py-6">
           <h2 className="text-xl font-bold ">{currentSong.title}</h2>
           <p className="text-red-200 text-sm">{currentSong.artist}</p>
         </div>
       </div>{" "}
       {/* Controls */}
-      <div className="px-6 pb-6 absolute bottom-0 left-0 right-0 rounded-b-lg">
+      <div className="px-6 pb-2 absolute bottom-0 left-0 right-0 rounded-b-lg">
         <MusicControls
-          isPlaying={isPlaying}
+          playSong={isPlaying}
           isShuffle={isShuffle}
           isRepeatOne={isRepeatOne}
           currentVolume={currentVolume}
@@ -273,7 +277,11 @@ export default function MusicPlayer({ songs }: { songs: SongsType[] }) {
         />
       </div>
       {/* Hidden Audio Element */}
-      <audio ref={audioRef} src={currentSong.url} loop={isRepeatOne} />
+      <audio
+        ref={audioRef}
+        src={currentSong.musicFile.url}
+        loop={isRepeatOne}
+      />
     </div>
   );
 }

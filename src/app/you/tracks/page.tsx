@@ -73,7 +73,7 @@ export default async function Page() {
         },
         genre: song.Genre.name,
         createdAt: song.createdAt,
-        hearted: song.HeartedSongs.length , // Kiểm tra xem bài hát có được yêu thích không
+        hearted: song.HeartedSongs.length , 
       };
     })
   );

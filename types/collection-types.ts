@@ -20,6 +20,7 @@ export type UsersType = {
   clerkId: string;
   createdAt: Date;
   updatedAt: Date;
+  
   Songs: SongsType[];
   Follows: FollowsType[];
   Comments: CommentsType[];
@@ -54,6 +55,7 @@ export type SongsType = {
   Playlists: PlaylistsType[];
   Image: ImagesSongsType;
   Users: UsersType;
+  HeartedSongs: HeartedSongsType;
 };
 
 export type CommentsType = {
@@ -86,6 +88,15 @@ export type FollowsType = {
   updatedAt: Date;
   Users: UsersType;
 };
+export type HeartedSongsType = {
+  id: string;
+  userId: string;
+  songId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  Users: UsersType;
+  Songs: SongsType;
+};
 
 export type SongWithUrls = {
   songId: string;
@@ -102,4 +113,19 @@ export type SongWithUrls = {
   genre: string;
   createdAt: Date;
   hearted: number;
+};
+
+export type SongWithSlug = {
+  id: string;
+  title: string;
+  artist: string;
+  fileCid: string;
+  imageId: string;
+  genreId: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  Image: ImagesSongsType;
+  HeartedSongs: HeartedSongsType;
+  Comments: CommentsType[];
 };

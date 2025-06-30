@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 import BookmarkIcon from "@/components/custom/icon/bookmark-icon";
 import { MdOutlineInsertEmoticon } from "react-icons/md";
 import { useUser } from "@clerk/nextjs";
+import { SongWithIncludes } from "../../../types/song-types";
+import Image from "next/image";
 type Comment = {
   id: string;
   username: string;
@@ -105,8 +107,18 @@ const initialComments: Comment[] = [
     replies: [],
   },
 ];
-
-export function CommentSection() {
+interface UserCreateSongInfor {
+  clerkId: string;
+  name: string | null;
+  imageUrl: string;
+}
+export function CommentSection({
+  commentData,
+  userCreate,
+}: {
+  commentData: SongWithIncludes["Comments"];
+  userCreate: UserCreateSongInfor;
+}) {
   const { isSignedIn, user, isLoaded } = useUser();
 
   const [comments, setComments] = useState<Comment[]>(initialComments);
@@ -184,11 +196,11 @@ export function CommentSection() {
     <div className="flex flex-col gap-2 w-full h-full">
       {/* Post header */}
       <div className="flex items-center p-4 border-b ">
-        <Avatar className="h-8 w-8 mr-2">
-          <img src="/user.png" alt="Profile" />
+        <Avatar className="h-8 w-8 mr-2 relative">
+          <Image src={userCreate.imageUrl} alt="Profile" fill />
         </Avatar>
         <div className="flex items-center gap-1">
-          <span className="font-semibold">sontungmtp</span>
+          <span className="font-semibold">{userCreate.name}</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             x="0px"

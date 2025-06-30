@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Volume, Volume1, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 interface HorizontalVolumeControlProps {
   initialVolume?: number;
@@ -20,6 +21,10 @@ export function HorizontalVolumeControl({
   const [isMuted, setIsMuted] = useState(false);
   const [isControlVisible, setIsControlVisible] = useState(false);
   const controlRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  // Check if URL contains "you/track"
+  const isYouTrackPage = pathname.includes("you/tracks");
 
   useEffect(() => {
     // Call the onVolumeChange callback when volume changes
@@ -92,7 +97,12 @@ export function HorizontalVolumeControl({
       </div>
 
       {isControlVisible && (
-        <div className="absolute top-3 right-[7.5em] w-1/4 mb-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-800 z-10">
+        <div
+          className={cn(
+            "absolute right-[7.5em] w-1/4 mb-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-800 z-10",
+            isYouTrackPage ? "top-3" : "top-0"
+          )}
+        >
           <div className="flex justify-between items-center gap-2 ">
             <Slider
               value={[isMuted ? 0 : volume]}

@@ -1,6 +1,7 @@
 "use server";
 import { prisma } from "@/utils/prisma";
 import { SongsType } from "../../../types/collection-types";
+import { pinata } from "@/utils/config";
 interface CreateSongData {
   title: string;
   artistName: string;
@@ -55,5 +56,27 @@ export async function createSong(
   } catch (error) {
     console.error("Error uploading song:", error);
     throw new Error("Failed to upload song");
+  }
+}
+
+export async function getSongsDataPinata(fileCid: string, imageCid: string) {
+  try {
+    const musicUrl = await pinata.gateways.private.createAccessLink({
+      cid: fileCid,
+      expires: 3600, // 1 hour
+    });
+
+    const imageUrl = await pinata.gateways.private.createAccessLink({
+      cid: imageCid,
+      expires: 3600, // 1 hour
+    });
+
+    return {
+      musicUrl,
+      imageUrl,
+    };
+  } catch (error) {
+    console.error("Error fetching song data:", error);
+    return null;
   }
 }
