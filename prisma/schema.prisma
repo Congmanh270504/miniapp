@@ -28,6 +28,7 @@ model Songs {
   slug String @unique
   artist String @default("")
   description String @default("")
+  duration Int @default(0)
   fileCid String @unique
   genreId String @db.ObjectId
   userId String @db.ObjectId

@@ -6,13 +6,13 @@ import { Upload, FileAudio, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { parseBlob } from "music-metadata-browser";
-import SongForm from "@/app/songs/create/songs-form"
+import SongForm from "@/app/songs/create/songs-form";
 
 export default function AudioUpload() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [artist, setArtist] = useState("");
+  const [duration, setDuration] = useState<number>(0);
   const [error, setError] = useState("");
-
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     setUploadedFiles(acceptedFiles);
     if (acceptedFiles.length > 0) {
@@ -20,6 +20,9 @@ export default function AudioUpload() {
       try {
         const metadata = await parseBlob(file);
         setArtist(metadata.common.artist || "");
+        // Đọc duration từ metadata
+        const durationInSeconds = metadata.format.duration || 0;
+        setDuration(Math.floor(durationInSeconds));
       } catch (err) {
         setError("Không đọc được metadata");
       }
@@ -42,6 +45,16 @@ export default function AudioUpload() {
     maxFiles: 1,
     multiple: false,
   });
+
+  const formatDuration = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+  
+  console.log(uploadedFiles);
+  console.log("Duration:", duration, "seconds");
+  console.log("Formatted duration:", formatDuration(duration));
 
   return (
     <div className="h-fit text-white p-6 ">
@@ -77,7 +90,11 @@ export default function AudioUpload() {
         )}
         {uploadedFiles.length > 0 ? (
           <div className="border-2 border-solid rounded-lg border-white p-4">
-            <SongForm uploadedFiles={uploadedFiles} artist={artist} />
+            <SongForm
+              uploadedFiles={uploadedFiles}
+              artist={artist}
+              duration={duration}
+            />
           </div>
         ) : (
           <div>

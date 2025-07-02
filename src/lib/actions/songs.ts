@@ -14,6 +14,7 @@ export async function createSong(
   songsCid: string,
   imagesCid: string,
   userId: string,
+  duration: number,
   data: CreateSongData
 ) {
   try {
@@ -46,6 +47,7 @@ export async function createSong(
         genreId: data.genreId,
         userId: currentUser.id,
         description: data.description,
+        duration: duration,
         fileCid: songsCid,
         imageId: image.id, // Sử dụng ID của image vừa tạo
       },

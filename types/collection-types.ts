@@ -103,6 +103,7 @@ export type SongWithUrls = {
   title: string;
   artist: string;
   slug: string;
+  duration:number
   musicFile: {
     cid: string;
     url: string;

@@ -4,7 +4,13 @@ import { ImageIcon, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 
-const UploadImageSong = (field: { field: any }) => {
+const UploadImageSong = ({
+  field,
+  isPending,
+}: {
+  field: any;
+  isPending: boolean;
+}) => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [fileName, setFileName] = useState<File[]>([]);
 
@@ -14,14 +20,14 @@ const UploadImageSong = (field: { field: any }) => {
       const imageUrl = URL.createObjectURL(file);
       setUploadedImage(imageUrl);
       setFileName([file]);
-      field.field.onChange(file); // Call the onChange method from the field object
+      field.onChange(file); // Call the onChange method from the field object
     }
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp", ".svg"],
+      "image/*": [".jpeg", ".jpg", ".png"],
     },
     multiple: false,
   });
@@ -32,6 +38,7 @@ const UploadImageSong = (field: { field: any }) => {
     }
     setUploadedImage(null);
     setFileName([]);
+    field.onChange(undefined);
   };
   return (
     <div className="w-full h-full">
@@ -54,9 +61,12 @@ const UploadImageSong = (field: { field: any }) => {
                 e.stopPropagation();
                 removeImage();
               }}
+              disabled={isPending}
               variant="secondary"
               size="sm"
-              className="absolute top-2 right-2 z-10 h-8 w-8 p-0 bg-red-600 hover:bg-black/70 border-none"
+              className={`absolute top-2 right-2 z-10 h-8 w-8 p-0 ${
+                isPending ? "bg-red-400" : "bg-red-600"
+              } hover:bg-black/70 border-none`}
             >
               <X className="h-4 w-4 text-white" />
             </Button>
@@ -81,7 +91,7 @@ const UploadImageSong = (field: { field: any }) => {
               Drag & drop an image here, or click to select
             </p>
             <p className="text-gray-500 text-xs mt-1">
-              Supports: JPEG, PNG, GIF, WebP, SVG
+              Supports: JPEG, PNG, JPG
             </p>
           </div>
         )}

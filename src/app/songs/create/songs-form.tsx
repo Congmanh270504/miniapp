@@ -47,9 +47,14 @@ import { useRouter } from "next/navigation";
 interface SongFormProps {
   uploadedFiles: File[];
   artist: string;
+  duration: number; // Optional duration prop
 }
 
-export default function SongForm({ uploadedFiles, artist }: SongFormProps) {
+export default function SongForm({
+  uploadedFiles,
+  artist,
+  duration,
+}: SongFormProps) {
   const dispatch = useDispatch<AppDispatch>();
   const genres = useSelector((state: RootState) => state.genreSlice);
   const { isSignedIn, user, isLoaded } = useUser();
@@ -134,7 +139,6 @@ export default function SongForm({ uploadedFiles, artist }: SongFormProps) {
       toast.error("Error uploading file");
     }
   };
-  console.log(user?.id);
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsPending(true);
@@ -148,7 +152,13 @@ export default function SongForm({ uploadedFiles, artist }: SongFormProps) {
           return;
         }
 
-        const req = await createSong(songsCid, imagesCid, user.id, values);
+        const req = await createSong(
+          songsCid,
+          imagesCid,
+          user.id,
+          duration,
+          values
+        );
 
         if (req.ok) {
           toast.success(req.message || "Song uploaded successfully");
@@ -169,6 +179,8 @@ export default function SongForm({ uploadedFiles, artist }: SongFormProps) {
     form.reset();
     form.clearErrors();
   }
+  
+  console.log(duration)
 
   return (
     <Form {...form}>
@@ -184,7 +196,7 @@ export default function SongForm({ uploadedFiles, artist }: SongFormProps) {
             render={({ field }) => (
               <FormItem className="w-full ">
                 <FormControl>
-                  <UploadImageSong field={field} />
+                  <UploadImageSong field={field} isPending={isPending} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -217,6 +229,7 @@ export default function SongForm({ uploadedFiles, artist }: SongFormProps) {
                           placeholder="What is love"
                           type="text"
                           className="ps-9"
+                          disabled={isPending}
                           {...field}
                         />
                         <div
@@ -262,6 +275,7 @@ export default function SongForm({ uploadedFiles, artist }: SongFormProps) {
                         placeholder="what-is-love"
                         type="text"
                         className=""
+                        disabled={isPending}
                         {...field}
                       />
                     </FormControl>
@@ -287,6 +301,7 @@ export default function SongForm({ uploadedFiles, artist }: SongFormProps) {
                           placeholder="TWICE"
                           type="text"
                           className=" "
+                          disabled={isPending}
                           {...field}
                         />
                       </div>
@@ -320,6 +335,7 @@ export default function SongForm({ uploadedFiles, artist }: SongFormProps) {
                         key="select-1"
                         {...field}
                         onValueChange={field.onChange}
+                        disabled={isPending}
                       >
                         <SelectTrigger className="w-full ">
                           <SelectValue placeholder="Choose genre song type" />
@@ -360,7 +376,8 @@ export default function SongForm({ uploadedFiles, artist }: SongFormProps) {
                           key="text-input-3"
                           placeholder="http://localhost:3000/songs"
                           type="text"
-                          className=" "
+                          className=""
+                          disabled={isPending}
                           {...field}
                         />
                       </div>
@@ -394,6 +411,7 @@ export default function SongForm({ uploadedFiles, artist }: SongFormProps) {
                       <Textarea
                         placeholder="Status for this song"
                         className="resize-none"
+                        disabled={isPending}
                         {...field}
                       />
                     </FormControl>

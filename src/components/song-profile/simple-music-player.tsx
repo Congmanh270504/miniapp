@@ -13,7 +13,6 @@ import { AppDispatch, RootState } from "@/store/store";
 import { setPlaySong } from "@/store/playSong/state";
 import { SongWithUrls } from "../../../types/collection-types";
 
-
 export default function SimpleMusicPlayer({
   songs,
 }: {
@@ -38,12 +37,17 @@ export default function SimpleMusicPlayer({
     const audio = audioRef.current;
     if (!audio) return;
 
-    const currentSong = songs.find((song) => song.songId === playSong.id);
+    const foundSong = songs.find((song) => song.songId === playSong.id);
 
-    if (currentSong && playSong.id) {
+    if (foundSong && playSong.id) {
+      // Update current song if it's different
+      if (currentSong.songId !== foundSong.songId) {
+        setCurrentSong(foundSong);
+      }
+
       // Set the audio source if it's different
-      if (audio.src !== currentSong.musicFile.url) {
-        audio.src = currentSong.musicFile.url;
+      if (audio.src !== foundSong.musicFile.url) {
+        audio.src = foundSong.musicFile.url;
         audio.load();
 
         // Wait for the audio to be ready before playing
@@ -73,7 +77,7 @@ export default function SimpleMusicPlayer({
         }
       }
     }
-  }, [playSong.id, playSong.isPlaying, songs]);
+  }, [playSong.id, playSong.isPlaying, songs, currentSong.songId]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -86,6 +90,7 @@ export default function SimpleMusicPlayer({
     }
 
     setCurrentTime(0);
+    setDuration(0); // Reset duration when song changes
   }, [currentSong]);
 
   useEffect(() => {

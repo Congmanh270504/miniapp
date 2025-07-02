@@ -33,6 +33,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useUser } from "@clerk/nextjs";
+import { Suspense } from "react";
 
 export default function NavUser() {
   const { isMobile } = useSidebar();
@@ -60,9 +61,15 @@ export default function NavUser() {
     <SidebarMenu>
       {user ? (
         <SidebarMenuItem className="flex items-center justify-between">
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
+          <Suspense
+            fallback={
+              <div className="h-8 w-8 rounded-lg bg-gray-200 animate-pulse" />
+            }
+          >
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </Suspense>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton

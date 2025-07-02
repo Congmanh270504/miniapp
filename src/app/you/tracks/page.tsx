@@ -64,6 +64,7 @@ export default async function Page() {
         title: song.title,
         slug: song.slug, // Thêm slug vào dữ liệu
         artist: song.artist,
+        duration: song.duration, // Thêm duration vào dữ liệu
         musicFile: {
           cid: song.fileCid,
           url: musicUrl,

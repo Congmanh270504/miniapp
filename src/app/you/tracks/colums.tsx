@@ -23,7 +23,7 @@ import {
   Pause,
   ListEnd,
 } from "lucide-react";
-import { AudioDuration } from "@/components/custom/audio-duration";
+import { FaHeart } from "react-icons/fa";
 import { TrackCell } from "./track-cell";
 import { SongWithUrls } from "../../../../types/collection-types";
 import {
@@ -32,13 +32,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Link from "next/link";
+import { formatDuration } from "@/lib/audio-utils";
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 const engagements = [
   {
     id: 1,
     name: "Hearted",
-    icon: <Heart size={16} />,
+    icon: <FaHeart className="text-red-500" />,
   },
   {
     id: 2,
@@ -101,7 +102,11 @@ export const columns: ColumnDef<SongWithUrls>[] = [
     header: () => <div className="text-left">Artist</div>,
     cell: ({ row }) => {
       const track = row.original;
-      return <span className="text-sm text-gray-500 mr-8">{track.artist}</span>;
+      return (
+        <span className="text-sm text-gray-500 mr-8 dark:text-white">
+          {track.artist}
+        </span>
+      );
     },
     size: 120,
   },
@@ -110,12 +115,16 @@ export const columns: ColumnDef<SongWithUrls>[] = [
     header: () => <div className="text-left ml-4">Genre</div>,
     cell: ({ row }) => {
       const track = row.original;
-      return <span className="text-sm text-gray-500 ml-4">{track.genre}</span>;
+      return (
+        <span className="text-sm text-gray-500 ml-4 dark:text-white">
+          {track.genre}
+        </span>
+      );
     },
     size: 100,
   },
   {
-    accessorKey: "musicFile",
+    accessorKey: "duration",
     header: ({ column }) => (
       <div className="text-center">
         <Button
@@ -131,10 +140,13 @@ export const columns: ColumnDef<SongWithUrls>[] = [
     cell: ({ row }) => {
       const track = row.original;
       return (
-        <div className="text-center">
-          <AudioDuration url={track.musicFile.url} cid={track.musicFile.cid} />
-        </div>
+        <div className="text-center">{formatDuration(track.duration)}</div>
       );
+    },
+    sortingFn: (rowA, rowB) => {
+      const a = rowA.original.duration;
+      const b = rowB.original.duration;
+      return a - b;
     },
     size: 100,
   },

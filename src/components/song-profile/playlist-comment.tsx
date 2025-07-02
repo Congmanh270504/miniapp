@@ -50,6 +50,7 @@ const PlaylistComment = async ({
       <div className="h-9/10 overflow-hidden shadow-lg border border-gray-100 rounded-lg">
         <div className="w-full h-full relative bg-white rounded-lg shadow animate-fade-down animate-once animate-duration-500 animate-delay-500 animate-ease-linear animate-normal">
           <CommentSection
+            description={currentSongData.description}
             commentData={comments}
             userCreate={userCreateSongInfor}
           />
