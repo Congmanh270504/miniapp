@@ -12,6 +12,7 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
+  Music,
 } from "lucide-react";
 
 import {
@@ -31,11 +32,6 @@ import { Suspense } from "react";
 
 // This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   teams: [
     {
       name: "Acme Inc",
@@ -55,22 +51,22 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
+      title: "Songs",
+      url: "/songs",
+      icon: Music,
       isActive: true,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "All Songs",
+          url: "/songs",
         },
         {
-          title: "Starred",
-          url: "#",
+          title: "Favorites",
+          url: "/songs/heartSongs",
         },
         {
-          title: "Settings",
-          url: "#",
+          title: "Upload Music",
+          url: "/songs/create",
         },
       ],
     },

@@ -12,6 +12,8 @@ export default function PlayList({
 }: {
   playList: ProcessedSongsData;
 }) {
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+
   const formatLikes = (count: number): string => {
     if (count >= 1000000) {
       return `${(count / 1000000).toFixed(1)}M`;
@@ -20,7 +22,16 @@ export default function PlayList({
     }
     return count.toString();
   };
+  const handleImageError = (songId: string) => {
+    setFailedImages((prev) => new Set(prev).add(songId));
+  };
 
+  const getImageSrc = (song: any) => {
+    if (failedImages.has(song.songId)) {
+      return "/twice.png";
+    }
+    return song.imageFile?.url || "/placeholder.svg";
+  };
   return (
     <div className="rounded-lg text-black ">
       <div className="flex items-center justify-between p-4 pb-2">
@@ -38,10 +49,11 @@ export default function PlayList({
             <div className="flex items-center rounded-md p-2 hover:bg-gray-500/50">
               <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded">
                 <Image
-                  src={song.imageFile?.url || "/placeholder.svg"}
+                  src={getImageSrc(song)}
                   alt={song.title}
                   fill
                   className="object-cover"
+                  onError={() => handleImageError(song.songId)}
                 />
               </div>
               {/* <button className="absolute left-5 top-1/2 -translate-y-1/2 transform rounded-full bg-black/50 p-1 opacity-0 transition-opacity group-hover:opacity-100">

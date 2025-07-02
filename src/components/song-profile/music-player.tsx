@@ -10,7 +10,6 @@ import {
   Shuffle,
   Repeat,
   ChevronLeft,
-  Heart,
 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,6 @@ import { IoMdShuffle } from "react-icons/io";
 import { Repeat1 } from "lucide-react";
 import { GrChapterNext } from "react-icons/gr";
 import { GrChapterPrevious } from "react-icons/gr";
-import { FaHeart } from "react-icons/fa";
 import { Volume, Volume1, Volume2, VolumeX } from "lucide-react";
 import { HorizontalVolumeControl } from "@/components/custom/horizontal-volume-control";
 import MusicControls from "./music-controls";
@@ -30,13 +28,19 @@ import {
   ProcessedSongsData,
   ProcessedSongWithPinata,
 } from "../../../types/song-types";
+import { useHeartSong } from "@/hooks/useHeartSong";
+import { HeartButton } from "@/components/custom/heart-button";
 
 export default function MusicPlayer({
   songs,
   slug,
+  heart,
+  userId,
 }: {
   songs: ProcessedSongsData;
   slug: string;
+  heart: boolean;
+  userId: string;
 }) {
   const currentSongData = songs.find((song) => song.slug === slug);
   if (!currentSongData) {
@@ -44,9 +48,7 @@ export default function MusicPlayer({
   }
   const [currentSong, setCurrentSong] =
     useState<ProcessedSongWithPinata>(currentSongData);
-  const hearted = currentSong.hearted.find(
-    (hearted) => hearted.songId === currentSong.songId
-  );
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audio = audioRef.current;
   const [isPlaying, setIsPlaying] = useState(false);
@@ -54,7 +56,6 @@ export default function MusicPlayer({
   const [duration, setDuration] = useState(0);
   const [isShuffle, setIsShuffle] = useState(false);
   const [isRepeatOne, setIsRepeatOne] = useState(false);
-  const [isHearted, setIsHearted] = useState(hearted ? true : false);
   const [currentVolume, setCurrentVolume] = useState(50);
 
   useEffect(() => {
@@ -232,17 +233,12 @@ export default function MusicPlayer({
         >
           <ChevronLeft size={24} className="text-black dark:text-white" />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="inline-flex items-center justify-center rounded-md px-6 font-medium  shadow-neutral-500/20 transition active:scale-95 "
-          onClick={() => setIsHearted(!isHearted)}
-        >
-          <FaHeart
-            size={24}
-            className={isHearted ? "text-red-600" : "text-gray-400"}
-          />
-        </Button>
+        <HeartButton
+          songId={currentSong.songId}
+          initialHeartState={heart}
+          size={24}
+          debounceDelay={500}
+        />
       </div>
       {/* Album Art */}
       <div className="h-full">

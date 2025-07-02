@@ -14,7 +14,8 @@ import {
 } from "../../../../types/song-types";
 import Loading from "@/components/ui/loading";
 import { getSongsDataPinata } from "@/lib/actions/songs";
-
+import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 interface PageProps {
   params: {
     slug: string;
@@ -23,6 +24,11 @@ interface PageProps {
 
 export default async function Page({ params }: PageProps) {
   const { slug } = await params;
+  const user = await currentUser();
+
+  if (!user) {
+    redirect("/sign-in");
+  }
 
   const currentSong = await prisma.songs.findFirst({
     where: { slug: slug },
@@ -58,6 +64,11 @@ export default async function Page({ params }: PageProps) {
       </div>
     );
   }
+  const heartedSongs = currentSong.HeartedSongs.find(
+    (hearted) => hearted.userId === user?.id
+  );
+
+  const heart = heartedSongs ? true : false;
 
   // Lấy 9 bài hát random khác (loại trừ bài hát hiện tại)
   const otherSongs = await prisma.songs.findMany({
@@ -135,7 +146,12 @@ export default async function Page({ params }: PageProps) {
   return (
     <Suspense fallback={<Loading />}>
       <div className="flex w-full h-full p-4 gap-2 ">
-        <MusicPlayer slug={currentSong.slug} songs={songData} />
+        <MusicPlayer
+          slug={currentSong.slug}
+          songs={songData}
+          heart={heart}
+          userId={user.id}
+        />
         <PlaylistComment
           currentSong={currentSong.id}
           comments={currentSong.Comments}

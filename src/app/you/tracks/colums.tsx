@@ -159,7 +159,7 @@ export const columns: ColumnDef<SongWithUrls>[] = [
           {engagements.map((engagement) => (
             <Tooltip key={engagement.name}>
               <TooltipTrigger asChild>
-                <span className="flex items-center gap-2">
+                <span className="flex items-center gap-2 dark:text-white">
                   {engagement.icon}{" "}
                   {handleEngagements(row.original, engagement.id)}
                 </span>
@@ -207,18 +207,6 @@ export const columns: ColumnDef<SongWithUrls>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(song.songId)}
-              >
-                Copy song ID
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  navigator.clipboard.writeText(song.musicFile.url)
-                }
-              >
-                Copy music URL
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <Link href={`/songs/${song.slug}`}>View details</Link>
