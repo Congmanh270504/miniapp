@@ -12,6 +12,12 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "img.clerk.com",
       },
+      {
+        protocol: "https",
+        hostname: "red-tough-takin-185.mypinata.cloud",
+        port: "",
+        pathname: "/files/**",
+      },
     ],
   },
   experimental: {
@@ -19,7 +25,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "1gb",
     },
   },
-  devIndicators: false
+  devIndicators: false,
 };
 
 export default nextConfig;

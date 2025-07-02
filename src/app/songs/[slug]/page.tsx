@@ -17,15 +17,15 @@ import { getSongsDataPinata } from "@/lib/actions/songs";
 
 interface PageProps {
   params: {
-    id: string;
+    slug: string;
   };
 }
 
 export default async function Page({ params }: PageProps) {
-  const { id } = await params;
+  const { slug } = await params;
 
   const currentSong = await prisma.songs.findFirst({
-    where: { id: id },
+    where: { slug: slug },
     include: {
       Image: true,
       Genre: true,
@@ -112,6 +112,7 @@ export default async function Page({ params }: PageProps) {
       return {
         songId: song.id,
         title: song.title,
+        slug: song.slug, // Thêm slug vào dữ liệu
         artist: song.artist,
         clerkId: song.Users.clerkId || "", // Sử dụng clerkId từ Users nếu có
         description: song.description,
@@ -134,7 +135,7 @@ export default async function Page({ params }: PageProps) {
   return (
     <Suspense fallback={<Loading />}>
       <div className="flex w-full h-full p-4 gap-2 ">
-        <MusicPlayer songs={songData} />
+        <MusicPlayer slug={currentSong.slug} songs={songData} />
         <PlaylistComment
           currentSong={currentSong.id}
           comments={currentSong.Comments}

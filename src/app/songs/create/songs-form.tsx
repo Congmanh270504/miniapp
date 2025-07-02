@@ -44,15 +44,12 @@ import { createSong } from "@/lib/actions/songs";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 
-interface SongDetailsProps {
+interface SongFormProps {
   uploadedFiles: File[];
   artist: string;
 }
 
-export default function SongDetails({
-  uploadedFiles,
-  artist,
-}: SongDetailsProps) {
+export default function SongForm({ uploadedFiles, artist }: SongFormProps) {
   const dispatch = useDispatch<AppDispatch>();
   const genres = useSelector((state: RootState) => state.genreSlice);
   const { isSignedIn, user, isLoaded } = useUser();
@@ -67,11 +64,19 @@ export default function SongDetails({
       .min(1, { message: "This field is required" })
       .min(1, { message: "Must be at least 1 characters" })
       .max(60, { message: "Must be at most 60 characters" }),
+    slug: z
+      .string()
+      .min(1, { message: "This field is required" })
+      .regex(/^[a-z0-9-]+$/, {
+        message:
+          "Slug must contain only lowercase letters, numbers, and hyphens",
+      }),
     artistName: z
       .string()
       .min(1, { message: "This field is required" })
       .min(1, { message: "Must be at least 1 characters" })
       .max(30, { message: "Must be at most 30 characters" }),
+
     description: z
       .string()
       .min(1, { message: "Must be at least 1 characters" })
@@ -88,6 +93,7 @@ export default function SongDetails({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: uploadedFiles[0].name.replace(/\.[^/.]+$/, ""),
+      slug: toSlug(uploadedFiles[0].name.replace(/\.[^/.]+$/, "")),
       artistName: artist,
       description: "",
       genreId: "",
@@ -101,6 +107,16 @@ export default function SongDetails({
       form.setValue("artistName", artist);
     }
   }, [artist, form]);
+
+  // Auto-generate slug when title changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === "title" && value.title) {
+        form.setValue("slug", toSlug(value.title));
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   const handleFileUpload = async (file: File) => {
     try {
@@ -137,7 +153,7 @@ export default function SongDetails({
         if (req.ok) {
           toast.success(req.message || "Song uploaded successfully");
           form.reset();
-          router.push("/songs");
+          router.push("/you/tracks");
         } else {
           toast.error(req.message || "Failed to upload song");
         }
@@ -213,6 +229,45 @@ export default function SongDetails({
                       </div>
                     </FormControl>
 
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="slug"
+              render={({ field }) => (
+                <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
+                  <div className="flex gap-1.5 w-full">
+                    <FormLabel className="flex shrink-0 text-black">
+                      Slug
+                    </FormLabel>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="size-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>
+                          URL-friendly version of the title (auto-generated)
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+
+                  <div className="w-full">
+                    <FormControl>
+                      <Input
+                        key="text-input-slug"
+                        placeholder="what-is-love"
+                        type="text"
+                        className=""
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription className="text-sm text-gray-600 mt-1 ml-1">
+                      This will be used in the URL for your song
+                    </FormDescription>
                     <FormMessage />
                   </div>
                 </FormItem>
@@ -336,17 +391,8 @@ export default function SongDetails({
                   </div>
                   <div className="w-full">
                     <FormControl>
-                      {/* <div className="relative w-full">
-                        <Input
-                          key="text-input-2"
-                          placeholder="http://localhost:3000/songs"
-                          type="text"
-                          className=" "
-                          {...field}
-                        />
-                      </div> */}
                       <Textarea
-                        placeholder="Tell us a little bit about yourself"
+                        placeholder="Status for this song"
                         className="resize-none"
                         {...field}
                       />

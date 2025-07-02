@@ -6,7 +6,7 @@ import { Upload, FileAudio, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { parseBlob } from "music-metadata-browser";
-import SongDetails from "@/app/songs/create/songs-details";
+import SongForm from "@/app/songs/create/songs-form"
 
 export default function AudioUpload() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -77,7 +77,7 @@ export default function AudioUpload() {
         )}
         {uploadedFiles.length > 0 ? (
           <div className="border-2 border-solid rounded-lg border-white p-4">
-            <SongDetails uploadedFiles={uploadedFiles} artist={artist} />
+            <SongForm uploadedFiles={uploadedFiles} artist={artist} />
           </div>
         ) : (
           <div>

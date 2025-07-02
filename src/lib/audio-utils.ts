@@ -7,34 +7,71 @@ export async function getAudioDuration(url: string): Promise<number> {
     }
 
     const audio = new Audio();
+    let resolved = false;
     
-    // Set crossorigin to handle CORS
+    // Set crossorigin to handle CORS - try different values
     audio.crossOrigin = "anonymous";
     
-    audio.addEventListener('loadedmetadata', () => {
+    const cleanup = () => {
+      if (!resolved) {
+        resolved = true;
+        audio.src = '';
+        audio.load();
+      }
+    };
+
+    const handleLoadedMetadata = () => {
+      if (resolved) return;
+      
+      console.log('Audio duration loaded:', audio.duration, 'for URL:', url);
+      
       if (audio.duration && !isNaN(audio.duration) && audio.duration !== Infinity) {
+        resolved = true;
+        clearTimeout(timeout);
         resolve(audio.duration);
       } else {
+        console.warn('Invalid duration for audio:', url, audio.duration);
+        resolved = true;
+        clearTimeout(timeout);
         resolve(0);
       }
-    });
+      cleanup();
+    };
     
-    audio.addEventListener('error', (e) => {
-      console.error('Error loading audio:', url, e);
-      resolve(0); // Return 0 if error
-    });
+    const handleError = (e: any) => {
+      if (resolved) return;
+      console.error('Error loading audio metadata:', url, e);
+      resolved = true;
+      clearTimeout(timeout);
+      resolve(0);
+      cleanup();
+    };
 
     // Set timeout to avoid hanging
     const timeout = setTimeout(() => {
-      resolve(0);
-    }, 10000); // 10 seconds timeout
+      if (!resolved) {
+        console.warn('Audio loading timeout for:', url);
+        resolved = true;
+        resolve(0);
+        cleanup();
+      }
+    }, 15000); // 15 seconds timeout
 
-    audio.addEventListener('loadedmetadata', () => {
-      clearTimeout(timeout);
-    });
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('error', handleError);
+    audio.addEventListener('abort', handleError);
     
+    // Try to preload metadata
+    audio.preload = 'metadata';
     audio.src = url;
-    audio.load(); // Force load
+    
+    // Force load metadata
+    try {
+      audio.load();
+    } catch (error) {
+      console.error('Error calling audio.load():', error);
+      handleError(error);
+    }
   });
 }
 

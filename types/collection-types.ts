@@ -20,7 +20,7 @@ export type UsersType = {
   clerkId: string;
   createdAt: Date;
   updatedAt: Date;
-  
+
   Songs: SongsType[];
   Follows: FollowsType[];
   Comments: CommentsType[];
@@ -102,6 +102,7 @@ export type SongWithUrls = {
   songId: string;
   title: string;
   artist: string;
+  slug: string;
   musicFile: {
     cid: string;
     url: string;

@@ -31,10 +31,19 @@ import {
   ProcessedSongWithPinata,
 } from "../../../types/song-types";
 
-export default function MusicPlayer({ songs }: { songs: ProcessedSongsData }) {
-  const [currentSong, setCurrentSong] = useState<ProcessedSongWithPinata>(
-    songs[0]
-  );
+export default function MusicPlayer({
+  songs,
+  slug,
+}: {
+  songs: ProcessedSongsData;
+  slug: string;
+}) {
+  const currentSongData = songs.find((song) => song.slug === slug);
+  if (!currentSongData) {
+    throw new Error("Current song not found");
+  }
+  const [currentSong, setCurrentSong] =
+    useState<ProcessedSongWithPinata>(currentSongData);
   const hearted = currentSong.hearted.find(
     (hearted) => hearted.songId === currentSong.songId
   );

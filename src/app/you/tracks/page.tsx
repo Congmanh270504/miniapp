@@ -47,7 +47,7 @@ export default async function Page() {
       // Tạo access link cho file nhạc
       const musicUrl = await pinata.gateways.private.createAccessLink({
         cid: song.fileCid,
-        expires: 3600, // 1 hour
+        expires: 7200, // 2 hours
       });
 
       // Tạo access link cho ảnh (nếu có)
@@ -55,13 +55,14 @@ export default async function Page() {
       if (song.Image?.cid) {
         imageUrl = await pinata.gateways.private.createAccessLink({
           cid: song.Image.cid,
-          expires: 3600, // 1 hour
+          expires: 7200, // 2 hours
         });
       }
 
       return {
         songId: song.id,
         title: song.title,
+        slug: song.slug, // Thêm slug vào dữ liệu
         artist: song.artist,
         musicFile: {
           cid: song.fileCid,

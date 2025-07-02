@@ -25,6 +25,7 @@ model Genres{
 model Songs {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   title String
+  slug String @unique
   artist String @default("")
   description String @default("")
   fileCid String @unique

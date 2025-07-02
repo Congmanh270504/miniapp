@@ -209,7 +209,7 @@ export const columns: ColumnDef<SongWithUrls>[] = [
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <Link href={`/songs/${song.songId}`}>View details</Link>
+                <Link href={`/songs/${song.slug}`}>View details</Link>
               </DropdownMenuItem>
               <DropdownMenuItem>Edit song</DropdownMenuItem>
               <DropdownMenuItem>Delete song</DropdownMenuItem>

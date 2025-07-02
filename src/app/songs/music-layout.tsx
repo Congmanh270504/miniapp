@@ -11,66 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Play, SkipForward } from "lucide-react";
 import { useState } from "react";
-
-// Sample data for trending songs
-const trendingSongs = [
-  {
-    id: 1,
-    title: "Năm Bên Anh",
-    artist: "Minh Định, Hà An Huy",
-    image: "/placeholder.svg?height=200&width=200",
-    explicit: false,
-  },
-  {
-    id: 2,
-    title: "TŨNG",
-    artist: "EM XINH 'SAY HI', Lyly, Lâm Bảo Ngọc, Liu Grace",
-    image: "/placeholder.svg?height=200&width=200",
-    explicit: false,
-  },
-  {
-    id: 3,
-    title: "Billyeoon Goyangi (Do the Dance)",
-    artist: "ILLIT",
-    image: "/placeholder.svg?height=200&width=200",
-    explicit: false,
-  },
-  {
-    id: 4,
-    title: "Gabriela",
-    artist: "KATSEYE",
-    image: "/placeholder.svg?height=200&width=200",
-    explicit: false,
-  },
-  {
-    id: 5,
-    title: "Killin' It Girl (feat. GloRilla)",
-    artist: "j-hope, GloRilla",
-    image: "/placeholder.svg?height=200&width=200",
-    explicit: true,
-  },
-  {
-    id: 6,
-    title: "Mr Electric Blue",
-    artist: "Benson Boone",
-    image: "/placeholder.svg?height=200&width=200",
-    explicit: false,
-  },
-  {
-    id: 7,
-    title: "Lý Do",
-    artist: "Ngô Kiến Huy, AEP SIMON",
-    image: "/placeholder.svg?height=200&width=200",
-    explicit: false,
-  },
-  {
-    id: 8,
-    title: "Thi Quan Ronbon",
-    artist: "JUN ND",
-    image: "/placeholder.svg?height=200&width=200",
-    explicit: false,
-  },
-];
+import { ProcessedSongsData } from "../../../types/song-types";
+import Link from "next/link";
 
 // Sample data for popular artists
 const popularArtists = [
@@ -118,8 +60,12 @@ const popularArtists = [
   },
 ];
 
-export default function MusicLayout() {
-  const [hoveredSong, setHoveredSong] = useState<number | null>(null);
+export default function MusicLayout({
+  songData,
+}: {
+  songData: ProcessedSongsData;
+}) {
+  const [hoveredSong, setHoveredSong] = useState<string | null>(null);
 
   return (
     <div className="h-full text-white p-6">
@@ -145,54 +91,56 @@ export default function MusicLayout() {
             className="w-full"
           >
             <CarouselContent className="-ml-4">
-              {trendingSongs.map((song, index) => (
+              {songData.map((song, index) => (
                 <CarouselItem
                   key={index}
                   className="pl-4 basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
                 >
-                  <Card
-                    className="h-full shadow-lg transition-colors cursor-pointer group"
-                    onMouseEnter={() => setHoveredSong(song.id)}
-                    onMouseLeave={() => setHoveredSong(null)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="relative mb-3">
-                        <img
-                          src={"/twice.png"}
-                          alt={song.title}
-                          className="w-full aspect-square object-cover rounded-md"
-                        />
-                        {/* Hover overlay with play and next buttons */}
-                        {hoveredSong === song.id && (
-                          <div className="absolute inset-0  rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <div className="flex items-center gap-2">
-                              <Button
-                                size="sm"
-                                className="h-8 w-8 rounded-full bg-white text-black hover:bg-gray-200"
-                              >
-                                <Play className="h-4 w-4 fill-current" />
-                              </Button>
+                  <Link href={`/songs/${song.slug}`}>
+                    <Card
+                      className="h-full shadow-lg transition-colors cursor-pointer group"
+                      onMouseEnter={() => setHoveredSong(song.songId)}
+                      onMouseLeave={() => setHoveredSong(null)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="relative mb-3">
+                          <img
+                            src={song.imageFile.url}
+                            alt={song.title}
+                            className="w-full aspect-square object-cover rounded-md"
+                          />
+                          {/* Hover overlay with play and next buttons */}
+                          {hoveredSong === song.songId && (
+                            <div className="absolute inset-0  rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  size="sm"
+                                  className="h-8 w-8 rounded-full bg-white text-black hover:bg-gray-200"
+                                >
+                                  <Play className="h-4 w-4 fill-current" />
+                                </Button>
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                      <div className="space-y-1">
-                        <h3 className="font-medium text-sm leading-tight line-clamp-2">
-                          {song.title}
-                        </h3>
-                        <div className="flex items-center gap-1">
-                          {song.explicit && (
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          <h3 className="font-medium text-sm leading-tight line-clamp-2">
+                            {song.title}
+                          </h3>
+                          <div className="flex items-center gap-1">
+                            {/* {song.explicit && (
                             <span className="bg-gray-600 text-xs px-1 rounded text-gray-300">
                               E
                             </span>
-                          )}
-                          <p className="text-gray-400 text-xs line-clamp-2">
-                            {song.artist}
-                          </p>
+                          )} */}
+                            <p className="text-gray-400 text-xs line-clamp-2">
+                              {song.artist}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 </CarouselItem>
               ))}
             </CarouselContent>

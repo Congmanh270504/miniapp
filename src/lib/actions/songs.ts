@@ -4,6 +4,7 @@ import { SongsType } from "../../../types/collection-types";
 import { pinata } from "@/utils/config";
 interface CreateSongData {
   title: string;
+  slug: string;
   artistName: string;
   genreId: string;
   album?: string;
@@ -40,6 +41,7 @@ export async function createSong(
     const song = await prisma.songs.create({
       data: {
         title: data.title,
+        slug: data.slug,
         artist: data.artistName,
         genreId: data.genreId,
         userId: currentUser.id,

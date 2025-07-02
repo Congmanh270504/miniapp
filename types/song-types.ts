@@ -52,6 +52,7 @@ export type Genres = {
 export interface SongWithIncludes {
   id: string;
   title: string;
+  slug: string; // Added slug for URL-friendly identification
   artist: string;
   description: string;
   fileCid: string;
@@ -93,6 +94,7 @@ export interface ProcessedSongData {
 export interface ProcessedSongWithPinata {
   songId: string;
   title: string;
+  slug: string;
   artist: string;
   clerkId: string; // Clerk ID của user tạo bài hát
   description: string;
