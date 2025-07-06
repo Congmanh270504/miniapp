@@ -200,7 +200,9 @@ const Lightning: React.FC<LightningProps> = ({
     };
   }, [hue, xOffset, speed, intensity, size]);
 
-  return <canvas ref={canvasRef} className="w-full h-full relative" />;
+  return (
+    <canvas ref={canvasRef} className="w-full h-full relative rounded-2xl" />
+  );
 };
 
 export default Lightning;

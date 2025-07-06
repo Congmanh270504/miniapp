@@ -179,13 +179,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           />
           <Label htmlFor="theme-mode">{isLight ? "Dark" : "Light"} Mode</Label>
         </div>
-        <Suspense
+        {/* <Suspense
           fallback={
             <div className="h-8 w-8 rounded-lg bg-gray-200 animate-pulse" />
           }
         >
           <NavUser />
-        </Suspense>
+        </Suspense> */}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

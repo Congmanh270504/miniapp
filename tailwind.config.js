@@ -9,7 +9,17 @@ module.exports = {
             screens: {
                 '4k': '2500px', // breakpoint cho màn hình lớn hơn 24 inch
             },
+            keyframes: {
+                shine: {
+                    '0%': { 'background-position': '100%' },
+                    '100%': { 'background-position': '-100%' },
+                },
+            },
+            animation: {
+                shine: 'shine 5s linear infinite',
+            },
         },
+
     },
     plugins: [
         require('tailwindcss-motion'),
