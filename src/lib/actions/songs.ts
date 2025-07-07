@@ -1,6 +1,6 @@
 "use server";
 import { prisma } from "@/utils/prisma";
-import { SongsType } from "../../../types/collection-types";
+import { SongsType, SongWithUrls } from "../../../types/collection-types";
 import { pinata } from "@/utils/config";
 interface CreateSongData {
   title: string;
@@ -26,6 +26,34 @@ export async function createSong(
       return { ok: false, message: "User not found" };
     }
     // console.log(songsCid, imagesCid);
+    const isExistingSong = await prisma.songs.findFirst({
+      where: {
+        OR: [{ title: data.title }, { slug: data.slug }],
+      },
+    });
+
+    if (isExistingSong) {
+      // Kiểm tra xem trùng title hay slug để thông báo cụ thể
+      if (
+        isExistingSong.title === data.title &&
+        isExistingSong.slug === data.slug
+      ) {
+        return {
+          ok: false,
+          message: "Song with this title and slug already exists",
+        };
+      } else if (isExistingSong.title === data.title) {
+        return {
+          ok: false,
+          message: "Song with this title already exists",
+        };
+      } else {
+        return {
+          ok: false,
+          message: "Song with this slug already exists",
+        };
+      }
+    }
 
     // Tạo image trước
     const image = await prisma.imagesSongs.create({
@@ -82,5 +110,48 @@ export async function getSongsDataPinata(fileCid: string, imageCid: string) {
   } catch (error) {
     console.error("Error fetching song data:", error);
     return null;
+  }
+}
+export async function deletedSong(song: SongWithUrls) {
+  try {
+    // Xóa song từ database (tự động xóa các bản ghi liên quan nhờ onDelete: Cascade)
+    const deletedSong = await prisma.songs.delete({
+      where: { id: song.songId },
+    });
+
+    if (!deletedSong) {
+      return { ok: false, message: "Song not found" };
+    }
+
+    // Xóa files từ Pinata
+    const filesImage = await pinata.files.private
+      .list()
+      .cid(song.imageFile.cid);
+
+    if (!filesImage) {
+      return { ok: false, message: "Image file not found" };
+    }
+
+    const filesMusic = await pinata.files.private
+      .list()
+      .cid(song.musicFile.cid);
+
+    if (!filesMusic) {
+      return { ok: false, message: "Music file not found" };
+    }
+
+    const deleteFile = await pinata.files.private.delete([
+      filesImage.files[0].id,
+      filesMusic.files[0].id,
+    ]);
+
+    if (!deleteFile) {
+      return { ok: false, message: "Failed to delete files from Pinata" };
+    }
+
+    return { ok: true, message: `Song "${song.title}" deleted successfully!` };
+  } catch (error) {
+    console.error("Error deleting song:", error);
+    return { ok: false, message: "Failed to delete song" };
   }
 }

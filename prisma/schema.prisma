@@ -40,7 +40,7 @@ model Songs {
   Playlists Playlists[]
   HeartedSongs HeartedSongs[]
   Genre Genres @relation(fields: [genreId], references: [id])
-  Image ImagesSongs @relation(fields: [imageId], references: [id])
+  Image ImagesSongs @relation(fields: [imageId], references: [id], onDelete: Cascade)
   Users Users @relation(fields: [userId], references: [id])
 }
 
@@ -76,7 +76,7 @@ model Playlists {
   updatedAt DateTime @updatedAt
 
   Users Users @relation(fields: [userId], references: [id])
-  Songs Songs? @relation(fields: [songId], references: [id])
+  Songs Songs? @relation(fields: [songId], references: [id], onDelete: Cascade)
 }
 
 model Comments {
@@ -89,7 +89,7 @@ model Comments {
 
   Replies CommentsReplies[] @relation("CommentToReplies")
   Users Users @relation(fields: [userId], references: [id])
-  Songs Songs? @relation(fields: [songId], references: [id])
+  Songs Songs? @relation(fields: [songId], references: [id], onDelete: Cascade)
 }
 
 model CommentsReplies {
@@ -120,5 +120,5 @@ model HeartedSongs {
   updatedAt DateTime @updatedAt
 
   Users Users @relation(fields: [userId], references: [id])
-  Songs Songs @relation(fields: [songId], references: [id])
+  Songs Songs @relation(fields: [songId], references: [id], onDelete: Cascade)
 }

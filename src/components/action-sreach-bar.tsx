@@ -156,7 +156,7 @@ function ActionSearchBar({ actions = allActions }: { actions?: Action[] }) {
   return (
     <div className="w-full max-w-xl ml-auto">
       <div className="relative flex flex-col justify-start items-center ">
-        <div className="w-full max-w-sm sticky top-0 z-10 pt-4 pb-1">
+        <div className="w-full max-w-sm sticky top-0 z-10 pb-1">
           <div className="relative">
             <Input
               type="text"
@@ -166,7 +166,7 @@ function ActionSearchBar({ actions = allActions }: { actions?: Action[] }) {
               onChange={handleInputChange}
               onFocus={handleFocus}
               onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-              className="pl-3 pr-9 py-1.5 h-9 text-sm rounded-lg focus-visible:ring-offset-0"
+              className="pl-3 pr-9 py-1.5 h-9 text-sm rounded-lg border-border/20 focus-visible:ring-offset-0"
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4">
               <AnimatePresence mode="popLayout">

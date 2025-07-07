@@ -33,6 +33,70 @@ import {
 } from "@/components/ui/tooltip";
 import Link from "next/link";
 import { formatDuration } from "@/lib/audio-utils";
+import DeleteSongDialog from "@/app/songs/delete-song-dialog";
+import { useState } from "react";
+import { deletedSong } from "@/lib/actions/songs";
+import { toast } from "sonner";
+
+// Component wrapper for actions cell
+function ActionsCell({ song }: { song: SongWithUrls }) {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+
+  const handleDeleteSong = async () => {
+    try {
+      setIsPending(true);
+      const response = await deletedSong(song);
+      if (response.ok) {
+        // Handle successful deletion, e.g., show a success message or refresh the list
+        toast.success(`Song "${song.title}" deleted successfully!`);
+      } else {
+        // Handle error response
+        toast.error(`Failed to delete song: ${response.message}`);
+      }
+    } catch (error) {
+      console.error("Error deleting song:", error);
+    } finally {
+      setIsPending(false);
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <Link href={`/songs/${song.slug}`}>View details</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem>Edit song</DropdownMenuItem>
+          <DropdownMenuItem
+            className="text-red-600 focus:text-red-600"
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
+            Delete song
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DeleteSongDialog
+        isPending={isPending}
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleDeleteSong}
+        songTitle={song.title}
+      />
+    </>
+  );
+}
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 const engagements = [
@@ -198,23 +262,7 @@ export const columns: ColumnDef<SongWithUrls>[] = [
       const song = row.original;
       return (
         <div className="text-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Link href={`/songs/${song.slug}`}>View details</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>Edit song</DropdownMenuItem>
-              <DropdownMenuItem>Delete song</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ActionsCell song={song} />
         </div>
       );
     },

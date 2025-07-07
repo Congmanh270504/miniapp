@@ -1,9 +1,5 @@
 "use client";
 
-import Stepper, {
-  Step,
-} from "@/app/components/react-bit-component/Stepper/Stepper";
-import SplitText from "../ui/react-bits/text-animations/SplitText/SplitText";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Upload, Music4, Info } from "lucide-react";
@@ -16,14 +12,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import Stepper, {
+  Step,
+} from "../ui/react-bits/react-bit-component/Stepper/Stepper";
 
 export function StepperWrapper() {
   return (

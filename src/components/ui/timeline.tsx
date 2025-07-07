@@ -1,9 +1,9 @@
 "use client";
 
-import ShinyText from "@/app/components/text-animations/ShinyText/ShinyText";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
 import { Upload, Settings, UserPlus, MessageCircle } from "lucide-react";
+import ShinyText from "./react-bits/text-animations/ShinyText/ShinyText";
 
 const experiences = [
   {

@@ -37,10 +37,13 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
-          <header className="sticky top-0 z-[9999] bg-background/95 backdrop-blur-sm border-b border-border/40 flex h-16 shrink-0 items-center gap-2 transition-all duration-200 ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 supports-[backdrop-filter]:bg-background/60">
+          <header className="sticky top-0 z-[9999] bg-background/2 backdrop-blur-md border-b border-border/30 flex h-16 shrink-0 items-center gap-2 transition-all duration-200 ease-linear">
             <div className="flex items-center gap-2 px-4 w-full">
               <SidebarTrigger className="-ml-1" />
-              <Separator orientation="vertical" className="mr-2 h-4" />
+              <Separator
+                orientation="vertical"
+                className="mr-2 h-4 bg-gray-300 dark:bg-gray-500"
+              />
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden md:block">

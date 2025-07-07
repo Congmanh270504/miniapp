@@ -3,6 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { SocialLinks } from "@/components/custom/social-links";
 import { NewsletterSignup } from "@/components/custom/newsletter-signup";
+import VN from "country-flag-icons/react/3x2/VN";
 
 const footerData = {
   sections: [
@@ -11,6 +12,8 @@ const footerData = {
       links: [
         { name: "All Songs", href: "/songs" },
         { name: "Favorites", href: "/songs/favorites" },
+        { name: "Trending Now", href: "/trending" },
+        { name: "New Releases", href: "/new-releases" },
       ],
     },
     {
@@ -25,13 +28,6 @@ const footerData = {
       links: [
         { name: "Profile Settings", href: "/profile" },
         { name: "Subscription", href: "/subscription" },
-      ],
-    },
-    {
-      title: "Discover",
-      links: [
-        { name: "Trending Now", href: "/trending" },
-        { name: "New Releases", href: "/new-releases" },
       ],
     },
     {
@@ -75,41 +71,62 @@ const footerData = {
 export default function Footer() {
   return (
     <footer className="bg-white border-t border-gray-200 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="py-12 lg:py-16">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-            {footerData.sections.map((section, index) => (
-              <div key={index} className="col-span-1">
-                <h3 className="text-sm font-medium text-gray-900 mb-4">
-                  {section.title}
-                </h3>
-                {section.links && (
-                  <ul className="space-y-3">
-                    {section.links.map((link, linkIndex) => (
-                      <li key={linkIndex}>
-                        <Link
-                          href={link.href}
-                          className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                        >
-                          {link.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Contact Information - Left Side */}
+            <div className="col-span-1">
+              <h3 className="text-sm font-medium text-gray-900 mb-4">
+                Contact Us
+              </h3>
+              <ul className="space-y-3">
+                <li className="flex items-center space-x-3">
+                  <Phone className="h-4 w-4 text-green-600" />
+                  <Link
+                    href="tel:+1234567890"
+                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    +1 (234) 567-8900
+                  </Link>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <Mail className="h-4 w-4 text-red-500" />
+                  <Link
+                    href="mailto:contact@company.com"
+                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    contact@company.com
+                  </Link>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <MapPin className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm text-gray-600">
+                    123 Innovation Drive, Tech City, TC 12345
+                  </span>
+                </li>
+              </ul>
 
-                {section.subSections &&
-                  section.subSections.map((subSection, subIndex) => (
-                    <div
-                      key={subIndex}
-                      className={subIndex > 0 ? "mt-8" : "mt-8"}
-                    >
-                      <h3 className="text-sm font-medium text-gray-900 mb-4">
-                        {subSection.title}
-                      </h3>
+              {/* Social Media */}
+              <div className="mt-8">
+                <h3 className="text-sm font-medium text-gray-900 mb-4">
+                  Follow Us
+                </h3>
+                <SocialLinks />
+              </div>
+            </div>
+
+            {/* Main Footer Links - Right Side */}
+            <div className="col-span-1 lg:col-span-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                {footerData.sections.map((section, index) => (
+                  <div key={index} className="col-span-1">
+                    <h3 className="text-sm font-medium text-gray-900 mb-4">
+                      {section.title}
+                    </h3>
+                    {section.links && (
                       <ul className="space-y-3">
-                        {subSection.links.map((link, linkIndex) => (
+                        {section.links.map((link, linkIndex) => (
                           <li key={linkIndex}>
                             <Link
                               href={link.href}
@@ -120,60 +137,33 @@ export default function Footer() {
                           </li>
                         ))}
                       </ul>
-                    </div>
-                  ))}
-              </div>
-            ))}
+                    )}
 
-            <div className="col-span-2 md:col-span-3 lg:col-span-6">
-              <Separator className="bg-gray-200 my-8" />
-            </div>
-
-            {/* Contact Information */}
-            <div className="col-span-2 md:col-span-3 lg:col-span-6 mt-8 lg:mt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Contact Details */}
-                <div>
-                  <h3 className="text-sm font-medium text-gray-900 mb-4">
-                    Contact Us
-                  </h3>
-                  <ul className="space-y-3">
-                    <li className="flex items-center space-x-3">
-                      <Phone className="h-4 w-4 text-green-600" />
-                      <Link
-                        href="tel:+1234567890"
-                        className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                      >
-                        +1 (234) 567-8900
-                      </Link>
-                    </li>
-                    <li className="flex items-center space-x-3">
-                      <Mail className="h-4 w-4 text-red-500" />
-                      <Link
-                        href="mailto:contact@company.com"
-                        className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                      >
-                        contact@company.com
-                      </Link>
-                    </li>
-                    <li className="flex items-center space-x-3">
-                      <MapPin className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm text-gray-600">
-                        123 Innovation Drive, Tech City, TC 12345
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-
-                {/* Social Media */}
-                <div>
-                  <h3 className="text-sm font-medium text-gray-900 mb-4">
-                    Follow Us
-                  </h3>
-                  <SocialLinks />
-
-                  <NewsletterSignup />
-                </div>
+                    {section.subSections &&
+                      section.subSections.map((subSection, subIndex) => (
+                        <div
+                          key={subIndex}
+                          className={subIndex > 0 ? "mt-8" : "mt-8"}
+                        >
+                          <h3 className="text-sm font-medium text-gray-900 mb-4">
+                            {subSection.title}
+                          </h3>
+                          <ul className="space-y-3">
+                            {subSection.links.map((link, linkIndex) => (
+                              <li key={linkIndex}>
+                                <Link
+                                  href={link.href}
+                                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                                >
+                                  {link.name}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -226,7 +216,9 @@ export default function Footer() {
                 </Link>
               </div>
             </div>
-            <div className="text-sm text-gray-500">United States</div>
+            <div className="text-sm text-gray-500 flex items-center gap-2">
+              Việt Nam | <VN className="w-4 h-4" />
+            </div>
           </div>
         </div>
       </div>

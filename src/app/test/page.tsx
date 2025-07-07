@@ -1,36 +1,50 @@
 import { Button } from "@/components/ui/button";
-import React from "react";
-import { pinata } from "@/utils/config";
-import Image from "next/image";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-const Page = async () => {
-  const cid = "bafkreieqqy6tlfouuwlz3uvculj5fg4yen23iy46nnxzdltztzbpx5vkse";
-
-  // Lấy thông tin metadata của ảnh
-  const imageUrl = await pinata.gateways.private.createAccessLink({
-    cid: "bafkreieqqy6tlfouuwlz3uvculj5fg4yen23iy46nnxzdltztzbpx5vkse",
-    expires: 3600, // Link sẽ hết hạn sau 1 giờ
-  });
-
-  console.log("imageUrl", imageUrl);
-
+export default function Page() {
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Pinata Image Display</h1>
-
-      {/* Hiển thị ảnh sử dụng Next.js Image component */}
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold mb-2">Using Next.js Image:</h2>
-        <Image
-          src={imageUrl}
-          alt="Pinata Image"
-          width={400}
-          height={300}
-          className="rounded-lg shadow-lg"
-        />
-      </div>
-    </div>
+    <Dialog>
+      <form>
+        <DialogTrigger asChild>
+          <Button variant="outline">Open Dialog</Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit profile</DialogTitle>
+            <DialogDescription>
+              Make changes to your profile here. Click save when you&apos;re
+              done.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <div className="grid gap-3">
+              <Label htmlFor="name-1">Name</Label>
+              <Input id="name-1" name="name" defaultValue="Pedro Duarte" />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="username-1">Username</Label>
+              <Input id="username-1" name="username" defaultValue="@peduarte" />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button type="submit">Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </form>
+    </Dialog>
   );
-};
-
-export default Page;
+}

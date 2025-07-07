@@ -5,7 +5,6 @@ import Lightning from "@/components/ui/react-bits/backgrounds/Lightning/Lightnin
 import { ArrowRight, Github, Linkedin, Mail, Twitter } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import TiltedCard from "./components/react-bit-component/TiltedCard/TiltedCard";
 import { SocialLinks } from "@/components/custom/social-links";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Timeline } from "@/components/ui/timeline";
@@ -14,6 +13,7 @@ import { ProcessedSongsData } from "../../types/song-types";
 import { pinata } from "@/utils/config";
 import { TrendingSongs } from "@/components/custom/trending-songs";
 import { StepperWrapper } from "@/components/custom/stepper-wrapper";
+import TiltedCard from "@/components/ui/react-bits/react-bit-component/TiltedCard/TiltedCard";
 
 export default async function Page() {
   const data = await prisma.songs.findMany({
@@ -77,8 +77,8 @@ export default async function Page() {
     })
   );
   return (
-    <div className="min-h-screen flex flex-col p-4">
-      <div className="flex-1">
+    <div className="min-h-screen flex flex-col ">
+      <div className="flex-1 p-4">
         <section className="relative min-h-screen overflow-hidden">
           <div className="absolute inset-0 z-0">
             <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
@@ -86,7 +86,7 @@ export default async function Page() {
             <div className="absolute bottom-20 left-1/3 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
           </div>
 
-          <div className="container relative z-10 mt-10 mb-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="container relative z-10 mt-10 mb-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center justify-self-center">
             <div className="space-y-6">
               <div className="inline-block">
                 <div className="relative px-3 py-1 text-sm font-medium rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-4">
@@ -103,9 +103,9 @@ export default async function Page() {
                 </div>
               </h1>
               <p className="text-xl text-zinc-400 w-full ">
-                Hey there! I've built this music app to help you discover new
-                tracks, create personalized playlists, and connect with fellow
-                music lovers in one beautiful platform.
+                Hey there! I've built this music website to help you discover
+                new tracks, create personalized playlists, and connect with
+                fellow music lovers in one beautiful platform.
               </p>
               <div className="flex flex-wrap gap-4 pt-4">
                 <Button className="bg-gradient-to-r from-purple-500 to-pink-500 border-0 group relative inline-flex  items-center justify-center overflow-hidden rounded-md px-6 font-medium duration-500">
@@ -131,7 +131,8 @@ export default async function Page() {
             <div className="flex justify-center h-full">
               {/* <CreativeHero /> */}
               <TiltedCard
-                imageSrc="https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58"
+                // imageSrc="https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58"
+                imageSrc="/twice.png"
                 altText="Kendrick Lamar - GNX Album Cover"
                 captionText="Kendrick Lamar - GNX"
                 containerHeight="300px"

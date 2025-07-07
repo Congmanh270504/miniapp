@@ -12,6 +12,7 @@ import React, {
 } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import SplitText from "../../text-animations/SplitText/SplitText";
+import { Button } from "@/components/ui/button";
 
 interface StepperProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
@@ -93,7 +94,7 @@ export default function Stepper({
       {...rest}
     >
       <SplitText
-        text="Step upload file songs"
+        text="Steps upload file songs"
         className="text-6xl font-semibold text-center text-black mb-6"
         delay={100}
         duration={0.6}
@@ -167,7 +168,7 @@ export default function Stepper({
                   className={`duration-350 rounded px-2 py-1 transition cursor-pointer relative z-[104] ${
                     currentStep === 1
                       ? "pointer-events-none opacity-50 text-neutral-400"
-                      : "text-neutral-400 hover:text-neutral-700"
+                      : "text-neutral-500 hover:text-neutral-700"
                   }`}
                   disabled={currentStep === 1}
                   style={{ pointerEvents: currentStep === 1 ? "none" : "auto" }}
