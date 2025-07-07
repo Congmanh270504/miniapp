@@ -36,10 +36,6 @@ import {
 import { useUser } from "@clerk/nextjs";
 import { toSlug } from "@/lib/hepper";
 import { TypographyH2 } from "@/components/ui/typography";
-import { getUser } from "@/lib/actions/users";
-import { current } from "@reduxjs/toolkit";
-import { UsersType } from "../../../../types/collection-types";
-import { currentUser } from "@clerk/nextjs/server";
 import { createSong } from "@/lib/actions/songs";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
@@ -129,7 +125,7 @@ export default function SongForm({
       data.set("songs", file);
       data.set("images", form.getValues("songsImages"));
 
-      const uploadFile = await fetch("/api/uploadFiles", {
+      const uploadFile = await fetch("/api/uploadFiles/create", {
         method: "POST",
         body: data,
       });
@@ -179,8 +175,6 @@ export default function SongForm({
     form.reset();
     form.clearErrors();
   }
-  
-  console.log(duration)
 
   return (
     <Form {...form}>

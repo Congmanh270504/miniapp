@@ -16,6 +16,7 @@ import Loading from "@/components/ui/loading";
 import { getSongsDataPinata } from "@/lib/actions/songs";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+
 interface PageProps {
   params: {
     slug: string;

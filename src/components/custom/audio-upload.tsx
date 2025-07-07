@@ -37,7 +37,7 @@ export default function AudioUpload() {
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
     accept: {
-      "audio/*": [".wav", ".flac", ".aiff", ".alac", ".mp3", ".m4a", ".ogg"],
+      "audio/*": [".mp3", ".mp4"],
     },
     maxSize: 50 * 1024 * 1024, // 50MB
     noClick: true,
@@ -45,16 +45,6 @@ export default function AudioUpload() {
     maxFiles: 1,
     multiple: false,
   });
-
-  const formatDuration = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
-  
-  console.log(uploadedFiles);
-  console.log("Duration:", duration, "seconds");
-  console.log("Formatted duration:", formatDuration(duration));
 
   return (
     <div className="h-fit text-white p-6 ">

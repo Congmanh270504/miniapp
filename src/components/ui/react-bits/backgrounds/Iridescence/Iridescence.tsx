@@ -51,6 +51,7 @@ interface IridescenceProps {
   speed?: number;
   amplitude?: number;
   mouseReact?: boolean;
+  children?: React.ReactNode;
 }
 
 export default function Iridescence({
@@ -58,6 +59,7 @@ export default function Iridescence({
   speed = 1.0,
   amplitude = 0.1,
   mouseReact = true,
+  children,
   ...rest
 }: IridescenceProps) {
   const ctnDom = useRef<HTMLDivElement>(null);
@@ -144,9 +146,11 @@ export default function Iridescence({
 
   return (
     <div ref={ctnDom} className="w-full h-full" {...rest}>
-      <div className="absolute top-20 inset-0 h-fit 2xl:top-28">
-        <AudioUpload />
-      </div>
+      {children || (
+        <div className="absolute top-20 inset-0 h-fit 2xl:top-28">
+          <AudioUpload />
+        </div>
+      )}
     </div>
   );
 }

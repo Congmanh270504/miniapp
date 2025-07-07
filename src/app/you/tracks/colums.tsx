@@ -77,7 +77,9 @@ function ActionsCell({ song }: { song: SongWithUrls }) {
           <DropdownMenuItem>
             <Link href={`/songs/${song.slug}`}>View details</Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>Edit song</DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link href={`/songs/edit/${song.slug}`}>Edit song</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem
             className="text-red-600 focus:text-red-600"
             onClick={() => setIsDeleteDialogOpen(true)}

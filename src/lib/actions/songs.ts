@@ -102,16 +102,19 @@ export async function getSongsDataPinata(fileCid: string, imageCid: string) {
       cid: imageCid,
       expires: 3600, // 1 hour
     });
+    const imageTitle = await pinata.files.private.list().cid(imageCid);
 
     return {
       musicUrl,
       imageUrl,
+      imageTitle: imageTitle.files[0].name, // Lấy tên file từ danh sách
     };
   } catch (error) {
     console.error("Error fetching song data:", error);
     return null;
   }
 }
+
 export async function deletedSong(song: SongWithUrls) {
   try {
     // Xóa song từ database (tự động xóa các bản ghi liên quan nhờ onDelete: Cascade)
@@ -153,5 +156,100 @@ export async function deletedSong(song: SongWithUrls) {
   } catch (error) {
     console.error("Error deleting song:", error);
     return { ok: false, message: "Failed to delete song" };
+  }
+}
+export async function updateSong(
+  songId: string,
+  data: {
+    title: string;
+    slug: string;
+    artistName: string;
+    description?: string;
+    genreId: string;
+  },
+  imagesCid?: string
+) {
+  try {
+    // Check if title or slug already exists for other songs
+    const isExistingSong = await prisma.songs.findFirst({
+      where: {
+        AND: [
+          { id: { not: songId } }, // Exclude current song
+          {
+            OR: [{ title: data.title }, { slug: data.slug }],
+          },
+        ],
+      },
+    });
+
+    if (isExistingSong) {
+      if (
+        isExistingSong.title === data.title &&
+        isExistingSong.slug === data.slug
+      ) {
+        return {
+          ok: false,
+          message: "Another song with this title and slug already exists",
+        };
+      } else if (isExistingSong.title === data.title) {
+        return {
+          ok: false,
+          message: "Another song with this title already exists",
+        };
+      } else {
+        return {
+          ok: false,
+          message: "Another song with this slug already exists",
+        };
+      }
+    }
+
+    let updateData: any = {
+      title: data.title,
+      slug: data.slug,
+      artist: data.artistName,
+      description: data.description,
+      genreId: data.genreId,
+    };
+
+    // If new image is provided, update the image
+    if (imagesCid) {
+      const currentSong = await prisma.songs.findUnique({
+        where: { id: songId },
+        include: { Image: true },
+      });
+
+      if (!currentSong) {
+        return { ok: false, message: "Song not found" };
+      }
+      // delete image in pinata clound
+      const filesImage = await pinata.files.private
+        .list()
+        .cid(currentSong.Image.cid);
+
+      await pinata.files.private.delete([filesImage.files[0].id]);
+
+      if (currentSong) {
+        // Update existing image record
+        await prisma.imagesSongs.update({
+          where: { id: currentSong.imageId },
+          data: { cid: imagesCid },
+        });
+      }
+    }
+
+    const updatedSong = await prisma.songs.update({
+      where: { id: songId },
+      data: updateData,
+    });
+
+    if (!updatedSong) {
+      return { ok: false, message: "Failed to update song" };
+    }
+
+    return { ok: true, message: "Song updated successfully" };
+  } catch (error) {
+    console.error("Error updating song:", error);
+    return { ok: false, message: "Failed to update song" };
   }
 }
