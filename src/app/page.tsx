@@ -81,9 +81,10 @@ export default async function Page() {
       <div className="flex-1 p-4">
         <section className="relative min-h-screen overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+            <div className="absolute top-20 left-30 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
             <div className="absolute top-40 right-10 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
             <div className="absolute bottom-20 left-1/3 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+            <div className="absolute top-1/4 right-1/3 w-72 h-72 bg-[#06923E] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
           </div>
 
           <div className="container relative z-10 mt-10 mb-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center justify-self-center">
@@ -131,7 +132,6 @@ export default async function Page() {
             <div className="flex justify-center h-full">
               {/* <CreativeHero /> */}
               <TiltedCard
-                // imageSrc="https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58"
                 imageSrc="/twice.png"
                 altText="Kendrick Lamar - GNX Album Cover"
                 captionText="Kendrick Lamar - GNX"
@@ -160,13 +160,16 @@ export default async function Page() {
           <StepperWrapper />
         </section>
 
-        <section className="py-12">
+        <section className="py-12 mt-[15em] relative w-full overflow-hidden">
           <TrendingSongs songData={songData} />
+
+          <div className="absolute top-[1em] left-[4em] z-0 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15"></div>
+          <div className="absolute bottom-[1em] right-[4em] z-0 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15"></div>
         </section>
 
         <section
           id="experience"
-          className="py-2 relative w-full overflow-hidden justify-items-center mb-10"
+          className="py-2 relative w-full overflow-hidden justify-items-center mb-10 mt-[15em]"
         >
           <div className="absolute inset-0 z-0">
             <div className="absolute top-1/3 right-1/3 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>

@@ -19,7 +19,7 @@ import Stepper, {
 export function StepperWrapper() {
   return (
     <div
-      className="w-full relative z-[100] mt-10"
+      className="w-full relative z-[100] mt-[15em]"
       style={{ position: "relative", zIndex: 100 }}
     >
       <Stepper

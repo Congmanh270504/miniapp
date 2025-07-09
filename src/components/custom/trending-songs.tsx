@@ -28,7 +28,7 @@ export const TrendingSongs: React.FC<TrendingSongsProps> = ({ songData }) => {
         <h1 className="text-2xl font-bold text-foreground dark:text-white">
           <SplitText
             text="Trending songs"
-            className="text-6xl font-semibold text-center text-black"
+            className="text-6xl font-semibold text-center bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent"
             delay={100}
             duration={0.6}
             ease="power3.out"

@@ -34,7 +34,7 @@ export function SectionHeading({ title, subtitle }: SectionHeadingProps) {
       >
         <SplitText
           text={title}
-          className="text-6xl font-semibold text-center text-black"
+          className="text-6xl font-semibold text-center bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text"
           delay={100}
           duration={0.6}
           ease="power3.out"

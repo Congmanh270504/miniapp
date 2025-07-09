@@ -95,7 +95,7 @@ export default function Stepper({
     >
       <SplitText
         text="Steps upload file songs"
-        className="text-6xl font-semibold text-center text-black mb-6"
+        className="text-6xl font-semibold text-center bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent mb-6"
         delay={100}
         duration={0.6}
         ease="power3.out"
