@@ -33,66 +33,43 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useUser } from "@clerk/nextjs";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import ClientOnly from "../ClientOnly";
 
 export default function NavUser() {
   const { isMobile } = useSidebar();
   const { isSignedIn, user, isLoaded } = useUser();
 
-  // Always render SidebarMenu to avoid hydration mismatch
-  // Wait for Clerk to load before showing actual content
-  if (!isLoaded) {
-    return (
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <div className="flex items-center gap-2 p-2">
-            <div className="h-8 w-8 rounded-lg bg-gray-200 animate-pulse" />
-            <div className="flex-1">
-              <div className="h-4 bg-gray-200 rounded animate-pulse mb-1" />
-              <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3" />
-            </div>
+  const LoadingSkeleton = () => (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <div className="flex items-center gap-2 p-2">
+          <div className="h-8 w-8 rounded-lg bg-gray-200 animate-pulse" />
+          <div className="flex-1">
+            <div className="h-4 bg-gray-200 rounded animate-pulse mb-1" />
+            <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3" />
           </div>
-        </SidebarMenuItem>
-      </SidebarMenu>
-    );
+        </div>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+
+  if (!isLoaded) {
+    return <LoadingSkeleton />;
   }
 
   return (
-    <SidebarMenu>
-      {user ? (
-        <SidebarMenuItem className="flex items-center justify-between">
-          <Suspense
-            fallback={
-              <div className="h-8 w-8 rounded-lg bg-gray-200 animate-pulse" />
-            }
-          >
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </Suspense>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              >
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.fullName}</span>
-                  <span className="truncate text-xs">
-                    {user.emailAddresses[0].emailAddress}
-                  </span>
-                </div>
-                <ChevronsUpDown className="ml-auto size-4" />
-              </SidebarMenuButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-              side={isMobile ? "bottom" : "right"}
-              align="end"
-              sideOffset={4}
-            >
-              <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+    <ClientOnly fallback={<LoadingSkeleton />}>
+      <SidebarMenu>
+        {user ? (
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage
                       src={user.imageUrl}
@@ -108,58 +85,87 @@ export default function NavUser() {
                       {user.emailAddresses[0].emailAddress}
                     </span>
                   </div>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
+                  <ChevronsUpDown className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+                side={isMobile ? "bottom" : "right"}
+                align="end"
+                sideOffset={4}
+              >
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage
+                        src={user.imageUrl}
+                        alt={user.fullName ? user.fullName : "User"}
+                      />
+                      <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-medium">
+                        {user.fullName}
+                      </span>
+                      <span className="truncate text-xs">
+                        {user.emailAddresses[0].emailAddress}
+                      </span>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <Sparkles />
+                    Upgrade to Pro
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <Sparkles />
+                    View Profile
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <CreditCard />
+                    Billing
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Bell />
+                    Notifications
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <Sparkles />
-                  Upgrade to Pro
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <CreditCard />
-                  Billing
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Bell />
-                  Notifications
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <SignOutButton>
-                  <span className="flex items-center gap-2">
-                    <LogOut />
+                  <SignOutButton>
+                    {/* <LogOut />
+                    <span className="flex items-center gap-2"></span> */}
                     Log out
-                  </span>
-                </SignOutButton>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarMenuItem>
-      ) : (
-        <SidebarMenuItem>
-          <div className="flex items-center gap-2 p-2">
-            <SignedOut>
-              <div className="flex gap-2">
-                <SignInButton mode="modal">
-                  <button className="text-sm text-blue-600 hover:text-blue-800">
-                    Sign In
-                  </button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <button className="text-sm text-blue-600 hover:text-blue-800">
-                    Sign Up
-                  </button>
-                </SignUpButton>
-              </div>
-            </SignedOut>
-          </div>
-        </SidebarMenuItem>
-      )}
-    </SidebarMenu>
+                  </SignOutButton>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        ) : (
+          <SidebarMenuItem>
+            <div className="flex items-center justify-center gap-2 p-2">
+              <SignInButton mode="modal">
+                <Button variant="outline" size="sm">
+                  Sign In
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button variant="outline" size="sm">
+                  Sign Up
+                </Button>
+              </SignUpButton>
+            </div>
+          </SidebarMenuItem>
+        )}
+      </SidebarMenu>
+    </ClientOnly>
   );
 }

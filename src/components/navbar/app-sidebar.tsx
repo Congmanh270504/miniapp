@@ -29,6 +29,7 @@ import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 import NavUser from "./nav-user";
 import { Suspense } from "react";
+import ClientOnly from "../ClientOnly";
 
 // This is sample data.
 const data = {
@@ -179,13 +180,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           />
           <Label htmlFor="theme-mode">{isLight ? "Dark" : "Light"} Mode</Label>
         </div>
-        {/* <Suspense
-          fallback={
-            <div className="h-8 w-8 rounded-lg bg-gray-200 animate-pulse" />
-          }
-        >
-          <NavUser />
-        </Suspense> */}
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
