@@ -5,9 +5,9 @@ import Iridescence from "@/components/ui/react-bits/backgrounds/Iridescence/Irid
 import EditSongForm from "./edit-song-form";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 const Page = async ({ params }: PageProps) => {
   const { slug } = await params;
