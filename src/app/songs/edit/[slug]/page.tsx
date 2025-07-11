@@ -4,10 +4,11 @@ import Image from "next/image";
 import React from "react";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
+
 const Page = async ({ params }: PageProps) => {
   const { slug } = await params;
   const currentSong = await prisma.songs.findFirst({

@@ -24,18 +24,6 @@ function ActionSearchBar() {
   const users = data?.users || [];
   const allResults = [...songs, ...users];
 
-  // Debug logs để kiểm tra states
-  console.log("Debug:", {
-    query: query,
-    debouncedQuery: debouncedQuery,
-    isFetching: isFetching,
-    error: error,
-    hasData: !!data,
-    songsLength: songs.length,
-    usersLength: users.length,
-    allResultsLength: allResults.length,
-  });
-
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

@@ -43,9 +43,9 @@ const getCachedOtherSongs = unstable_cache(
 );
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export default async function Page({ params }: PageProps) {

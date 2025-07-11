@@ -63,7 +63,6 @@ const getCachedTrendingSongs = unstable_cache(
       });
 
       if (!songs.length) {
-        console.log("⚠️ No songs found for home page");
         return [];
       }
 

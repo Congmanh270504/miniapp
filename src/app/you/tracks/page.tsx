@@ -76,8 +76,6 @@ export default async function Page() {
     );
   }
 
-  console.log(`Loading ${data.Songs.length} songs for user tracks`);
-
   // Performance optimization: Batch create access links
   const { musicUrls, imageUrls } = await createBatchAccessLinks(
     data.Songs,
