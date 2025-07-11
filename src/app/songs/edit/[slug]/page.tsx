@@ -1,13 +1,12 @@
+"use server";
 import { prisma } from "@/utils/prisma";
 import Image from "next/image";
 import React from "react";
-import Iridescence from "@/components/ui/react-bits/backgrounds/Iridescence/Iridescence";
-import EditSongForm from "./edit-song-form";
 
 interface PageProps {
-  params: Promise<{
+  params: {
     slug: string;
-  }>;
+  };
 }
 const Page = async ({ params }: PageProps) => {
   const { slug } = await params;
@@ -16,9 +15,20 @@ const Page = async ({ params }: PageProps) => {
     include: {
       Image: true,
       Genre: true,
+      HeartedSongs: true,
+      Users: true, // Include user information
+      Comments: {
+        include: {
+          Replies: {
+            include: {
+              Users: true,
+            },
+          },
+          Users: true,
+        },
+      },
     },
   });
-
   if (!currentSong) {
     return (
       <div className="flex w-full h-full p-4 gap-2 ">
@@ -34,20 +44,12 @@ const Page = async ({ params }: PageProps) => {
       </div>
     );
   }
-
   return (
-    <Iridescence
-      color={[1, 1, 1]}
-      mouseReact={false}
-      amplitude={0.1}
-      speed={1.0}
-    >
-      <div className="absolute inset-0 flex items-center justify-center p-4">
-        <div className="w-full border-2 border-solid rounded-lg border-white p-4 ">
-          <EditSongForm song={currentSong} />
-        </div>
-      </div>
-    </Iridescence>
+    <div>
+      <h1 className="text-2xl font-bold">Welcome to the Songs Page</h1>
+      <p className="mt-4">This is where you can find all the songs.</p>
+      {/* Add more content or components as needed */}
+    </div>
   );
 };
 

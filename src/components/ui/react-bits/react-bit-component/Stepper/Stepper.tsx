@@ -93,19 +93,28 @@ export default function Stepper({
       className="flex min-h-full flex-1 flex-col items-center justify-center p-4 sm:aspect-[4/3] md:aspect-[2/1] relative z-[100]"
       {...rest}
     >
-      <SplitText
-        text="Steps upload file songs"
-        className="text-6xl font-semibold text-center bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent mb-6"
-        delay={100}
-        duration={0.6}
-        ease="power3.out"
-        splitType="chars"
-        from={{ opacity: 0, y: 40 }}
-        to={{ opacity: 1, y: 0 }}
-        threshold={0.1}
-        rootMargin="-100px"
-        textAlign="center"
-      />
+      <div className="inline-block mb-2">
+        <div className="relative px-3 py-1 text-sm font-medium rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-4">
+          <span className="relative z-10">
+            <SplitText
+              text="Steps upload file songs"
+              className="text-6xl italic text-center text-[#670D2F] px-3 "
+              // className="text-6xl italic text-center text-gray-700 px-3"
+              delay={100}
+              duration={0.6}
+              ease="power3.out"
+              splitType="chars"
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="center"
+            />
+          </span>
+          <span className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 animate-pulse shadow-lg hover:shadow-xl"></span>
+        </div>
+      </div>
+
       <div
         className={`mx-auto w-full rounded-4xl shadow-xl relative z-[101] ${stepCircleContainerClassName}`}
         style={{ border: "1px solid #222" }}

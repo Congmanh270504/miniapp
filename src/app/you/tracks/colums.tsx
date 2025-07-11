@@ -244,12 +244,12 @@ export const columns: ColumnDef<SongWithUrls>[] = [
     accessorKey: "createdAt",
     header: () => <div className="text-center">Created At</div>,
     cell: ({ row }) => {
+      const createdAt = row.getValue("createdAt");
+
       return (
         <div className="text-center">
           <span>
-            {row.getValue("createdAt")
-              ? convertToVNDay(row.getValue("createdAt") as Date)
-              : "N/A"}
+            {createdAt ? convertToVNDay(createdAt as Date | string) : "N/A"}
           </span>
         </div>
       );

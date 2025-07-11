@@ -9,11 +9,43 @@ import { SongsData, ProcessedSongsData } from "../../../../types/song-types";
 import Loading from "@/components/ui/loading";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { unstable_cache } from "next/cache";
+import { songWithAllRelations } from "@/lib/prisma-includes";
+import {
+  createBatchAccessLinks,
+  transformSongDataFull,
+} from "@/lib/song-utils";
+
+// Helper: Standard include pattern cho songs với tất cả relations
+const songIncludePattern = songWithAllRelations;
+
+// Cached function để lấy other songs (cache 5 phút)
+const getCachedOtherSongs = unstable_cache(
+  async (excludeId: string) => {
+    return await prisma.songs.findMany({
+      where: {
+        NOT: {
+          id: excludeId,
+        },
+      },
+      include: songIncludePattern,
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 9,
+    });
+  },
+  ["other-songs"],
+  {
+    revalidate: 300, // 5 phút
+    tags: ["songs"],
+  }
+);
 
 interface PageProps {
-  params: Promise<{
+  params: {
     slug: string;
-  }>;
+  };
 }
 
 export default async function Page({ params }: PageProps) {
@@ -26,22 +58,7 @@ export default async function Page({ params }: PageProps) {
 
   const currentSong = await prisma.songs.findFirst({
     where: { slug: slug },
-    include: {
-      Image: true,
-      Genre: true,
-      HeartedSongs: true,
-      Users: true, // Include user information
-      Comments: {
-        include: {
-          Replies: {
-            include: {
-              Users: true,
-            },
-          },
-          Users: true,
-        },
-      },
-    },
+    include: songWithAllRelations,
   });
   if (!currentSong) {
     return (
@@ -64,78 +81,17 @@ export default async function Page({ params }: PageProps) {
 
   const heart = heartedSongs ? true : false;
 
-  // Lấy 9 bài hát random khác (loại trừ bài hát hiện tại)
-  const otherSongs = await prisma.songs.findMany({
-    where: {
-      NOT: {
-        id: currentSong.id, // Sử dụng NOT thay vì not để rõ ràng hơn
-      },
-    },
-    include: {
-      Image: true,
-      Genre: true,
-      HeartedSongs: true,
-      Users: true, // Include user information
-      Comments: {
-        include: {
-          Replies: {
-            include: {
-              Users: true,
-            },
-          },
-          Users: true,
-        },
-      },
-    },
-    orderBy: {
-      id: "desc",
-    },
-    take: 9,
-  });
+  // Lấy 9 bài hát random khác (loại trừ bài hát hiện tại) - cached
+  const otherSongs = await getCachedOtherSongs(currentSong.id);
 
   // Kết hợp kết quả với bài hát hiện tại ở đầu
-  const data: SongsData = currentSong
-    ? [currentSong, ...otherSongs]
-    : otherSongs;
+  const data = currentSong ? [currentSong, ...otherSongs] : otherSongs;
 
-  const songData: ProcessedSongsData = await Promise.all(
-    data.map(async (song) => {
-      // Tạo access link cho file nhạc
-      const musicUrl = await pinata.gateways.private.createAccessLink({
-        cid: song.fileCid,
-        expires: 3600, // 1 hour
-      });
+  // Performance optimization: Batch create access links
+  const { musicUrls, imageUrls } = await createBatchAccessLinks(data, 3600); // 1 hour
 
-      // Tạo access link cho ảnh (nếu có)
-      let imageUrl = "";
-      if (song.Image?.cid) {
-        imageUrl = await pinata.gateways.private.createAccessLink({
-          cid: song.Image.cid,
-          expires: 3600, // 1 hour
-        });
-      }
-      return {
-        songId: song.id,
-        title: song.title,
-        slug: song.slug, // Thêm slug vào dữ liệu
-        artist: song.artist,
-        clerkId: song.Users.clerkId || "", // Sử dụng clerkId từ Users nếu có
-        description: song.description,
-        musicFile: {
-          cid: song.fileCid,
-          url: musicUrl,
-        },
-        imageFile: {
-          cid: song.Image.cid,
-          url: imageUrl,
-        },
-        genre: song.Genre.name,
-        createdAt: song.createdAt,
-        hearted: song.HeartedSongs,
-        comments: song.Comments,
-      };
-    })
-  );
+  // Transform song data với URLs đã được tạo sẵn
+  const songData = transformSongDataFull(data, musicUrls, imageUrls);
 
   return (
     <Suspense fallback={<Loading />}>

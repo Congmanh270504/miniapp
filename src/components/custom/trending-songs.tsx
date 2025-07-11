@@ -9,11 +9,12 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import { Play } from "lucide-react";
+import { Play, Music } from "lucide-react";
 import { useState } from "react";
 import { ProcessedSongsData } from "../../../types/song-types";
 import Link from "next/link";
 import SplitText from "../ui/react-bits/text-animations/SplitText/SplitText";
+import Image from "next/image";
 
 interface TrendingSongsProps {
   songData: ProcessedSongsData;
@@ -21,25 +22,46 @@ interface TrendingSongsProps {
 
 export const TrendingSongs: React.FC<TrendingSongsProps> = ({ songData }) => {
   const [hoveredSong, setHoveredSong] = useState<string | null>(null);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
+  const handleImageError = (songId: string) => {
+    setImageErrors((prev) => new Set(prev).add(songId));
+  };
+
+  if (!songData.length) {
+    return (
+      <div className="mb-12 rounded text-center py-8">
+        <div className="text-gray-400">
+          <Music className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <p className="text-lg">No trending songs available</p>
+          <p className="text-sm mt-2">Check back later for new music!</p>
+        </div>
+      </div>
+    );
+  }
   return (
-    <div className="mb-12">
+    <div className="mb-12 rounded">
       <div className="relative flex items-center justify-center mb-6">
-        <h1 className="text-2xl font-bold text-foreground dark:text-white">
-          <SplitText
-            text="Trending songs"
-            className="text-6xl font-semibold text-center bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent"
-            delay={100}
-            duration={0.6}
-            ease="power3.out"
-            splitType="chars"
-            from={{ opacity: 0, y: 40 }}
-            to={{ opacity: 1, y: 0 }}
-            threshold={0.1}
-            rootMargin="-100px"
-            textAlign="center"
-          />
-        </h1>
+        <div className="inline-block mb-2">
+          <div className="relative px-3 py-1 text-sm font-medium rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-4">
+            <span className="relative z-10">
+              <SplitText
+                text="Trending songs"
+                className="text-6xl italic text-center text-[#670D2F] px-3"
+                delay={100}
+                duration={0.6}
+                ease="power3.out"
+                splitType="chars"
+                from={{ opacity: 0, y: 40 }}
+                to={{ opacity: 1, y: 0 }}
+                threshold={0.1}
+                rootMargin="-100px"
+                textAlign="center"
+              />
+            </span>
+            <span className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 animate-pulse shadow-lg hover:shadow-xl"></span>
+          </div>
+        </div>
         <Button
           variant="ghost"
           className="absolute right-0 text-gray-400 text-sm hover:text-gray-700"
@@ -70,11 +92,22 @@ export const TrendingSongs: React.FC<TrendingSongsProps> = ({ songData }) => {
                   >
                     <CardContent className="p-4">
                       <div className="relative mb-3">
-                        <img
-                          src={song.imageFile.url}
-                          alt={song.title}
-                          className="w-full aspect-square object-cover rounded-md"
-                        />
+                        {imageErrors.has(song.songId) ? (
+                          // Fallback cho khi image không load được
+                          <div className="w-full aspect-square bg-gray-700 rounded-md flex items-center justify-center">
+                            <Music className="h-8 w-8 text-gray-400" />
+                          </div>
+                        ) : (
+                          <Image
+                            src={song.imageFile.url || "/placeholder-song.jpg"}
+                            alt={song.title}
+                            width={200}
+                            height={200}
+                            className="w-full aspect-square object-cover rounded-md"
+                            onError={() => handleImageError(song.songId)}
+                            priority={index < 4} // Priority loading cho 4 ảnh đầu
+                          />
+                        )}
                         {/* Hover overlay with play button */}
                         {hoveredSong === song.songId && (
                           <div className="absolute inset-0 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">

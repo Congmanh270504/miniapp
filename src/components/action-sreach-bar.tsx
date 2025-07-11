@@ -13,8 +13,9 @@ function ActionSearchBar() {
   const [query, setQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const debouncedQuery = useDebounce(query, 200); // Giảm từ 300ms xuống 200ms
-  const { data, isLoading, error } = useSearch(debouncedQuery);
+  const [isTyping, setIsTyping] = useState(false);
+  const debouncedQuery = useDebounce(query, 500);
+  const { data, isFetching, error } = useSearch(debouncedQuery);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -22,6 +23,18 @@ function ActionSearchBar() {
   const songs = data?.songs || [];
   const users = data?.users || [];
   const allResults = [...songs, ...users];
+
+  // Debug logs để kiểm tra states
+  console.log("Debug:", {
+    query: query,
+    debouncedQuery: debouncedQuery,
+    isFetching: isFetching,
+    error: error,
+    hasData: !!data,
+    songsLength: songs.length,
+    usersLength: users.length,
+    allResultsLength: allResults.length,
+  });
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -99,7 +112,13 @@ function ActionSearchBar() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
     setSelectedIndex(-1);
+    setIsTyping(true);
   };
+
+  // Reset typing state when debounced query changes
+  useEffect(() => {
+    setIsTyping(false);
+  }, [debouncedQuery]);
 
   const handleFocus = () => {
     setIsFocused(true);
@@ -184,29 +203,36 @@ function ActionSearchBar() {
                       </div>
                     )}
 
-                    {isLoading && (
-                      <div className="p-4 text-center pt-8">
-                        <Loader2 className="h-4 w-4 animate-spin mx-auto mb-2" />
-                        <p className="text-sm text-gray-500">Searching...</p>
-                        {/* Skeleton loading */}
-                        <div className="mt-3 space-y-2">
-                          {[1, 2, 3].map((item) => (
-                            <div
-                              key={item}
-                              className="flex items-center gap-3 px-3 py-2"
-                            >
-                              <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                              <div className="flex-1 space-y-1">
-                                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4"></div>
-                                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/2"></div>
+                    {/* Loading state - hiển thị khi đang typing hoặc đang loading */}
+                    {(isFetching || (isTyping && query.trim().length >= 1)) &&
+                      debouncedQuery.trim().length >= 1 && (
+                        <div className="p-4 text-center pt-8">
+                          <Loader2 className="h-4 w-4 animate-spin mx-auto mb-2" />
+                          <p className="text-sm text-gray-500">
+                            {isTyping
+                              ? `Searching for "${query}"...`
+                              : `Searching for "${debouncedQuery}"...`}
+                          </p>
+                          {/* Skeleton loading */}
+                          <div className="mt-3 space-y-2">
+                            {[1, 2, 3].map((item) => (
+                              <div
+                                key={item}
+                                className="flex items-center gap-3 px-3 py-2"
+                              >
+                                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div className="flex-1 space-y-1">
+                                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4"></div>
+                                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/2"></div>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {error && (
+                    {/* Error state */}
+                    {error && !isFetching && (
                       <div className="p-4 text-center text-red-500 pt-8">
                         <p className="text-sm">
                           Search failed. Please try again.
@@ -214,19 +240,21 @@ function ActionSearchBar() {
                       </div>
                     )}
 
-                    {!isLoading &&
+                    {/* No results state - chỉ hiển thị khi không loading, không typing và không có lỗi */}
+                    {!isFetching &&
+                      !isTyping &&
                       !error &&
                       allResults.length === 0 &&
-                      query.trim().length >= 1 && (
+                      debouncedQuery.trim().length >= 1 && (
                         <div className="p-4 text-center pt-8">
                           <Search className="h-8 w-8 mx-auto mb-2 text-gray-300" />
                           <p className="text-sm text-gray-500">
-                            No results found for "{query}"
+                            No results found for "{debouncedQuery}"
                           </p>
                         </div>
                       )}
 
-                    {!isLoading && !error && songs.length > 0 && (
+                    {!isFetching && !error && songs.length > 0 && (
                       <div className="py-2">
                         <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b">
                           Songs ({songs.length})
@@ -281,7 +309,7 @@ function ActionSearchBar() {
                       </div>
                     )}
 
-                    {!isLoading && !error && users.length > 0 && (
+                    {!isFetching && !error && users.length > 0 && (
                       <div className="py-2">
                         <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b">
                           Users ({users.length})
@@ -338,7 +366,7 @@ function ActionSearchBar() {
                       </div>
                     )}
 
-                    {!isLoading && !error && allResults.length > 0 && (
+                    {!isFetching && !error && allResults.length > 0 && (
                       <div className="px-3 py-2 border-t border-gray-100 dark:border-gray-800">
                         <div className="flex items-center justify-between text-xs text-gray-500">
                           <span>Use ↑↓ to navigate, Enter to select</span>

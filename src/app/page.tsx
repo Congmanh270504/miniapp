@@ -1,4 +1,3 @@
-"use server";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import Lightning from "@/components/ui/react-bits/backgrounds/Lightning/Lightning";
@@ -14,68 +13,133 @@ import { pinata } from "@/utils/config";
 import { TrendingSongs } from "@/components/custom/trending-songs";
 import { StepperWrapper } from "@/components/custom/stepper-wrapper";
 import TiltedCard from "@/components/ui/react-bits/react-bit-component/TiltedCard/TiltedCard";
+import RotatingText from "@/components/ui/react-bits/text-animations/RotatingText/RotatingText";
+import { unstable_cache } from "next/cache";
+import { songForListFast } from "@/lib/prisma-includes";
+import {
+  createBatchAccessLinks,
+  transformSongDataFull,
+} from "@/lib/song-utils";
+import { Metadata } from "next";
+import { Suspense } from "react";
 
-export default async function Page() {
-  const data = await prisma.songs.findMany({
-    include: {
-      Image: true,
-      Genre: true,
-      HeartedSongs: true,
-      Users: true, // Include user information
-      Comments: {
-        include: {
-          Replies: {
-            include: {
-              Users: true,
-            },
-          },
-          Users: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: 10, // Lấy 10 bài hát mới nhất
-  });
-  const songData: ProcessedSongsData = await Promise.all(
-    data.map(async (song) => {
-      // Tạo access link cho file nhạc
-      const musicUrl = await pinata.gateways.private.createAccessLink({
-        cid: song.fileCid,
-        expires: 3600, // 1 hour
+// Metadata for SEO optimization
+export const metadata: Metadata = {
+  title: "Music Library - Discover & Share Your Favorite Music",
+  description:
+    "Discover new tracks, create personalized playlists, and connect with fellow music lovers in one beautiful platform",
+  keywords: [
+    "music",
+    "songs",
+    "playlist",
+    "audio",
+    "streaming",
+    "discover",
+    "trending",
+  ],
+  openGraph: {
+    title: "Music Library - Discover & Share Your Favorite Music",
+    description:
+      "Discover new tracks, create personalized playlists, and connect with fellow music lovers",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+// Cached function để lấy trending songs với error handling
+const getCachedTrendingSongs = unstable_cache(
+  async (): Promise<ProcessedSongsData> => {
+    try {
+      const songs = await prisma.songs.findMany({
+        include: songForListFast, // Sử dụng pattern nhanh cho home page
+        orderBy: [
+          { createdAt: "desc" },
+          { HeartedSongs: { _count: "desc" } }, // Thêm sort theo popularity
+        ],
+        take: 8, // Giảm từ 10 xuống 8 để load nhanh hơn
       });
 
-      // Tạo access link cho ảnh (nếu có)
-      let imageUrl = "";
-      if (song.Image?.cid) {
-        imageUrl = await pinata.gateways.private.createAccessLink({
-          cid: song.Image.cid,
-          expires: 3600, // 1 hour
-        });
+      if (!songs.length) {
+        console.log("⚠️ No songs found for home page");
+        return [];
       }
-      return {
-        songId: song.id,
-        title: song.title,
-        slug: song.slug, // Thêm slug vào dữ liệu
-        artist: song.artist,
-        clerkId: song.Users.clerkId || "", // Sử dụng clerkId từ Users nếu có
-        description: song.description,
-        musicFile: {
-          cid: song.fileCid,
-          url: musicUrl,
-        },
-        imageFile: {
-          cid: song.Image.cid,
-          url: imageUrl,
-        },
-        genre: song.Genre.name,
-        createdAt: song.createdAt,
-        hearted: song.HeartedSongs,
-        comments: song.Comments,
-      };
-    })
-  );
+
+      // Performance optimization: Batch create access links với timeout
+      const { musicUrls, imageUrls } = await Promise.race([
+        createBatchAccessLinks(songs, 3600), // 1 hour
+        new Promise<{ musicUrls: string[]; imageUrls: string[] }>((_, reject) =>
+          setTimeout(
+            () => reject(new Error("Timeout creating access links")),
+            30000
+          )
+        ),
+      ]);
+
+      // Transform song data với URLs đã được tạo sẵn
+      const processedData = transformSongDataFull(songs, musicUrls, imageUrls);
+
+      return processedData;
+    } catch (error) {
+      console.error("❌ Error in getCachedTrendingSongs:", error);
+      // Return empty array instead of throwing to prevent page crash
+      return [];
+    }
+  },
+  ["home-trending-songs"],
+  {
+    revalidate: 900, // 15 phút
+    tags: ["songs", "trending", "home"],
+  }
+);
+
+// Loading component for trending songs
+const TrendingSongsLoader = () => (
+  <div className="mb-12 rounded">
+    <div className="relative flex items-center justify-center mb-6">
+      <div className="inline-block mb-2">
+        <div className="relative px-3 py-1 text-sm font-medium rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-4">
+          <span className="relative z-10 text-6xl italic text-center text-[#670D2F] px-3">
+            Loading songs...
+          </span>
+          <span className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 animate-pulse"></span>
+        </div>
+      </div>
+    </div>
+    <div className="relative px-16">
+      <div className="flex gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="w-48 h-64 bg-gray-700 rounded-lg animate-pulse"
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+// Async component for trending songs
+async function TrendingSongsSection() {
+  const songData = await getCachedTrendingSongs();
+
+  if (!songData.length) {
+    return (
+      <div className="mb-12 rounded text-center py-8">
+        <div className="text-gray-400">
+          <p className="text-lg">No trending songs available</p>
+          <p className="text-sm mt-2">Check back later for new music!</p>
+        </div>
+      </div>
+    );
+  }
+
+  return <TrendingSongs songData={songData} />;
+}
+
+export default async function Page() {
   return (
     <div className="min-h-screen flex flex-col ">
       <div className="flex-1 p-4">
@@ -98,10 +162,21 @@ export default async function Page() {
                 </div>
               </div>
               <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-                <div className="block">Hi, I'm</div>
-                <div className="mt-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-                  Công Mạnh
+                <div className="block bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+                  Hi, I'm
                 </div>
+                <RotatingText
+                  texts={["Công Mạnh!", "Funny", "Patient", "Love sports"]}
+                  mainClassName="px-2 sm:px-2 md:px-3 text-[#320A6B] overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg"
+                  staggerFrom={"last"}
+                  initial={{ y: "100%" }}
+                  animate={{ y: 0 }}
+                  exit={{ y: "-120%" }}
+                  staggerDuration={0.025}
+                  splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
+                  transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                  rotationInterval={2500}
+                />
               </h1>
               <p className="text-xl text-zinc-400 w-full ">
                 Hey there! I've built this music website to help you discover
@@ -133,8 +208,8 @@ export default async function Page() {
               {/* <CreativeHero /> */}
               <TiltedCard
                 imageSrc="/twice.png"
-                altText="Kendrick Lamar - GNX Album Cover"
-                captionText="Kendrick Lamar - GNX"
+                altText="TWICE Album Cover"
+                captionText="TWICE"
                 containerHeight="300px"
                 containerWidth="300px"
                 imageHeight="500px"
@@ -144,9 +219,7 @@ export default async function Page() {
                 showMobileWarning={false}
                 showTooltip={true}
                 displayOverlayContent={true}
-                overlayContent={
-                  <p className="tilted-card-demo-text">Kendrick Lamar - GNX</p>
-                }
+                overlayContent={<p className="tilted-card-demo-text">TWICE</p>}
               />
             </div>
           </div>
@@ -161,7 +234,9 @@ export default async function Page() {
         </section>
 
         <section className="py-12 mt-[15em] relative w-full overflow-hidden">
-          <TrendingSongs songData={songData} />
+          <Suspense fallback={<TrendingSongsLoader />}>
+            <TrendingSongsSection />
+          </Suspense>
 
           <div className="absolute top-[1em] left-[4em] z-0 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15"></div>
           <div className="absolute bottom-[1em] right-[4em] z-0 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15"></div>
