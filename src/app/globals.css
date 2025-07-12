@@ -146,6 +146,10 @@
   }
 }
 
+* {
+  box-sizing: border-box;
+}
+
 .tilted-card-demo-text {
   text-transform: capitalize;
   color: #fff;
