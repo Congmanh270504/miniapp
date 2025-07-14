@@ -2,10 +2,8 @@
 import MusicPlayer from "@/components/song-profile/music-player";
 import PlaylistComment from "@/components/song-profile/playlist-comment";
 import { prisma } from "@/utils/prisma";
-import { pinata } from "@/utils/config";
 import Image from "next/image";
 import React, { Suspense } from "react";
-import { SongsData, ProcessedSongsData } from "../../../../types/song-types";
 import Loading from "@/components/ui/loading";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";

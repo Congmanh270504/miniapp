@@ -1,39 +1,173 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload, FileAudio, X } from "lucide-react";
+import { Upload, FileAudio, X, CheckCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { parseBlob } from "music-metadata-browser";
 import SongForm from "@/app/songs/create/songs-form";
+import { toast } from "sonner";
+
+interface UploadedFileData {
+  file: File;
+  audioId?: string;
+  audioCid?: string;
+  isUploading: boolean;
+  uploaded: boolean;
+  artist: string;
+  duration: number;
+}
 
 export default function AudioUpload() {
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [artist, setArtist] = useState("");
-  const [duration, setDuration] = useState<number>(0);
+  const [uploadedFileData, setUploadedFileData] =
+    useState<UploadedFileData | null>(null);
   const [error, setError] = useState("");
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    setUploadedFiles(acceptedFiles);
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-delete timeout management
+  const startAutoDeleteTimeout = useCallback((audioId: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(async () => {
       try {
-        const metadata = await parseBlob(file);
-        setArtist(metadata.common.artist || "");
-        // Đọc duration từ metadata
-        const durationInSeconds = metadata.format.duration || 0;
-        setDuration(Math.floor(durationInSeconds));
-      } catch (err) {
-        setError("Không đọc được metadata");
+        await fetch("/api/uploadFiles/delete", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: audioId }),
+        });
+
+        setUploadedFileData(null);
+        toast.warning(
+          "Audio file was automatically deleted due to timeout (20 minutes)"
+        );
+      } catch (error) {
+        console.error("Error auto-deleting file:", error);
       }
+    }, 20 * 60 * 1000); // 20 minutes
+  }, []);
+
+  const clearAutoDeleteTimeout = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
   }, []);
 
-  const removeFile = useCallback((indexToRemove: number) => {
-    setUploadedFiles((prev) =>
-      prev.filter((_, index) => index !== indexToRemove)
-    );
-  }, []);
+  const uploadAudioFile = useCallback(
+    async (file: File) => {
+      try {
+        const formData = new FormData();
+        formData.append("audio", file);
+
+        const response = await fetch("/api/uploadFiles/audio", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Upload failed");
+        }
+
+        const result = await response.json();
+
+        setUploadedFileData((prev) =>
+          prev
+            ? {
+                ...prev,
+                audioId: result.audioId,
+                audioCid: result.audioCid,
+                isUploading: false,
+                uploaded: true,
+              }
+            : null
+        );
+
+        // Start auto-delete timeout
+        startAutoDeleteTimeout(result.audioId);
+
+        return result;
+      } catch (error) {
+        setUploadedFileData((prev) =>
+          prev
+            ? {
+                ...prev,
+                isUploading: false,
+                uploaded: false,
+              }
+            : null
+        );
+
+        toast.error("Failed to upload audio file");
+        throw error;
+      }
+    },
+    [startAutoDeleteTimeout]
+  );
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
+
+      try {
+        // Extract metadata first
+        const metadata = await parseBlob(file);
+        const artist = metadata.common.artist || "";
+        const durationInSeconds = metadata.format.duration || 0;
+        const duration = Math.floor(durationInSeconds);
+
+        // Set initial state with uploading status
+        setUploadedFileData({
+          file,
+          isUploading: true,
+          uploaded: false,
+          artist,
+          duration,
+        });
+
+        // Upload the file
+        await uploadAudioFile(file);
+      } catch (err) {
+        setError("Could not read metadata or upload failed");
+        setUploadedFileData(null);
+        toast.error("Failed to process audio file");
+      }
+    },
+    [uploadAudioFile]
+  );
+
+  const removeFile = useCallback(async () => {
+    setUploadedFileData(null);
+
+    if (uploadedFileData?.audioId) {
+      try {
+        await fetch("/api/uploadFiles/delete", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: uploadedFileData.audioId }),
+        });
+      } catch (error) {
+        console.error("Error deleting file:", error);
+      }
+    }
+
+    clearAutoDeleteTimeout();
+  }, [uploadedFileData?.audioId, clearAutoDeleteTimeout]);
+
+  // Clear timeout on component unmount
+  useEffect(() => {
+    return () => {
+      clearAutoDeleteTimeout();
+    };
+  }, [clearAutoDeleteTimeout]);
+
+  // Handle form submission success - clear timeout
+  const handleFormSubmitSuccess = useCallback(() => {
+    clearAutoDeleteTimeout();
+  }, [clearAutoDeleteTimeout]);
+
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
     accept: {
@@ -49,41 +183,67 @@ export default function AudioUpload() {
   return (
     <div className="h-fit text-white p-6 ">
       <div className="w-full mx-auto">
-        {uploadedFiles.length > 0 && (
+        {uploadedFileData && (
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-4">Uploaded Files:</h1>
             <div className="space-y-2">
-              {uploadedFiles.map((file, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-gray-600 rounded-lg group transition-colors"
-                >
-                  <div className="flex items-center space-x-3">
-                    <FileAudio className="w-5 h-5 text-blue-400" />
-                    <span className="text-white">{file.name}</span>
+              <div className="flex items-center justify-between p-3 bg-gray-600 rounded-lg group transition-colors">
+                <div className="flex items-center space-x-3">
+                  <FileAudio className="w-5 h-5 text-blue-400" />
+                  <span className="text-white">
+                    {uploadedFileData.file.name}
+                  </span>
+                  <span className="text-gray-400 text-sm">
+                    ({(uploadedFileData.file.size / (1024 * 1024)).toFixed(2)}{" "}
+                    MB)
+                  </span>
+                  {uploadedFileData.duration > 0 && (
                     <span className="text-gray-400 text-sm">
-                      ({(file.size / (1024 * 1024)).toFixed(2)} MB)
+                      • {Math.floor(uploadedFileData.duration / 60)}:
+                      {(uploadedFileData.duration % 60)
+                        .toString()
+                        .padStart(2, "0")}
                     </span>
-                  </div>
+                  )}
+                </div>
+                <div className="flex items-center space-x-2">
+                  {uploadedFileData.isUploading && (
+                    <div className="flex items-center space-x-1">
+                      <Clock className="w-4 h-4 text-blue-400 animate-spin" />
+                      <span className="text-blue-400 text-xs">
+                        Uploading...
+                      </span>
+                    </div>
+                  )}
+                  {uploadedFileData.uploaded && (
+                    <div className="flex items-center space-x-1">
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <span className="text-green-400 text-xs">Uploaded</span>
+                    </div>
+                  )}
                   <Button
-                    onClick={() => removeFile(index)}
+                    onClick={removeFile}
                     variant="ghost"
                     size="sm"
-                    className=" transition-opacity duration-200 hover:bg-red-600 text-white p-1 h-8 w-8"
+                    className="transition-opacity duration-200 hover:bg-red-600 text-white p-1 h-8 w-8"
+                    disabled={uploadedFileData.isUploading}
                   >
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         )}
-        {uploadedFiles.length > 0 ? (
+        {uploadedFileData && uploadedFileData.uploaded ? (
           <div className="border-2 border-solid rounded-lg border-white p-4">
             <SongForm
-              uploadedFiles={uploadedFiles}
-              artist={artist}
-              duration={duration}
+              uploadedFiles={[uploadedFileData.file]}
+              artist={uploadedFileData.artist}
+              duration={uploadedFileData.duration}
+              audioId={uploadedFileData.audioId}
+              audioCid={uploadedFileData.audioCid}
+              onSubmitSuccess={handleFormSubmitSuccess}
             />
           </div>
         ) : (

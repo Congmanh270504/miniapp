@@ -103,6 +103,7 @@ export const TrendingSongs: React.FC<TrendingSongsProps> = ({ songData }) => {
                             alt={song.title}
                             width={200}
                             height={200}
+                            quality={100}
                             className="w-full aspect-square object-cover rounded-md"
                             onError={() => handleImageError(song.songId)}
                             priority={index < 4} // Priority loading cho 4 ảnh đầu

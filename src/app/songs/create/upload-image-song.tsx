@@ -1,45 +1,87 @@
 "use client";
-import React, { useCallback, useState } from "react";
-import { ImageIcon, X } from "lucide-react";
+import React, { useCallback, useState, useEffect } from "react";
+import { ImageIcon, X, Upload } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
+import { useFileUpload } from "@/hooks/useFileUpload";
+import { toast } from "sonner";
 
 const UploadImageSong = ({
   field,
   isPending,
+  onImageUploaded,
 }: {
   field: any;
   isPending: boolean;
+  onImageUploaded?: (cid: string) => void;
 }) => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<File[]>([]);
+  const [currentFile, setCurrentFile] = useState<File | null>(null);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setUploadedImage(imageUrl);
-      setFileName([file]);
-      field.onChange(file); // Call the onChange method from the field object
+  const {
+    uploadedFile,
+    isUploading,
+    error,
+    uploadWithDebounce,
+    clearFile,
+    cancelAutoDelete,
+  } = useFileUpload({
+    endpoint: "/api/uploadFiles/image",
+    autoDeleteDelay: 20 * 60 * 1000, // 20 minutes
+    debounceDelay: 3000, // 3 seconds debounce for image changes
+  });
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (file) {
+        const imageUrl = URL.createObjectURL(file);
+        setUploadedImage(imageUrl);
+        setCurrentFile(file);
+        field.onChange(file);
+
+        // Upload with debounce to avoid multiple uploads when user changes image quickly
+        uploadWithDebounce(file, "image");
+      }
+    },
+    [field, uploadWithDebounce]
+  );
+
+  // Effect to handle upload completion
+  useEffect(() => {
+    if (uploadedFile?.cid && onImageUploaded) {
+      onImageUploaded(uploadedFile.cid);
+      toast.success("Image uploaded successfully!");
     }
-  }, []);
+  }, [uploadedFile, onImageUploaded]);
+
+  // Effect to handle upload errors
+  useEffect(() => {
+    if (error) {
+      toast.error(`Upload failed: ${error}`);
+    }
+  }, [error]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
       "image/*": [".jpeg", ".jpg", ".png"],
     },
+    maxSize: 10 * 1024 * 1024, // 10 MB
     multiple: false,
+    maxFiles: 1,
   });
 
-  const removeImage = () => {
+  const removeImage = async () => {
     if (uploadedImage) {
       URL.revokeObjectURL(uploadedImage);
     }
     setUploadedImage(null);
-    setFileName([]);
+    setCurrentFile(null);
     field.onChange(undefined);
+    await clearFile();
   };
+
   return (
     <div className="w-full h-full">
       <div
@@ -61,22 +103,23 @@ const UploadImageSong = ({
                 e.stopPropagation();
                 removeImage();
               }}
-              disabled={isPending}
+              disabled={isPending || isUploading}
               variant="secondary"
               size="sm"
               className={`absolute top-2 right-2 z-10 h-8 w-8 p-0 ${
-                isPending ? "bg-red-400" : "bg-red-600"
+                isPending || isUploading ? "bg-red-400" : "bg-red-600"
               } hover:bg-black/70 border-none`}
             >
               <X className="h-4 w-4 text-white" />
             </Button>
+
             <img
               src={uploadedImage || "/placeholder.svg"}
-              alt={fileName[0]?.name || "Uploaded image"}
+              alt={currentFile?.name || "Uploaded image"}
               className="w-full h-auto max-h-96 object-contain rounded-md"
             />
             <p className="text-black text-sm mt-2 truncate">
-              {fileName[0]?.name}
+              {currentFile?.name}
             </p>
           </div>
         ) : (

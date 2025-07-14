@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import { fetchGenres } from "@/store/genres/state";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -43,21 +43,70 @@ import { useRouter } from "next/navigation";
 interface SongFormProps {
   uploadedFiles: File[];
   artist: string;
-  duration: number; // Optional duration prop
+  duration: number;
+  audioId?: string;
+  audioCid?: string;
+  onSubmitSuccess?: () => void;
 }
 
 export default function SongForm({
   uploadedFiles,
   artist,
   duration,
+  audioId,
+  audioCid,
+  onSubmitSuccess,
 }: SongFormProps) {
   const dispatch = useDispatch<AppDispatch>();
   const genres = useSelector((state: RootState) => state.genreSlice);
   const { isSignedIn, user, isLoaded } = useUser();
   const router = useRouter();
+
+  // State for uploaded image file CID
+  const [imageCid, setImageCid] = useState<string>("");
+  const formTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     dispatch(fetchGenres());
   }, [dispatch]);
+
+  // Form timeout management - only for image auto-delete
+  useEffect(() => {
+    if (imageCid) {
+      // Reset timeout when image is uploaded
+      if (formTimeoutRef.current) {
+        clearTimeout(formTimeoutRef.current);
+      }
+
+      // Set 20-minute timeout for image auto-delete if form isn't submitted
+      formTimeoutRef.current = setTimeout(() => {
+        deleteImageFile();
+        toast.warning(
+          "Image file was automatically deleted due to timeout (20 minutes)"
+        );
+      }, 20 * 60 * 1000); // 20 minutes
+    }
+
+    return () => {
+      if (formTimeoutRef.current) {
+        clearTimeout(formTimeoutRef.current);
+      }
+    };
+  }, [imageCid]);
+
+  const deleteImageFile = async () => {
+    if (imageCid) {
+      try {
+        await fetch("/api/uploadFiles/delete", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cid: imageCid }),
+        });
+      } catch (error) {
+        console.error("Error deleting image file:", error);
+      }
+    }
+  };
 
   const formSchema = z.object({
     title: z
@@ -77,7 +126,6 @@ export default function SongForm({
       .min(1, { message: "This field is required" })
       .min(1, { message: "Must be at least 1 characters" })
       .max(30, { message: "Must be at most 30 characters" }),
-
     description: z
       .string()
       .min(1, { message: "Must be at least 1 characters" })
@@ -119,13 +167,17 @@ export default function SongForm({
     return () => subscription.unsubscribe();
   }, [form]);
 
+  // Handlers for upload callbacks
+  const handleImageUploaded = (cid: string) => {
+    setImageCid(cid);
+  };
+
   const handleFileUpload = async (file: File) => {
     try {
       const data = new FormData();
-      data.set("songs", file);
       data.set("images", form.getValues("songsImages"));
 
-      const uploadFile = await fetch("/api/uploadFiles/create", {
+      const uploadFile = await fetch("/api/uploadFiles/image", {
         method: "POST",
         body: data,
       });
@@ -135,34 +187,49 @@ export default function SongForm({
       toast.error("Error uploading file");
     }
   };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsPending(true);
-      if (user?.id) {
-        const fileUpload = await handleFileUpload(uploadedFiles[0]);
-        const { songsCid, imagesCid } = fileUpload;
 
-        if (!songsCid || !imagesCid) {
-          toast.error("Failed to upload song or image");
-          setIsPending(false);
-          return;
-        }
+      if (!user?.id) {
+        toast.error("You must be logged in to upload songs");
+        setIsPending(false);
+        return;
+      }
 
-        const req = await createSong(
-          songsCid,
-          imagesCid,
-          user.id,
-          duration,
-          values
-        );
+      if (!audioCid) {
+        toast.error("Audio file is required");
+        setIsPending(false);
+        return;
+      }
 
-        if (req.ok) {
-          toast.success(req.message || "Song uploaded successfully");
-          form.reset();
-          router.push("/you/tracks");
-        } else {
-          toast.error(req.message || "Failed to upload song");
-        }
+      if (!imageCid) {
+        toast.error("Please upload an image first");
+        setIsPending(false);
+        return;
+      }
+
+      // Clear the timeout since we're submitting
+      if (formTimeoutRef.current) {
+        clearTimeout(formTimeoutRef.current);
+      }
+
+      const req = await createSong(
+        audioCid!,
+        imageCid,
+        user.id,
+        duration,
+        values
+      );
+
+      if (req.ok) {
+        toast.success(req.message || "Song uploaded successfully");
+        form.reset();
+        onSubmitSuccess?.(); // Call parent callback to stop audio auto-delete
+        router.push("/you/tracks");
+      } else {
+        toast.error(req.message || "Failed to upload song");
       }
       setIsPending(false);
     } catch (error) {
@@ -174,6 +241,7 @@ export default function SongForm({
   function onReset() {
     form.reset();
     form.clearErrors();
+    setImageCid("");
   }
 
   return (
@@ -190,7 +258,11 @@ export default function SongForm({
             render={({ field }) => (
               <FormItem className="w-full ">
                 <FormControl>
-                  <UploadImageSong field={field} isPending={isPending} />
+                  <UploadImageSong
+                    field={field}
+                    isPending={isPending}
+                    onImageUploaded={handleImageUploaded}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -205,7 +277,6 @@ export default function SongForm({
             >
               <TypographyH2 text="Upload song file" />
             </div>
-
             <FormField
               control={form.control}
               name="title"

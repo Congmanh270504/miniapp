@@ -51,8 +51,6 @@ const Page = async () => {
   // Sử dụng cached function để lấy songs - Ưu tiên load ít songs trước
   const data = await getCachedSongs(1, 30); // Giảm xuống 30 để load nhanh hơn
 
-  console.log(`Loading ${data.length} songs for main page`);
-
   // Performance optimization: Batch create access links
   const { musicUrls, imageUrls } = await createBatchAccessLinks(data, 3600); // 1 hour
 
