@@ -23,6 +23,7 @@ interface TrendingSongsProps {
 export const TrendingSongs: React.FC<TrendingSongsProps> = ({ songData }) => {
   const [hoveredSong, setHoveredSong] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  
 
   const handleImageError = (songId: string) => {
     setImageErrors((prev) => new Set(prev).add(songId));

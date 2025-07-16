@@ -47,6 +47,10 @@ export default function MusicPlayer({
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
 
+  // Dynamic music URL loading for playlist songs
+  const [musicUrls, setMusicUrls] = useState<Map<string, string>>(new Map());
+  const [loadingMusicUrl, setLoadingMusicUrl] = useState(false);
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audio = audioRef.current;
 
@@ -239,6 +243,35 @@ export default function MusicPlayer({
     setImageError(true);
     setIsImageLoading(false);
   }, []);
+
+  // Function to create music access link on demand
+  const createMusicAccessLink = useCallback(
+    async (fileCid: string) => {
+      if (musicUrls.has(fileCid) || loadingMusicUrl)
+        return musicUrls.get(fileCid) || "";
+
+      setLoadingMusicUrl(true);
+      try {
+        const response = await fetch("/api/songs/music-access", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fileCid }),
+        });
+
+        if (response.ok) {
+          const { musicUrl } = await response.json();
+          setMusicUrls((prev) => new Map(prev).set(fileCid, musicUrl));
+          return musicUrl;
+        }
+      } catch (error) {
+        console.error("Failed to create music access link:", error);
+      } finally {
+        setLoadingMusicUrl(false);
+      }
+      return "";
+    },
+    [musicUrls, loadingMusicUrl]
+  );
 
   return (
     <div className="relative w-[65%] h-full rounded-lg overflow-hidden shadow-lg border border-gray-100">

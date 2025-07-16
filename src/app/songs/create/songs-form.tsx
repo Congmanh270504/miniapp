@@ -172,21 +172,6 @@ export default function SongForm({
     setImageCid(cid);
   };
 
-  const handleFileUpload = async (file: File) => {
-    try {
-      const data = new FormData();
-      data.set("images", form.getValues("songsImages"));
-
-      const uploadFile = await fetch("/api/uploadFiles/image", {
-        method: "POST",
-        body: data,
-      });
-      const response = await uploadFile.json();
-      return response;
-    } catch (error) {
-      toast.error("Error uploading file");
-    }
-  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {

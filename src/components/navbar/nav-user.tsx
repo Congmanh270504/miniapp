@@ -6,7 +6,9 @@ import {
   ChevronsUpDown,
   CreditCard,
   LogOut,
+  LogOutIcon,
   Sparkles,
+  User,
 } from "lucide-react";
 import {
   ClerkProvider,
@@ -38,7 +40,7 @@ import { Button } from "../ui/button";
 import ClientOnly from "../ClientOnly";
 
 export default function NavUser() {
-  const { isMobile } = useSidebar();
+  const { isMobile, state } = useSidebar();
   const { isSignedIn, user, isLoaded } = useUser();
 
   const LoadingSkeleton = () => (
@@ -140,6 +142,7 @@ export default function NavUser() {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
+                  <LogOutIcon />
                   <SignOutButton>
                     {/* <LogOut />
                     <span className="flex items-center gap-2"></span> */}
@@ -151,17 +154,31 @@ export default function NavUser() {
           </SidebarMenuItem>
         ) : (
           <SidebarMenuItem>
-            <div className="flex items-center justify-center gap-2 p-2">
+            <div
+              className={`flex items-center gap-2 p-2 transition-all duration-200 ${
+                state === "collapsed" ? "justify-center" : "justify-center"
+              }`}
+            >
               <SignInButton mode="modal">
-                <Button variant="outline" size="sm">
-                  Sign In
+                <Button
+                  variant="outline"
+                  size={state === "collapsed" ? "icon" : "sm"}
+                  className="transition-all duration-200"
+                >
+                  {state === "collapsed" ? (
+                    <User className="h-4 w-4" />
+                  ) : (
+                    "Sign In"
+                  )}
                 </Button>
               </SignInButton>
-              <SignUpButton mode="modal">
-                <Button variant="outline" size="sm">
-                  Sign Up
-                </Button>
-              </SignUpButton>
+              {state !== "collapsed" && (
+                <SignUpButton mode="modal">
+                  <Button variant="outline" size="sm">
+                    Sign Up
+                  </Button>
+                </SignUpButton>
+              )}
             </div>
           </SidebarMenuItem>
         )}

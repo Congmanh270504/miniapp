@@ -2,17 +2,75 @@ import { pinata } from "@/utils/config";
 import { ProcessedSongsData } from "../../types/song-types";
 
 /**
+ * Create access link for current song (both music and image)
+ */
+export async function createCurrentSongAccessLinks(
+  song: { fileCid: string; Image?: { cid: string } | null },
+  expires: number = 3600
+) {
+  const [musicResult, imageResult] = await Promise.allSettled([
+    pinata.gateways.private.createAccessLink({
+      cid: song.fileCid,
+      expires,
+    }),
+    song.Image?.cid
+      ? pinata.gateways.private.createAccessLink({
+          cid: song.Image.cid,
+          expires,
+        })
+      : Promise.resolve(""),
+  ]);
+
+  return {
+    musicUrl: musicResult.status === "fulfilled" ? musicResult.value : "",
+    imageUrl: imageResult.status === "fulfilled" ? imageResult.value : "",
+  };
+}
+
+/**
+ * Create optimized image access links for playlist (images only)
+ */
+export async function createPlaylistImageLinks(
+  songs: Array<{ Image?: { cid: string } | null }>,
+  expires: number = 3600
+) {
+  const imageResults = await Promise.allSettled(
+    songs.map(async (song) => {
+      if (!song.Image?.cid) return "";
+      try {
+        const accessLink = await pinata.gateways.private
+          .createAccessLink({
+            cid: song.Image.cid,
+            expires,
+          })
+          .optimizeImage({
+            width: 300,
+            height: 300,
+            format: "webp",
+            fit: "cover",
+          });
+        // Return plain access link without optimization parameters
+        return accessLink;
+      } catch (error) {
+        console.error("Failed to create optimized image URL:", error);
+        return "";
+      }
+    })
+  );
+
+  return imageResults.map((result) =>
+    result.status === "fulfilled" ? result.value : ""
+  );
+}
+
+/**
  * Batch create Pinata access links for songs with error handling
- * @param songs Array of songs with fileCid and Image.cid
- * @param expires Expiration time in seconds (default: 3600 = 1 hour)
- * @returns Object with musicUrls and imageUrls arrays
  */
 export async function createBatchAccessLinks(
   songs: Array<{ fileCid: string; Image?: { cid: string } | null }>,
   expires: number = 3600
 ) {
   const [musicUrls, imageUrls] = await Promise.allSettled([
-    // Create all music URLs in parallel
     Promise.allSettled(
       songs.map(async (song) => {
         try {
@@ -21,16 +79,11 @@ export async function createBatchAccessLinks(
             expires,
           });
         } catch (error) {
-          console.error(
-            "Failed to create music URL for fileCid:",
-            song.fileCid,
-            error
-          );
+          console.error("Failed to create music URL:", error);
           return "";
         }
       })
     ),
-    // Create all image URLs in parallel
     Promise.allSettled(
       songs.map(async (song) => {
         if (!song.Image?.cid) return "";
@@ -40,18 +93,13 @@ export async function createBatchAccessLinks(
             expires,
           });
         } catch (error) {
-          console.error(
-            "Failed to create image URL for cid:",
-            song.Image.cid,
-            error
-          );
+          console.error("Failed to create image URL:", error);
           return "";
         }
       })
     ),
   ]);
 
-  // Extract URLs with fallback
   const musicUrlsResolved =
     musicUrls.status === "fulfilled"
       ? (musicUrls.value as PromiseSettledResult<string>[]).map((result) =>
@@ -73,11 +121,91 @@ export async function createBatchAccessLinks(
 }
 
 /**
+ * Transform current song data with access links
+ */
+export function transformCurrentSongData(
+  song: {
+    id: string;
+    title: string;
+    slug: string;
+    artist: string;
+    description: string;
+    fileCid: string;
+    createdAt: Date;
+    Image?: { cid: string } | null;
+    Genre: { name: string };
+    Users: { clerkId: string };
+    HeartedSongs: Array<any>;
+    Comments: Array<any>;
+  },
+  musicUrl: string,
+  imageUrl: string
+) {
+  return {
+    songId: song.id,
+    title: song.title,
+    slug: song.slug,
+    artist: song.artist,
+    clerkId: song.Users.clerkId || "",
+    description: song.description,
+    musicFile: {
+      cid: song.fileCid,
+      url: musicUrl,
+    },
+    imageFile: {
+      cid: song.Image?.cid || "",
+      url: imageUrl,
+    },
+    genre: song.Genre.name,
+    createdAt: song.createdAt,
+    hearted: song.HeartedSongs,
+    comments: song.Comments,
+  };
+}
+
+/**
+ * Transform playlist songs data
+ */
+export function transformPlaylistData(
+  songs: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    artist: string;
+    duration?: number;
+    fileCid: string;
+    createdAt: Date;
+    Image?: { cid: string } | null;
+    Genre: { name: string };
+    HeartedSongs: Array<any>;
+  }>,
+  imageUrls: string[]
+) {
+  return songs.map((song, index) => ({
+    songId: song.id,
+    title: song.title,
+    slug: song.slug,
+    artist: song.artist,
+    clerkId: "",
+    description: "",
+    duration: song.duration || 0,
+    musicFile: {
+      cid: song.fileCid,
+      url: "",
+    },
+    imageFile: {
+      cid: song.Image?.cid || "",
+      url: imageUrls[index] || "",
+    },
+    genre: song.Genre.name,
+    createdAt: song.createdAt,
+    hearted: song.HeartedSongs,
+    comments: [],
+  }));
+}
+
+/**
  * Transform song data with Pinata URLs (simple version)
- * @param songs Array of songs from database
- * @param musicUrls Array of music URLs from Pinata
- * @param imageUrls Array of image URLs from Pinata
- * @returns Processed song data ready for components
  */
 export function transformSongData(
   songs: Array<{
@@ -117,10 +245,6 @@ export function transformSongData(
 
 /**
  * Transform song data with Pinata URLs (full version for ProcessedSongsData)
- * @param songs Array of songs from database with full relations
- * @param musicUrls Array of music URLs from Pinata
- * @param imageUrls Array of image URLs from Pinata
- * @returns ProcessedSongsData ready for components
  */
 export function transformSongDataFull(
   songs: Array<{

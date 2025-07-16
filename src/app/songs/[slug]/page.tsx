@@ -10,15 +10,17 @@ import { redirect } from "next/navigation";
 import { unstable_cache } from "next/cache";
 import { songWithAllRelations } from "@/lib/prisma-includes";
 import {
-  createBatchAccessLinks,
-  transformSongDataFull,
+  createCurrentSongAccessLinks,
+  createPlaylistImageLinks,
+  transformCurrentSongData,
+  transformPlaylistData,
 } from "@/lib/song-utils";
 
 // Helper: Standard include pattern cho songs với tất cả relations
 const songIncludePattern = songWithAllRelations;
 
-// Cached function để lấy other songs (cache 5 phút)
-const getCachedOtherSongs = unstable_cache(
+// Cached function để lấy playlist songs (cache 5 phút) - chỉ lấy 5 bài đầu
+const getCachedPlaylistSongs = unstable_cache(
   async (excludeId: string) => {
     return await prisma.songs.findMany({
       where: {
@@ -26,14 +28,18 @@ const getCachedOtherSongs = unstable_cache(
           id: excludeId,
         },
       },
-      include: songIncludePattern,
+      include: {
+        Image: true,
+        Genre: true,
+        HeartedSongs: true,
+      },
       orderBy: {
         createdAt: "desc",
       },
-      take: 9,
+      take: 5, // Chỉ lấy 5 bài đầu
     });
   },
-  ["other-songs"],
+  ["playlist-songs"],
   {
     revalidate: 300, // 5 phút
     tags: ["songs"],
@@ -58,6 +64,7 @@ export default async function Page({ params }: PageProps) {
     where: { slug: slug },
     include: songWithAllRelations,
   });
+
   if (!currentSong) {
     return (
       <div className="flex w-full h-full p-4 gap-2 ">
@@ -79,31 +86,41 @@ export default async function Page({ params }: PageProps) {
 
   const heart = heartedSongs ? true : false;
 
-  // Lấy 9 bài hát random khác (loại trừ bài hát hiện tại) - cached
-  const otherSongs = await getCachedOtherSongs(currentSong.id);
+  // Lấy 5 bài hát cho playlist (loại trừ bài hát hiện tại) - cached
+  const playlistSongs = await getCachedPlaylistSongs(currentSong.id);
 
-  // Kết hợp kết quả với bài hát hiện tại ở đầu
-  const data = currentSong ? [currentSong, ...otherSongs] : otherSongs;
+  // Tạo access links riêng biệt
+  // 1. Cho bài hát hiện tại: cả nhạc và ảnh
+  const currentSongLinks = await createCurrentSongAccessLinks(
+    currentSong,
+    3600
+  );
 
-  // Performance optimization: Batch create access links
-  const { musicUrls, imageUrls } = await createBatchAccessLinks(data, 3600); // 1 hour
+  // 2. Cho playlist: chỉ ảnh được tối ưu hóa
+  const playlistImageUrls = await createPlaylistImageLinks(playlistSongs);
 
-  // Transform song data với URLs đã được tạo sẵn
-  const songData = transformSongDataFull(data, musicUrls, imageUrls);
+  // Transform data
+  const currentSongData = transformCurrentSongData(
+    currentSong,
+    currentSongLinks.musicUrl,
+    currentSongLinks.imageUrl
+  );
+
+  const playlistData = transformPlaylistData(playlistSongs, playlistImageUrls);
 
   return (
     <Suspense fallback={<Loading />}>
       <div className="flex w-full h-full p-4 gap-2 ">
         <MusicPlayer
           slug={currentSong.slug}
-          songs={songData}
+          songs={[currentSongData, ...playlistData]}
           heart={heart}
           userId={user.id}
         />
         <PlaylistComment
           currentSong={currentSong.id}
           comments={currentSong.Comments}
-          songs={songData}
+          songs={[currentSongData, ...playlistData]}
         />
       </div>
     </Suspense>

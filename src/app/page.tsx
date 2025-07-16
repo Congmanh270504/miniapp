@@ -1,15 +1,11 @@
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import Lightning from "@/components/ui/react-bits/backgrounds/Lightning/Lightning";
-import { ArrowRight, Github, Linkedin, Mail, Twitter } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { SocialLinks } from "@/components/custom/social-links";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Timeline } from "@/components/ui/timeline";
 import { prisma } from "@/utils/prisma";
 import { ProcessedSongsData } from "../../types/song-types";
-import { pinata } from "@/utils/config";
 import { TrendingSongs } from "@/components/custom/trending-songs";
 import { StepperWrapper } from "@/components/custom/stepper-wrapper";
 import TiltedCard from "@/components/ui/react-bits/react-bit-component/TiltedCard/TiltedCard";

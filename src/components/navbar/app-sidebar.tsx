@@ -21,6 +21,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { TeamSwitcher } from "./team-switcher";
 import { NavMain } from "./nav-main";
@@ -158,6 +159,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { setTheme } = useTheme();
+  const { state } = useSidebar();
 
   const [isLight, setIsLight] = React.useState(true);
   return (
@@ -170,7 +172,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex items-center space-x-2 ml-[7px]">
+        <div
+          className={`flex items-center space-x-2 ${state ? "" : "ml-[7px]"}`}
+        >
           <Switch
             id="theme-mode"
             onClick={() => {
@@ -178,7 +182,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               setIsLight(!isLight);
             }}
           />
-          <Label htmlFor="theme-mode">{isLight ? "Dark" : "Light"} Mode</Label>
+          <Label
+            htmlFor="theme-mode"
+            className={`transition-opacity duration-200 ${
+              state === "collapsed"
+                ? "opacity-0 pointer-events-none"
+                : "opacity-100"
+            }`}
+          >
+            {isLight ? "Dark" : "Light"} Mode
+          </Label>
         </div>
         <NavUser />
       </SidebarFooter>
