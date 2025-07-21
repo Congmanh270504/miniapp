@@ -1,5 +1,8 @@
 import { pinata } from "@/utils/config";
-import { ProcessedSongsData } from "../../types/song-types";
+import {
+  ProcessedSongsData,
+  SongWithPinataImage,
+} from "../../types/song-types";
 
 /**
  * Create access link for current song (both music and image)
@@ -14,10 +17,14 @@ export async function createCurrentSongAccessLinks(
       expires,
     }),
     song.Image?.cid
-      ? pinata.gateways.private.createAccessLink({
-          cid: song.Image.cid,
-          expires,
-        })
+      ? pinata.gateways.private
+          .createAccessLink({
+            cid: song.Image.cid,
+            expires,
+          })
+          .optimizeImage({
+            format: "webp",
+          })
       : Promise.resolve(""),
   ]);
 
@@ -66,6 +73,7 @@ export async function createPlaylistImageLinks(
 /**
  * Batch create Pinata access links for songs with error handling
  */
+
 export async function createBatchAccessLinks(
   songs: Array<{ fileCid: string; Image?: { cid: string } | null }>,
   expires: number = 3600
@@ -76,7 +84,7 @@ export async function createBatchAccessLinks(
         try {
           return await pinata.gateways.private.createAccessLink({
             cid: song.fileCid,
-            expires,
+            expires: expires,
           });
         } catch (error) {
           console.error("Failed to create music URL:", error);
@@ -90,7 +98,7 @@ export async function createBatchAccessLinks(
         try {
           return await pinata.gateways.private.createAccessLink({
             cid: song.Image.cid,
-            expires,
+            expires: expires,
           });
         } catch (error) {
           console.error("Failed to create image URL:", error);
@@ -116,6 +124,46 @@ export async function createBatchAccessLinks(
 
   return {
     musicUrls: musicUrlsResolved,
+    imageUrls: imageUrlsResolved,
+  };
+}
+
+export async function createBatchAccessLinksImages(
+  songs: Array<{ Image: { cid: string } }>,
+  expires: number = 3600
+) {
+  const [imageUrls] = await Promise.allSettled([
+    Promise.allSettled(
+      songs.map(async (song) => {
+        if (!song.Image?.cid) return "";
+        try {
+          return await pinata.gateways.private
+            .createAccessLink({
+              cid: song.Image.cid,
+              expires: expires,
+            })
+            .optimizeImage({
+              width: 300,
+              height: 300,
+              format: "webp",
+              fit: "cover",
+            });
+        } catch (error) {
+          console.error("Failed to create image URL:", error);
+          return "";
+        }
+      })
+    ),
+  ]);
+
+  const imageUrlsResolved =
+    imageUrls.status === "fulfilled"
+      ? (imageUrls.value as PromiseSettledResult<string>[]).map((result) =>
+          result.status === "fulfilled" ? result.value : ""
+        )
+      : songs.map(() => "");
+
+  return {
     imageUrls: imageUrlsResolved,
   };
 }
@@ -240,6 +288,45 @@ export function transformSongData(
     genre: song.Genre.name,
     createdAt: song.createdAt,
     hearted: song.HeartedSongs.length,
+  }));
+}
+
+/**
+ * Transform song data with Pinata URLs (for ProcessedSongsData)
+ */
+export function transformSongDataWithUrls(
+  songs: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    artist: string;
+    description: string;
+    fileCid: string;
+    createdAt: Date;
+    Image?: { cid: string } | null;
+    Genre: { name: string };
+    Users: { clerkId: string };
+    HeartedSongs: Array<any>;
+    Comments: Array<any>;
+  }>,
+  imageUrls: string[]
+): SongWithPinataImage[] {
+  return songs.map((song, index) => ({
+    songId: song.id,
+    title: song.title,
+    slug: song.slug,
+    fileCid: song.fileCid,
+    artist: song.artist,
+    clerkId: song.Users.clerkId || "",
+    description: song.description,
+    imageFile: {
+      cid: song.Image?.cid || "",
+      url: imageUrls[index] || "",
+    },
+    genre: song.Genre.name,
+    createdAt: song.createdAt,
+    hearted: song.HeartedSongs,
+    comments: song.Comments,
   }));
 }
 

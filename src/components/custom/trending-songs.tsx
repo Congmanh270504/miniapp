@@ -11,19 +11,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Play, Music } from "lucide-react";
 import { useState } from "react";
-import { ProcessedSongsData } from "../../../types/song-types";
+import { SongWithPinataImage } from "../../../types/song-types";
 import Link from "next/link";
 import SplitText from "../ui/react-bits/text-animations/SplitText/SplitText";
 import Image from "next/image";
 
 interface TrendingSongsProps {
-  songData: ProcessedSongsData;
+  songData: SongWithPinataImage[];
 }
 
 export const TrendingSongs: React.FC<TrendingSongsProps> = ({ songData }) => {
   const [hoveredSong, setHoveredSong] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
-  
 
   const handleImageError = (songId: string) => {
     setImageErrors((prev) => new Set(prev).add(songId));

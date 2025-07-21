@@ -5,7 +5,10 @@ import { SocialLinks } from "@/components/custom/social-links";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Timeline } from "@/components/ui/timeline";
 import { prisma } from "@/utils/prisma";
-import { ProcessedSongsData } from "../../types/song-types";
+import {
+  ProcessedSongsData,
+  SongWithPinataImage,
+} from "../../types/song-types";
 import { TrendingSongs } from "@/components/custom/trending-songs";
 import { StepperWrapper } from "@/components/custom/stepper-wrapper";
 import TiltedCard from "@/components/ui/react-bits/react-bit-component/TiltedCard/TiltedCard";
@@ -14,7 +17,9 @@ import { unstable_cache } from "next/cache";
 import { songForListFast } from "@/lib/prisma-includes";
 import {
   createBatchAccessLinks,
+  createBatchAccessLinksImages,
   transformSongDataFull,
+  transformSongDataWithUrls,
 } from "@/lib/song-utils";
 import { Metadata } from "next";
 import { Suspense } from "react";
@@ -47,7 +52,7 @@ export const metadata: Metadata = {
 
 // Cached function để lấy trending songs với error handling
 const getCachedTrendingSongs = unstable_cache(
-  async (): Promise<ProcessedSongsData> => {
+  async (): Promise<SongWithPinataImage[]> => {
     try {
       const songs = await prisma.songs.findMany({
         include: songForListFast, // Sử dụng pattern nhanh cho home page
@@ -55,7 +60,7 @@ const getCachedTrendingSongs = unstable_cache(
           { createdAt: "desc" },
           { HeartedSongs: { _count: "desc" } }, // Thêm sort theo popularity
         ],
-        take: 8, // Giảm từ 10 xuống 8 để load nhanh hơn
+        take: 8,
       });
 
       if (!songs.length) {
@@ -63,9 +68,9 @@ const getCachedTrendingSongs = unstable_cache(
       }
 
       // Performance optimization: Batch create access links với timeout
-      const { musicUrls, imageUrls } = await Promise.race([
-        createBatchAccessLinks(songs, 3600), // 1 hour
-        new Promise<{ musicUrls: string[]; imageUrls: string[] }>((_, reject) =>
+      const { imageUrls } = await Promise.race([
+        createBatchAccessLinksImages(songs, 60), // 1 hour
+        new Promise<{ imageUrls: string[] }>((_, reject) =>
           setTimeout(
             () => reject(new Error("Timeout creating access links")),
             30000
@@ -74,7 +79,7 @@ const getCachedTrendingSongs = unstable_cache(
       ]);
 
       // Transform song data với URLs đã được tạo sẵn
-      const processedData = transformSongDataFull(songs, musicUrls, imageUrls);
+      const processedData = transformSongDataWithUrls(songs, imageUrls);
 
       return processedData;
     } catch (error) {

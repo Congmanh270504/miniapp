@@ -66,8 +66,8 @@ export default function LazyPlaylist({
     (e: React.UIEvent<HTMLDivElement>) => {
       const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
 
-      // Load more when user scrolls to 80% of the content
-      if (scrollHeight - scrollTop <= clientHeight * 1.2) {
+      // Load more when user scrolls to 90% of the content
+      if (scrollHeight - scrollTop <= clientHeight * 1.1) {
         loadMore();
       }
     },
@@ -75,7 +75,7 @@ export default function LazyPlaylist({
   );
 
   return (
-    <div className="rounded-lg text-black h-full flex flex-col">
+    <div className="rounded-lg text-black h-full flex flex-col ">
       <div className="flex items-center justify-between p-4 pb-2 flex-shrink-0">
         <h2 className="text-lg font-bold">My Favorites</h2>
         <a
@@ -86,14 +86,12 @@ export default function LazyPlaylist({
         </a>
       </div>
       <div
-        className="flex-1 space-y-1 p-2 overflow-y-auto"
+        className="flex-1 space-y-1 p-2 overflow-y-auto no-scrollbar"
         onScroll={handleScroll}
         style={{
           minHeight: "200px",
           maxHeight: "calc(100% - 60px)", // Trừ đi height của header
           overscrollBehavior: "contain",
-          scrollbarWidth: "thin",
-          scrollbarColor: "#d1d5db #f3f4f6",
         }}
       >
         {playlist.map((song) => (

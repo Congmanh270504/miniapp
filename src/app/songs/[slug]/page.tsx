@@ -112,10 +112,9 @@ export default async function Page({ params }: PageProps) {
     <Suspense fallback={<Loading />}>
       <div className="flex w-full h-full p-4 gap-2 ">
         <MusicPlayer
-          slug={currentSong.slug}
-          songs={[currentSongData, ...playlistData]}
+          currentSongData={currentSongData}
+          songs={playlistData}
           heart={heart}
-          userId={user.id}
         />
         <PlaylistComment
           currentSong={currentSong.id}

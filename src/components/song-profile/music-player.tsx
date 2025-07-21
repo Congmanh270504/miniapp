@@ -15,25 +15,13 @@ import { HeartButton } from "@/components/custom/heart-button";
 
 export default function MusicPlayer({
   songs,
-  slug,
   heart,
-  userId,
+  currentSongData,
 }: {
   songs: ProcessedSongsData;
-  slug: string;
   heart: boolean;
-  userId: string;
+  currentSongData: ProcessedSongWithPinata;
 }) {
-  // Memoize current song data để tránh re-calculation
-  const currentSongData = useMemo(
-    () => songs.find((song) => song.slug === slug),
-    [songs, slug]
-  );
-
-  if (!currentSongData) {
-    throw new Error("Current song not found");
-  }
-
   const [currentSong, setCurrentSong] =
     useState<ProcessedSongWithPinata>(currentSongData);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -48,7 +36,7 @@ export default function MusicPlayer({
   const [imageError, setImageError] = useState(false);
 
   // Dynamic music URL loading for playlist songs
-  const [musicUrls, setMusicUrls] = useState<Map<string, string>>(new Map());
+  const [musicUrls, setMusicUrls] = useState(currentSongData.musicFile.url);
   const [loadingMusicUrl, setLoadingMusicUrl] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -123,7 +111,7 @@ export default function MusicPlayer({
       (song) => song.songId === currentSong.songId
     );
     const nextIndex = (currentIndex + 1) % songs.length;
-
+    createMusicAccessLink(songs[nextIndex].musicFile.cid);
     setCurrentTime(0);
     setCurrentSong(songs[nextIndex]);
     setIsPlaying(true);
@@ -134,7 +122,7 @@ export default function MusicPlayer({
       (song) => song.songId === currentSong.songId
     );
     const prevIndex = (currentIndex - 1 + songs.length) % songs.length;
-
+    createMusicAccessLink(songs[prevIndex].musicFile.cid);
     setCurrentTime(0);
     setCurrentSong(songs[prevIndex]);
     setIsPlaying(true);
@@ -247,28 +235,26 @@ export default function MusicPlayer({
   // Function to create music access link on demand
   const createMusicAccessLink = useCallback(
     async (fileCid: string) => {
-      if (musicUrls.has(fileCid) || loadingMusicUrl)
-        return musicUrls.get(fileCid) || "";
-
+      if (loadingMusicUrl) return "";
       setLoadingMusicUrl(true);
       try {
-        const response = await fetch("/api/songs/music-access", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ fileCid }),
-        });
+        const response = await fetch(
+          `/api/songs/music-access?fileCid=${encodeURIComponent(fileCid)}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
 
-        if (response.ok) {
-          const { musicUrl } = await response.json();
-          setMusicUrls((prev) => new Map(prev).set(fileCid, musicUrl));
-          return musicUrl;
+        if (response.status === 200) {
+          const { musicAccessLink } = await response.json();
+          setMusicUrls(musicAccessLink);
         }
       } catch (error) {
         console.error("Failed to create music access link:", error);
       } finally {
         setLoadingMusicUrl(false);
       }
-      return "";
     },
     [musicUrls, loadingMusicUrl]
   );
@@ -359,11 +345,7 @@ export default function MusicPlayer({
         />
       </div>
       {/* Hidden Audio Element */}
-      <audio
-        ref={audioRef}
-        src={currentSong.musicFile.url}
-        loop={isRepeatOne}
-      />
+      <audio ref={audioRef} src={musicUrls} loop={isRepeatOne} />
     </div>
   );
 }
