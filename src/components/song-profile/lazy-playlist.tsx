@@ -77,10 +77,10 @@ export default function LazyPlaylist({
   return (
     <div className="rounded-lg text-black h-full flex flex-col ">
       <div className="flex items-center justify-between p-4 pb-2 flex-shrink-0">
-        <h2 className="text-lg font-bold">My Favorites</h2>
+        <h2 className="text-lg font-bold dark:text-white">My Favorites</h2>
         <a
           href="#"
-          className="text-xs font-medium text-[#332D56] hover:underline"
+          className="text-xs font-medium text-[#332D56] hover:underline dark:text-white"
         >
           See All
         </a>
@@ -110,13 +110,17 @@ export default function LazyPlaylist({
                 />
               </div>
               <div className="ml-3 flex-1">
-                <h3 className="text-sm font-medium">{song.title}</h3>
-                <p className="text-xs text-[#3A0519]">{song.artist}</p>
+                <h3 className="text-sm font-medium dark:text-white">
+                  {song.title}
+                </h3>
+                <p className="text-xs text-[#3A0519] dark:text-white">
+                  {song.artist}
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex items-center text-gray-400">
-                  <Heart className="h-4 w-4 mr-1" />
-                  <span className="text-xs text-black">
+                  <Heart className="h-4 w-4 mr-1 " />
+                  <span className="text-xs text-black dark:text-white">
                     {formatLikes(song.hearted.length)}
                   </span>
                 </div>

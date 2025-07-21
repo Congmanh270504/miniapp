@@ -98,6 +98,7 @@ export interface ProcessedSongWithPinata {
   artist: string;
   clerkId: string; // Clerk ID của user tạo bài hát
   description: string;
+  duration: number; // Duration in seconds
   musicFile: {
     cid: string;
     url: string;

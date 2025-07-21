@@ -16,7 +16,7 @@ import { Repeat1 } from "lucide-react";
 import { GrChapterNext } from "react-icons/gr";
 import { GrChapterPrevious } from "react-icons/gr";
 import { HorizontalVolumeControl } from "@/components/custom/horizontal-volume-control";
-
+import { FaPlay } from "react-icons/fa";
 interface MusicControlsProps {
   playSong: boolean;
   isShuffle: boolean;
@@ -63,11 +63,11 @@ const PlayButton = memo(
     onTogglePlay: () => void;
   }) => (
     <Button
-      className="bg-white rounded-full outline-solid border p-3 text-red-600 shadow-neutral-500/20 transition active:scale-95 hover:bg-gray-100 group relative inline-flex h-12 w-12 items-center justify-center overflow-hidden"
+      className="bg-black rounded-full border-black text-white transition active:scale-95  group relative inline-flex h-12 w-12 items-center justify-center overflow-hidden dark:bg-[#73737333]"
       onClick={onTogglePlay}
     >
-      <div className="transition duration-700 group-hover:rotate-[360deg]">
-        {isPlaying ? <Pause size={24} /> : <Play size={24} />}
+      <div className="ml-0.5 transition duration-700 group-hover:rotate-[360deg]">
+        {isPlaying ? <Pause size={24} /> : <FaPlay />}
       </div>
     </Button>
   )
@@ -103,8 +103,8 @@ function MusicControls({
         </div>
       </div>
 
-      {/* Center - Main controls */}
-      <div className="flex items-center space-x-4">
+      {/* Center - Main controls - ✅ Đã căn giữa */}
+      <div className="flex items-center justify-center space-x-4 flex-1">
         <ControlButton onClick={onPrevSong}>
           <GrChapterPrevious />
         </ControlButton>

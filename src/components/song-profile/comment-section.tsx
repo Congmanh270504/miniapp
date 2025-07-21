@@ -195,7 +195,7 @@ export function CommentSection({
   };
 
   return (
-    <div className="flex flex-col gap-2 w-full h-full">
+    <div className="flex flex-col gap-2 w-full h-full dark:bg-black ">
       {/* Post header */}
       <div className="flex items-center p-4 border-b gap-2">
         <Avatar className="h-8 w-8 mr-2 relative">
@@ -223,9 +223,7 @@ export function CommentSection({
             </svg>
             <span className="ml-1 text-blue-500 font-medium">Follow</span>
           </div>
-          <div className="text-gray-500 text-base ">
-            {description}
-          </div>
+          <div className="text-gray-500 text-base ">{description}</div>
         </div>
         <Button variant="ghost" size="icon" className="ml-auto">
           <MoreHorizontal className="h-5 w-5" />
@@ -351,7 +349,7 @@ export function CommentSection({
       </div>
 
       {/* Post actions */}
-      <div className=" bg-white shadow-lg mt-auto">
+      <div className=" bg-white shadow-lg mt-auto dark:bg-black">
         <div className="p-4 border-t">
           <div className="flex items-center mb-3">
             <Button

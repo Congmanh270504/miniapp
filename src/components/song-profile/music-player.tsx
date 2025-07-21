@@ -12,6 +12,10 @@ import {
   ProcessedSongWithPinata,
 } from "../../../types/song-types";
 import { HeartButton } from "@/components/custom/heart-button";
+import ReactPlayer from "react-player";
+import { FaLastfmSquare } from "react-icons/fa";
+import SplitText from "../ui/react-bits/text-animations/SplitText/SplitText";
+import ShinyText from "../ui/react-bits/text-animations/ShinyText/ShinyText";
 
 export default function MusicPlayer({
   songs,
@@ -26,7 +30,7 @@ export default function MusicPlayer({
     useState<ProcessedSongWithPinata>(currentSongData);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState(currentSongData.duration);
   const [isShuffle, setIsShuffle] = useState(false);
   const [isRepeatOne, setIsRepeatOne] = useState(false);
   const [currentVolume, setCurrentVolume] = useState(50);
@@ -39,8 +43,7 @@ export default function MusicPlayer({
   const [musicUrls, setMusicUrls] = useState(currentSongData.musicFile.url);
   const [loadingMusicUrl, setLoadingMusicUrl] = useState(false);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audio = audioRef.current;
+  const playerRef = useRef<any>(null);
 
   // Preload next/previous images
   const preloadImages = useCallback(() => {
@@ -68,27 +71,15 @@ export default function MusicPlayer({
 
   // Audio effects - optimized with useCallback
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.load(); // Đảm bảo load lại source mới
+    // ReactPlayer handles loading automatically when src changes
     setCurrentTime(0);
-
-    if (isPlaying) {
-      audio.play().catch((error) => {
-        console.error("Error playing audio:", error);
-      });
-    }
-  }, [currentSong.musicFile.url, isPlaying]);
+  }, [currentSong.musicFile.url]);
 
   // Audio ended handler - memoized
   const handleEnded = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
     if (isRepeatOne) {
-      audio.currentTime = 0;
-      audio.play().catch(console.error);
+      // ReactPlayer will handle repeat automatically with loop prop
+      return;
     } else if (isShuffle) {
       const randomIndex = Math.floor(Math.random() * songs.length);
       setCurrentSong(songs[randomIndex]);
@@ -97,16 +88,11 @@ export default function MusicPlayer({
     }
   }, [isRepeatOne, isShuffle, songs]);
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.addEventListener("ended", handleEnded);
-    return () => audio.removeEventListener("ended", handleEnded);
-  }, [handleEnded]);
+  // ReactPlayer will call onEnded prop directly
 
   // Optimized handlers with useCallback
   const handleNextSong = useCallback(() => {
+    setIsPlaying(false);
     const currentIndex = songs.findIndex(
       (song) => song.songId === currentSong.songId
     );
@@ -118,6 +104,7 @@ export default function MusicPlayer({
   }, [songs, currentSong.songId]);
 
   const handlePrevSong = useCallback(() => {
+    setIsPlaying(false);
     const currentIndex = songs.findIndex(
       (song) => song.songId === currentSong.songId
     );
@@ -128,89 +115,79 @@ export default function MusicPlayer({
     setIsPlaying(true);
   }, [songs, currentSong.songId]);
 
-  const handleVolumeChange = useCallback(
-    (volume: number) => {
-      setCurrentVolume(volume);
-      if (audio) {
-        audio.volume = volume / 100;
-      }
-    },
-    [audio]
-  );
-  // Audio metadata and time tracking
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+  const handleVolumeChange = useCallback((volume: number) => {
+    setCurrentVolume(volume);
+    // ReactPlayer handles volume through props
+  }, []);
 
-    const setAudioData = () => setDuration(audio.duration);
-    const setAudioTime = () => setCurrentTime(audio.currentTime);
+  // ReactPlayer event handlers - memoized for better performance
+  const handleTimeUpdate = useCallback(() => {
+    const player = playerRef.current;
 
-    audio.addEventListener("loadedmetadata", setAudioData);
-    audio.addEventListener("timeupdate", setAudioTime);
+    if (!player) return;
 
-    return () => {
-      audio.removeEventListener("loadedmetadata", setAudioData);
-      audio.removeEventListener("timeupdate", setAudioTime);
-    };
+    if (!player.duration) return;
+    setCurrentTime(player.currentTime);
+  }, []);
+
+  const handlePlayerError = useCallback((error: any) => {
+    console.error("Player error:", error);
   }, []);
 
   // Optimized control handlers
   const togglePlay = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play().catch(console.error);
-    }
     setIsPlaying(!isPlaying);
   }, [isPlaying]);
 
   const handleForward10s = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    const player = playerRef.current;
+    if (!player) return;
 
-    const newTime = Math.min(audio.currentTime + 10, audio.duration || 0);
-    audio.currentTime = newTime;
+    const newTime = Math.min(currentTime + 10, duration || 0);
+    player.currentTime = newTime;
+
     setCurrentTime(newTime);
 
     if (!isPlaying) {
-      audio.play().catch(console.error);
       setIsPlaying(true);
     }
-  }, [isPlaying]);
+  }, [currentTime, duration, isPlaying]);
 
   const handleBackward10s = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio || audio.currentTime === 0) return;
+    const player = playerRef.current;
+    if (!player || currentTime === 0) return;
 
-    const newTime = Math.max(audio.currentTime - 10, 0);
-    audio.currentTime = newTime;
+    const newTime = Math.max(currentTime - 10, 0);
+    player.currentTime = newTime;
     setCurrentTime(newTime);
 
     if (!isPlaying) {
-      audio.play().catch(console.error);
       setIsPlaying(true);
     }
-  }, [isPlaying]);
+  }, [currentTime, isPlaying]);
 
   const handleProgressChange = useCallback(
     (value: number[]) => {
-      const audio = audioRef.current;
-      if (!audio) return;
+      const player = playerRef.current;
+      if (!player) return;
 
       const newTime = value[0];
-      audio.currentTime = newTime;
+      player.currentTime = newTime;
       setCurrentTime(newTime);
 
       if (!isPlaying) {
-        audio.play().catch(console.error);
         setIsPlaying(true);
       }
     },
     [isPlaying]
   );
+
+  // Thêm handler cho onDuration
+  const handleDuration = useCallback(() => {
+    const player = playerRef.current;
+    if (!player) return;
+    setDuration(player.duration);
+  }, []);
 
   // Toggle functions memoized
   const toggleShuffle = useCallback(
@@ -222,10 +199,6 @@ export default function MusicPlayer({
     [isRepeatOne]
   );
 
-  // Image loading handlers
-  const handleImageLoad = useCallback(() => {
-    setIsImageLoading(false);
-  }, []);
 
   const handleImageError = useCallback(() => {
     setImageError(true);
@@ -260,7 +233,7 @@ export default function MusicPlayer({
   );
 
   return (
-    <div className="relative w-[65%] h-full rounded-lg overflow-hidden shadow-lg border border-gray-100">
+    <div className="flex flex-col w-[65%] h-full rounded-lg overflow-hidden shadow-lg border border-gray-100 dark:border-gray-700">
       {/* Image Preloader - Background component */}
       <ImagePreloader songs={songs} currentSongId={currentSong.songId} />
 
@@ -280,9 +253,10 @@ export default function MusicPlayer({
           debounceDelay={500}
         />
       </div>
+
       {/* Album Art - Optimized with loading states */}
-      <div className="h-full">
-        <div className="h-[55vh] w-full relative justify-items-center mx-auto min-[1900px]:h-[65vh]">
+      <div className="flex-1 flex flex-col">
+        <div className="flex-1 w-full relative justify-items-center mx-auto">
           {/* Loading skeleton */}
           {isImageLoading && (
             <div className="absolute inset-0 m-4 rounded-[2em] flex items-center justify-center ">
@@ -300,28 +274,42 @@ export default function MusicPlayer({
               src={currentSong.imageFile.url}
               alt={`${currentSong.title} by ${currentSong.artist}`}
               fill
-              className={`object-cover p-4 rounded-[2em] transition-opacity duration-300 ${
+              className={`object-cover p-4 rounded-[2em] transition-opacity duration-300 animate-fade-down animate-once animate-duration-500 animate-delay-500 animate-ease-linear animate-normal ${
                 isImageLoading ? "opacity-0" : "opacity-100"
               }`}
               quality={95}
               priority={true} // High priority for faster loading
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 65vw, 50vw"
-              onLoad={handleImageLoad}
               onError={handleImageError}
-              placeholder="blur"
-              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+Cp5r6"
+              onLoadingComplete={() => setIsImageLoading(false)}
             />
           )}
         </div>
 
         {/* Song Info */}
-        <div className="text-center px-4 min-[2100px]:py-6">
-          <h2 className="text-xl font-bold">{currentSong.title}</h2>
-          <p className="text-red-200 text-sm">{currentSong.artist}</p>
+        <div className="text-center flex flex-col gap-1 px-2 py-2 min-[2100px]:py-6">
+          <SplitText
+            text={currentSong.title}
+            className="text-6xl italic text-center text-[#670D2F] px-3 "
+            delay={100}
+            duration={0.6}
+            ease="power3.out"
+            splitType="chars"
+            from={{ opacity: 0, y: 40 }}
+            to={{ opacity: 1, y: 0 }}
+            threshold={0.1}
+            rootMargin="-100px"
+            textAlign="center"
+          />
+
+          <p className="block bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600 text-lg">
+            {currentSong.artist}
+          </p>
         </div>
       </div>
+
       {/* Controls - Memoized for better performance */}
-      <div className="px-6 pb-2 absolute bottom-0 left-0 right-0 rounded-b-lg">
+      <div className="px-4 pb-2">
         <MusicControls
           playSong={isPlaying}
           isShuffle={isShuffle}
@@ -344,8 +332,20 @@ export default function MusicPlayer({
           onProgressChange={handleProgressChange}
         />
       </div>
-      {/* Hidden Audio Element */}
-      <audio ref={audioRef} src={musicUrls} loop={isRepeatOne} />
+
+      {/* ReactPlayer Audio Element */}
+      <div style={{ display: "none" }}>
+        <ReactPlayer
+          ref={playerRef}
+          src={musicUrls}
+          playing={isPlaying}
+          loop={isRepeatOne}
+          onTimeUpdate={handleTimeUpdate}
+          onDurationChange={handleDuration}
+          onEnded={handleEnded}
+          onError={handlePlayerError}
+        />
+      </div>
     </div>
   );
 }

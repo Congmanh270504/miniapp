@@ -178,6 +178,7 @@ export function transformCurrentSongData(
     slug: string;
     artist: string;
     description: string;
+    duration: number;
     fileCid: string;
     createdAt: Date;
     Image?: { cid: string } | null;
@@ -196,6 +197,7 @@ export function transformCurrentSongData(
     artist: song.artist,
     clerkId: song.Users.clerkId || "",
     description: song.description,
+    duration: song.duration,
     musicFile: {
       cid: song.fileCid,
       url: musicUrl,
@@ -342,6 +344,7 @@ export function transformSongDataFull(
     description: string;
     fileCid: string;
     createdAt: Date;
+    duration: number;
     Image?: { cid: string } | null;
     Genre: { name: string };
     Users: { clerkId: string };
@@ -358,6 +361,7 @@ export function transformSongDataFull(
     artist: song.artist,
     clerkId: song.Users.clerkId || "",
     description: song.description,
+    duration: song.duration,
     musicFile: {
       cid: song.fileCid,
       url: musicUrls[index] || "",
