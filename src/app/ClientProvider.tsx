@@ -21,6 +21,7 @@ import { useState } from "react";
 import { store } from "@/store/store";
 import ActionSearchBar from "@/components/action-sreach-bar";
 import { QueryProvider } from "./providers";
+import Footer from "@/components/footer";
 
 interface ClientProviderProps {
   children: React.ReactNode;
@@ -80,6 +81,7 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
             <div className="w-full h-[calc(100vh-var(--spacing)*16)] ">
               {children}
             </div>
+            {/* <Footer /> */}
           </SidebarInset>
         </SidebarProvider>
         <Toaster richColors closeButton position="bottom-right" />

@@ -265,7 +265,6 @@ export default async function Page() {
       </div>
 
       {/* Footer always at bottom */}
-      <Footer />
     </div>
   );
 }

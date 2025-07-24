@@ -79,7 +79,7 @@ export default async function Page() {
   // Performance optimization: Batch create access links
   const { musicUrls, imageUrls } = await createBatchAccessLinks(
     data.Songs,
-    7200
+    60
   ); // 2 hours
 
   // Transform song data với URLs đã được tạo sẵn
