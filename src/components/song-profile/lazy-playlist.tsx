@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ProcessedSongsData } from "../../../types/song-types";
 import { useLazyLoading } from "@/hooks/useLazyLoading";
 import OptimizedImage from "@/components/ui/optimized-image";
+import { FaHeart } from "react-icons/fa";
 
 interface LazyPlaylistProps {
   initialPlaylist: ProcessedSongsData;
@@ -131,21 +132,19 @@ export default function LazyPlaylist({
                   quality={85}
                 />
               </div>
-              <div className="ml-3 flex-1">
-                <h3 className="text-sm font-medium dark:text-white">
+              <div className="ml-3 flex-1 overflow-hidden">
+                <h3 className="text-sm font-medium dark:text-white truncate">
                   {song.title}
                 </h3>
-                <p className="text-xs text-[#3A0519] dark:text-white">
+                <p className="text-xs text-[#3A0519] dark:text-white truncate">
                   {song.artist}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center text-gray-400">
-                  <Heart className="h-4 w-4 mr-1 " />
-                  <span className="text-xs text-black dark:text-white">
-                    {formatLikes(song.hearted.length)}
-                  </span>
-                </div>
+              <div className="flex items-center gap-1 text-gray-400 w-12 justify-end flex-shrink-0">
+                <FaHeart className="text-red-600 w-3 h-3 mr-1" />
+                <span className="text-xs text-black dark:text-white text-right">
+                  {formatLikes(song.hearted.length)}
+                </span>
               </div>
             </div>
           </Link>

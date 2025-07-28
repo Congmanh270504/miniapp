@@ -15,12 +15,10 @@ interface UserCreateSongInfo {
 }
 
 const PlaylistComment = ({
-  comments,
   songs,
   currentSong,
   userCreateSongInfor,
 }: {
-  comments: SongWithIncludes["Comments"];
   songs: ProcessedSongsData;
   currentSong: string;
   userCreateSongInfor: UserCreateSongInfo;
@@ -44,8 +42,9 @@ const PlaylistComment = ({
       <div className="flex-1 overflow-hidden shadow-lg border border-gray-100 rounded-lg dark:border-gray-700">
         <div className="w-full h-full relative bg-white rounded-lg shadow animate-fade-down animate-once animate-duration-500 animate-delay-500 animate-ease-linear animate-normal ">
           <CommentSection
-            description={currentSongData.description}
-            commentData={comments}
+            currentSong={currentSongData}
+            // description={currentSongData.description}
+            // commentData={currentSongData.comments}
             userCreate={userCreateSongInfor}
           />
         </div>

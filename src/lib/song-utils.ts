@@ -102,10 +102,7 @@ export async function createBatchAccessLinks(
               expires,
             })
             .optimizeImage({
-              width: 300,
-              height: 300,
               format: "webp",
-              fit: "cover",
             });
         } catch (error) {
           console.error("Failed to create image URL:", error);

@@ -19,7 +19,6 @@ interface MusicPlayerWrapperProps {
   currentSongData: ProcessedSongWithPinata;
   songs: ProcessedSongsData;
   heart: boolean;
-  comments: SongWithIncludes["Comments"];
   userCreateSongInfor: UserCreateSongInfo;
 }
 
@@ -27,7 +26,6 @@ export default function MusicPlayerWrapper({
   currentSongData,
   songs,
   heart,
-  comments,
   userCreateSongInfor,
 }: MusicPlayerWrapperProps) {
   const [currentSongId, setCurrentSongId] = useState(currentSongData.songId);
@@ -46,7 +44,6 @@ export default function MusicPlayerWrapper({
       />
       <PlaylistComment
         currentSong={currentSongId}
-        comments={comments}
         songs={songs}
         userCreateSongInfor={userCreateSongInfor}
       />

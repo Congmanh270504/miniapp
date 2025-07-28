@@ -130,7 +130,6 @@ export default async function Page({ params }: PageProps) {
           currentSongData={currentSongInPlaylist}
           songs={playlistData}
           heart={heart}
-          comments={currentSong.Comments}
           userCreateSongInfor={userCreateSongInfor}
         />
       </div>
