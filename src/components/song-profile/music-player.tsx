@@ -13,18 +13,17 @@ import {
 } from "../../../types/song-types";
 import { HeartButton } from "@/components/custom/heart-button";
 import ReactPlayer from "react-player";
-import { FaLastfmSquare } from "react-icons/fa";
-import SplitText from "../ui/react-bits/text-animations/SplitText/SplitText";
-import ShinyText from "../ui/react-bits/text-animations/ShinyText/ShinyText";
 
 export default function MusicPlayer({
   songs,
   heart,
   currentSongData,
+  onSongChange,
 }: {
   songs: ProcessedSongsData;
   heart: boolean;
   currentSongData: ProcessedSongWithPinata;
+  onSongChange?: (songId: string) => void;
 }) {
   const [currentSong, setCurrentSong] =
     useState<ProcessedSongWithPinata>(currentSongData);
@@ -75,21 +74,6 @@ export default function MusicPlayer({
     setCurrentTime(0);
   }, [currentSong.musicFile.url]);
 
-  // Audio ended handler - memoized
-  const handleEnded = useCallback(() => {
-    if (isRepeatOne) {
-      // ReactPlayer will handle repeat automatically with loop prop
-      return;
-    } else if (isShuffle) {
-      const randomIndex = Math.floor(Math.random() * songs.length);
-      setCurrentSong(songs[randomIndex]);
-    } else {
-      handleNextSong();
-    }
-  }, [isRepeatOne, isShuffle, songs]);
-
-  // ReactPlayer will call onEnded prop directly
-
   // Optimized handlers with useCallback
   const handleNextSong = useCallback(() => {
     setIsPlaying(false);
@@ -97,11 +81,20 @@ export default function MusicPlayer({
       (song) => song.songId === currentSong.songId
     );
     const nextIndex = (currentIndex + 1) % songs.length;
-    createMusicAccessLink(songs[nextIndex].musicFile.cid);
+    const nextSong = songs[nextIndex];
+
+    setMusicUrls(nextSong.musicFile.url);
+    // Update URL without page reload
+    window.history.pushState(null, "", `/songs/${nextSong.slug}`);
+
+    // Reset time and play next song
     setCurrentTime(0);
-    setCurrentSong(songs[nextIndex]);
+    setCurrentSong(nextSong);
     setIsPlaying(true);
-  }, [songs, currentSong.songId]);
+
+    // Notify parent component about song change
+    onSongChange?.(nextSong.songId);
+  }, [songs, currentSong.songId, onSongChange]);
 
   const handlePrevSong = useCallback(() => {
     setIsPlaying(false);
@@ -109,11 +102,43 @@ export default function MusicPlayer({
       (song) => song.songId === currentSong.songId
     );
     const prevIndex = (currentIndex - 1 + songs.length) % songs.length;
-    createMusicAccessLink(songs[prevIndex].musicFile.cid);
+    const prevSong = songs[prevIndex];
+
+    setMusicUrls(prevSong.musicFile.url);
+    // Update URL without page reload
+    window.history.pushState(null, "", `/songs/${prevSong.slug}`);
+
     setCurrentTime(0);
-    setCurrentSong(songs[prevIndex]);
+    setCurrentSong(prevSong);
     setIsPlaying(true);
-  }, [songs, currentSong.songId]);
+
+    // Notify parent component about song change
+    onSongChange?.(prevSong.songId);
+  }, [songs, currentSong.songId, onSongChange]);
+
+  // Audio ended handler - memoized
+  const handleEnded = useCallback(() => {
+    if (isRepeatOne) {
+      // ReactPlayer will handle repeat automatically with loop prop
+      return;
+    } else if (isShuffle) {
+      const randomIndex = Math.floor(Math.random() * songs.length);
+      const randomSong = songs[randomIndex];
+
+      setMusicUrls(randomSong.musicFile.url);
+      // Update URL without page reload
+      window.history.pushState(null, "", `/songs/${randomSong.slug}`);
+
+      setCurrentTime(0);
+      setCurrentSong(randomSong);
+      setIsPlaying(true);
+
+      // Notify parent component about song change
+      onSongChange?.(randomSong.songId);
+    } else {
+      handleNextSong();
+    }
+  }, [isRepeatOne, isShuffle, songs, handleNextSong, onSongChange]);
 
   const handleVolumeChange = useCallback((volume: number) => {
     setCurrentVolume(volume);
@@ -199,38 +224,10 @@ export default function MusicPlayer({
     [isRepeatOne]
   );
 
-
   const handleImageError = useCallback(() => {
     setImageError(true);
     setIsImageLoading(false);
   }, []);
-
-  // Function to create music access link on demand
-  const createMusicAccessLink = useCallback(
-    async (fileCid: string) => {
-      if (loadingMusicUrl) return "";
-      setLoadingMusicUrl(true);
-      try {
-        const response = await fetch(
-          `/api/songs/music-access?fileCid=${encodeURIComponent(fileCid)}`,
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-
-        if (response.status === 200) {
-          const { musicAccessLink } = await response.json();
-          setMusicUrls(musicAccessLink);
-        }
-      } catch (error) {
-        console.error("Failed to create music access link:", error);
-      } finally {
-        setLoadingMusicUrl(false);
-      }
-    },
-    [musicUrls, loadingMusicUrl]
-  );
 
   return (
     <div className="flex flex-col w-[65%] h-full rounded-lg overflow-hidden shadow-lg border border-gray-100 dark:border-gray-700">
@@ -251,6 +248,7 @@ export default function MusicPlayer({
           initialHeartState={heart}
           size={24}
           debounceDelay={500}
+          key={currentSong.songId} // Force re-render when song changes
         />
       </div>
 
@@ -288,19 +286,9 @@ export default function MusicPlayer({
 
         {/* Song Info */}
         <div className="text-center flex flex-col gap-1 px-2 py-2 min-[2100px]:py-6">
-          <SplitText
-            text={currentSong.title}
-            className="text-6xl italic text-center text-[#670D2F] px-3 "
-            delay={100}
-            duration={0.6}
-            ease="power3.out"
-            splitType="chars"
-            from={{ opacity: 0, y: 40 }}
-            to={{ opacity: 1, y: 0 }}
-            threshold={0.1}
-            rootMargin="-100px"
-            textAlign="center"
-          />
+          <h1 className="text-6xl italic text-center text-[#670D2F] px-3 ">
+            {currentSong.title}
+          </h1>
 
           <p className="block bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600 text-lg">
             {currentSong.artist}
@@ -340,6 +328,7 @@ export default function MusicPlayer({
           src={musicUrls}
           playing={isPlaying}
           loop={isRepeatOne}
+          volume={currentVolume / 100}
           onTimeUpdate={handleTimeUpdate}
           onDurationChange={handleDuration}
           onEnded={handleEnded}

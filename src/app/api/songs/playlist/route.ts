@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/utils/prisma";
 import {
+  createBatchAccessLinks,
   createPlaylistImageLinks,
+  transformCurrentSongData,
   transformPlaylistData,
+  transformSongDataFull,
 } from "@/lib/song-utils";
+import { songWithAllRelations } from "@/lib/prisma-includes";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,25 +16,19 @@ export async function GET(request: NextRequest) {
     const skip = parseInt(searchParams.get("skip") || "0");
     const take = parseInt(searchParams.get("take") || "5");
 
-    if (!excludeId) {
-      return NextResponse.json(
-        { error: "excludeId is required" },
-        { status: 400 }
-      );
-    }
+    // Tạo where condition dựa trên việc có excludeId hay không
+    const whereCondition = excludeId
+      ? {
+          NOT: {
+            id: excludeId,
+          },
+        }
+      : {};
 
     // Lấy songs từ database (skip những bài đã load)
     const songs = await prisma.songs.findMany({
-      where: {
-        NOT: {
-          id: excludeId,
-        },
-      },
-      include: {
-        Image: true,
-        Genre: true,
-        HeartedSongs: true,
-      },
+      where: whereCondition,
+      include: songWithAllRelations,
       orderBy: {
         createdAt: "desc",
       },
@@ -39,10 +37,10 @@ export async function GET(request: NextRequest) {
     });
 
     // Tạo optimized image URLs cho các bài hát mới
-    const imageUrls = await createPlaylistImageLinks(songs);
+    const { musicUrls, imageUrls } = await createBatchAccessLinks(songs);
 
     // Transform data
-    const playlistData = transformPlaylistData(songs, imageUrls);
+    const playlistData = transformSongDataFull(songs, musicUrls, imageUrls);
 
     return NextResponse.json({
       songs: playlistData,

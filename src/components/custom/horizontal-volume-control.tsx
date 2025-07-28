@@ -58,14 +58,6 @@ export function HorizontalVolumeControl({
     }
   };
 
-  const toggleMute = () => {
-    if (isMuted) {
-      setIsMuted(false);
-    } else {
-      setIsMuted(true);
-    }
-  };
-
   const toggleControlVisibility = () => {
     setIsControlVisible(!isControlVisible);
   };
@@ -99,11 +91,11 @@ export function HorizontalVolumeControl({
       {isControlVisible && (
         <div
           className={cn(
-            "absolute right-[7.5em] w-1/4 mb-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-800 z-10",
+            "absolute right-[6em] w-52 mb-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg p-2 border border-gray-200 dark:border-gray-800 z-10",
             isYouTrackPage ? "top-3" : "top-0"
           )}
         >
-          <div className="flex justify-between items-center gap-2 ">
+          <div className="flex justify-between items-center gap-3">
             <Slider
               value={[isMuted ? 0 : volume]}
               min={0}
@@ -111,10 +103,10 @@ export function HorizontalVolumeControl({
               step={1}
               onValueChange={handleVolumeChange}
               orientation="horizontal"
-              className="h-full"
+              className="flex-1"
               aria-label="Volume Control"
             />
-            <span className="text-xs text-muted-foreground mt-1 font-bold">
+            <span className="text-xs text-muted-foreground font-bold min-w-[50px] text-right">
               {isMuted ? "Muted" : `${volume}%`}
             </span>
           </div>

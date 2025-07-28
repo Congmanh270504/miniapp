@@ -1,6 +1,4 @@
 "use server";
-import MusicPlayer from "@/components/song-profile/music-player";
-import PlaylistComment from "@/components/song-profile/playlist-comment";
 import { prisma } from "@/utils/prisma";
 import Image from "next/image";
 import React, { Suspense } from "react";
@@ -10,36 +8,24 @@ import { redirect } from "next/navigation";
 import { unstable_cache } from "next/cache";
 import { songWithAllRelations } from "@/lib/prisma-includes";
 import {
-  createCurrentSongAccessLinks,
-  createPlaylistImageLinks,
-  transformCurrentSongData,
-  transformPlaylistData,
+  createBatchAccessLinks,
+  transformSongDataFull,
 } from "@/lib/song-utils";
+import { getUserById } from "@/lib/actions/user";
+import MusicPlayerWrapper from "@/components/song-profile/music-player-wrapper";
 
-// Helper: Standard include pattern cho songs với tất cả relations
-const songIncludePattern = songWithAllRelations;
-
-// Cached function để lấy playlist songs (cache 5 phút) - chỉ lấy 5 bài đầu
-const getCachedPlaylistSongs = unstable_cache(
-  async (excludeId: string) => {
+// Cached function để lấy tất cả songs cho playlist (cache 5 phút) - theo thứ tự cố định
+const getCachedAllPlaylistSongs = unstable_cache(
+  async () => {
     return await prisma.songs.findMany({
-      where: {
-        NOT: {
-          id: excludeId,
-        },
-      },
-      include: {
-        Image: true,
-        Genre: true,
-        HeartedSongs: true,
-      },
+      include: songWithAllRelations,
       orderBy: {
         createdAt: "desc",
       },
-      take: 5, // Chỉ lấy 5 bài đầu
+      take: 20, // Lấy 20 bài để có đủ cho next/prev
     });
   },
-  ["playlist-songs"],
+  ["all-playlist-songs"],
   {
     revalidate: 300, // 5 phút
     tags: ["songs"],
@@ -80,46 +66,72 @@ export default async function Page({ params }: PageProps) {
       </div>
     );
   }
+
   const heartedSongs = currentSong.HeartedSongs.find(
     (hearted) => hearted.userId === user?.id
   );
 
   const heart = heartedSongs ? true : false;
 
-  // Lấy 5 bài hát cho playlist (loại trừ bài hát hiện tại) - cached
-  const playlistSongs = await getCachedPlaylistSongs(currentSong.id);
+  // Lấy tất cả bài hát cho playlist theo thứ tự cố định - cached
+  const allPlaylistSongs = await getCachedAllPlaylistSongs();
 
-  // Tạo access links riêng biệt
-  // 1. Cho bài hát hiện tại: cả nhạc và ảnh
-  const currentSongLinks = await createCurrentSongAccessLinks(
-    currentSong,
+  // Tạo access links cho tất cả bài hát
+  const { musicUrls, imageUrls } = await createBatchAccessLinks(
+    allPlaylistSongs.slice(0, 10), // Giới hạn lấy 10 bài để tránh quá tải
     3600
   );
 
-  // 2. Cho playlist: chỉ ảnh được tối ưu hóa
-  const playlistImageUrls = await createPlaylistImageLinks(playlistSongs);
-
-  // Transform data
-  const currentSongData = transformCurrentSongData(
-    currentSong,
-    currentSongLinks.musicUrl,
-    currentSongLinks.imageUrl
+  const playlistData = transformSongDataFull(
+    allPlaylistSongs.slice(0, 10),
+    imageUrls,
+    musicUrls
   );
 
-  const playlistData = transformPlaylistData(playlistSongs, playlistImageUrls);
+  // Tìm current song trong playlist data
+  const currentSongInPlaylist = playlistData.find(
+    (song) => song.songId === currentSong.id
+  );
+
+  if (!currentSongInPlaylist) {
+    return (
+      <div className="flex w-full h-full p-4 gap-2 ">
+        <div className="flex flex-col items-center justify-center w-full h-full">
+          <h1 className="text-2xl font-bold">
+            Current song not found in playlist
+          </h1>
+        </div>
+      </div>
+    );
+  }
+
+  // Get user information cho current song
+  const userClerk = await getUserById(currentSong.Users.clerkId);
+  if (!userClerk || !userClerk.user) {
+    return (
+      <div className="flex w-full h-full p-4 gap-2 ">
+        <div className="flex flex-col items-center justify-center w-full h-full">
+          <h1 className="text-2xl font-bold">User Not Found</h1>
+        </div>
+      </div>
+    );
+  }
+
+  const userCreateSongInfor = {
+    clerkId: userClerk.user.id,
+    name: userClerk.user.fullName,
+    imageUrl: userClerk.user.imageUrl,
+  };
 
   return (
     <Suspense fallback={<Loading />}>
       <div className="flex w-full h-full p-4 gap-2 ">
-        <MusicPlayer
-          currentSongData={currentSongData}
+        <MusicPlayerWrapper
+          currentSongData={currentSongInPlaylist}
           songs={playlistData}
           heart={heart}
-        />
-        <PlaylistComment
-          currentSong={currentSong.id}
           comments={currentSong.Comments}
-          songs={[currentSongData, ...playlistData]}
+          userCreateSongInfor={userCreateSongInfor}
         />
       </div>
     </Suspense>

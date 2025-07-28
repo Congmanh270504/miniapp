@@ -84,7 +84,7 @@ export async function createBatchAccessLinks(
         try {
           return await pinata.gateways.private.createAccessLink({
             cid: song.fileCid,
-            expires: expires,
+            expires,
           });
         } catch (error) {
           console.error("Failed to create music URL:", error);
@@ -96,10 +96,17 @@ export async function createBatchAccessLinks(
       songs.map(async (song) => {
         if (!song.Image?.cid) return "";
         try {
-          return await pinata.gateways.private.createAccessLink({
-            cid: song.Image.cid,
-            expires: expires,
-          });
+          return await pinata.gateways.private
+            .createAccessLink({
+              cid: song.Image.cid,
+              expires,
+            })
+            .optimizeImage({
+              width: 300,
+              height: 300,
+              format: "webp",
+              fit: "cover",
+            });
         } catch (error) {
           console.error("Failed to create image URL:", error);
           return "";
@@ -351,8 +358,8 @@ export function transformSongDataFull(
     HeartedSongs: Array<any>;
     Comments: Array<any>;
   }>,
-  musicUrls: string[],
-  imageUrls: string[]
+  imageUrls: string[],
+  musicUrls: string[]
 ): ProcessedSongsData {
   return songs.map((song, index) => ({
     songId: song.id,

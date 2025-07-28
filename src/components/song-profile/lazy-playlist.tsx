@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 import { ProcessedSongsData } from "../../../types/song-types";
@@ -10,6 +10,7 @@ import OptimizedImage from "@/components/ui/optimized-image";
 interface LazyPlaylistProps {
   initialPlaylist: ProcessedSongsData;
   currentSongId: string;
+  onCurrentSongChange?: (songId: string) => void;
 }
 
 export default function LazyPlaylist({
@@ -17,26 +18,29 @@ export default function LazyPlaylist({
   currentSongId,
 }: LazyPlaylistProps) {
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const [activeSongId, setActiveSongId] = useState(currentSongId);
+
+  // Update active song ID when it changes from parent
+  useEffect(() => {
+    setActiveSongId(currentSongId);
+  }, [currentSongId]);
 
   // Sử dụng custom hook cho lazy loading
-  const loadMoreSongs = useCallback(
-    async (skip: number, take: number) => {
-      const response = await fetch(
-        `/api/songs/playlist?excludeId=${currentSongId}&skip=${skip}&take=${take}`
-      );
-      const result = await response.json();
+  const loadMoreSongs = useCallback(async (skip: number, take: number) => {
+    const response = await fetch(
+      `/api/songs/playlist?skip=${skip}&take=${take}`
+    );
+    const result = await response.json();
 
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to load songs");
-      }
+    if (!response.ok) {
+      throw new Error(result.error || "Failed to load songs");
+    }
 
-      return {
-        data: result.songs || [],
-        hasMore: result.hasMore || false,
-      };
-    },
-    [currentSongId]
-  );
+    return {
+      data: result.songs || [],
+      hasMore: result.hasMore || false,
+    };
+  }, []);
 
   const {
     data: playlist,
@@ -44,10 +48,24 @@ export default function LazyPlaylist({
     hasMore,
     loadMore,
   } = useLazyLoading({
-    initialData: initialPlaylist,
+    initialData: initialPlaylist.slice(0, 10), // Chỉ hiển thị 10 bài đầu tiên
     loadMoreFn: loadMoreSongs,
     take: 5,
   });
+
+  // Merge initial playlist with dynamically loaded songs, maintaining order
+  const displayPlaylist = useMemo(() => {
+    // Start with initial playlist (first 10)
+    const basePlaylist = initialPlaylist.slice(0, 10);
+
+    // Add any additional loaded songs that aren't in initial playlist
+    const additionalSongs = playlist.filter(
+      (song) =>
+        !initialPlaylist.some((initial) => initial.songId === song.songId)
+    );
+
+    return [...basePlaylist, ...additionalSongs];
+  }, [initialPlaylist, playlist]);
 
   const formatLikes = useCallback((count: number): string => {
     if (count >= 1000000) {
@@ -94,9 +112,13 @@ export default function LazyPlaylist({
           overscrollBehavior: "contain",
         }}
       >
-        {playlist.map((song) => (
+        {displayPlaylist.map((song) => (
           <Link key={song.songId} href={`/songs/${song.slug}`}>
-            <div className="flex items-center rounded-md p-2 hover:bg-gray-500/50">
+            <div
+              className={`flex items-center rounded-md p-2 hover:bg-gray-500/50 ${
+                song.songId === activeSongId ? "bg-gray-500/50" : ""
+              }`}
+            >
               <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded">
                 <OptimizedImage
                   src={song.imageFile?.url || ""}
@@ -135,7 +157,7 @@ export default function LazyPlaylist({
           </div>
         )}
 
-        {!hasMore && playlist.length > 0 && (
+        {!hasMore && displayPlaylist.length > 0 && (
           <div className="text-center text-gray-500 text-xs p-2">
             No more songs to load
           </div>

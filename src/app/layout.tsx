@@ -11,7 +11,6 @@ import {
 } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import ClientProvider from "./ClientProvider";
-import SessionWrapper from "@/components/session-wrapper";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

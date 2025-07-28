@@ -17,6 +17,7 @@ import { GrChapterNext } from "react-icons/gr";
 import { GrChapterPrevious } from "react-icons/gr";
 import { HorizontalVolumeControl } from "@/components/custom/horizontal-volume-control";
 import { FaPlay } from "react-icons/fa";
+import { Slider } from "@radix-ui/react-slider";
 interface MusicControlsProps {
   playSong: boolean;
   isShuffle: boolean;
@@ -125,7 +126,7 @@ function MusicControls({
       </div>
 
       {/* Right side - Repeat and Volume */}
-      <div className="flex gap-1">
+      <div className="relative flex gap-1">
         <Button onClick={onToggleRepeat}>
           {isRepeatOne ? <Repeat1 size={20} /> : <Repeat size={20} />}
         </Button>
