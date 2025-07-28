@@ -387,13 +387,6 @@ export function StepperWrapper() {
                         <SelectTrigger>
                           <SelectValue placeholder="Choose genre" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pop">Pop</SelectItem>
-                          <SelectItem value="rock">Rock</SelectItem>
-                          <SelectItem value="hiphop">Hip Hop</SelectItem>
-                          <SelectItem value="electronic">Electronic</SelectItem>
-                          <SelectItem value="jazz">Jazz</SelectItem>
-                        </SelectContent>
                       </Select>
                     </div>
 

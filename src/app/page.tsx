@@ -207,9 +207,9 @@ export default async function Page() {
             <div className="flex justify-center h-full">
               {/* <CreativeHero /> */}
               <TiltedCard
-                imageSrc="/twice.png"
-                altText="TWICE Album Cover"
-                captionText="TWICE"
+                imageSrc="/bg.jfif"
+                altText="Cmạnh"
+                captionText="Cmạnh"
                 containerHeight="300px"
                 containerWidth="300px"
                 imageHeight="500px"
@@ -219,7 +219,7 @@ export default async function Page() {
                 showMobileWarning={false}
                 showTooltip={true}
                 displayOverlayContent={true}
-                overlayContent={<p className="tilted-card-demo-text">TWICE</p>}
+                overlayContent={<p className="tilted-card-demo-text">Cmạnh</p>}
               />
             </div>
           </div>
