@@ -3,7 +3,16 @@
 import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Send, Music, User, Loader2, X } from "lucide-react";
+import {
+  Search,
+  Send,
+  Music,
+  User,
+  Loader2,
+  X,
+  Heart,
+  MessageCircle,
+} from "lucide-react";
 import useDebounce from "@/hooks/useDebounce";
 import { useSearch } from "@/hooks/useSearch";
 import { useRouter } from "next/navigation";
@@ -45,12 +54,15 @@ function ActionSearchBar() {
           if (selectedIndex >= 0 && allResults[selectedIndex]) {
             const result = allResults[selectedIndex];
             if ("slug" in result) {
-              // It's a song
               router.push(`/songs/${result.slug}`);
             } else {
               // It's a user
               router.push(`/user/${result.clerkId}`);
             }
+            handleClear();
+          } else if (query.trim().length >= 1) {
+            // Không có item nào được select nhưng có query -> chuyển đến search page
+            router.push(`/search/${encodeURIComponent(query.trim())}`);
             handleClear();
           }
           break;
@@ -63,7 +75,7 @@ function ActionSearchBar() {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isFocused, allResults, selectedIndex, router]);
+  }, [isFocused, allResults, selectedIndex, query, router]);
 
   // Handle click outside
   useEffect(() => {
@@ -290,6 +302,18 @@ function ActionSearchBar() {
                                 <p className="text-xs text-gray-500 truncate">
                                   {song.artist}
                                 </p>
+
+                                {/* Counts */}
+                                <div className="flex items-center gap-3 mt-1">
+                                  <div className="flex items-center gap-1 text-xs text-gray-400">
+                                    <Heart className="w-3 h-3" />
+                                    <span>{song.heartedCount || 0}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1 text-xs text-gray-400">
+                                    <MessageCircle className="w-3 h-3" />
+                                    <span>{song.commentsCount || 0}</span>
+                                  </div>
+                                </div>
                               </div>
                             </motion.div>
                           ))}

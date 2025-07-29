@@ -32,7 +32,7 @@ export const HoverEffect = ({
   return (
     <div
       className={cn(
-        "grid grid-cols-1 md:grid-cols-2  lg:grid-cols-5  py-10",
+        "grid grid-cols-1 md:grid-cols-2  lg:grid-cols-5  py-10 animate-fade-down animate-once animate-ease-in",
         className
       )}
     >
@@ -112,7 +112,9 @@ export const HoverEffect = ({
                   </div>
                   <div className="flex items-center gap-1">
                     <MessageCircle className="h-4 w-4" />
-                    <span className="text-xs">{formatLikes(item.comments.length)}</span>
+                    <span className="text-xs">
+                      {formatLikes(item.comments.length)}
+                    </span>
                   </div>
                 </div>
               </div>

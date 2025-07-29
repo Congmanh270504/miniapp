@@ -62,6 +62,12 @@ export const songForSearch = {
       clerkId: true,
     },
   },
+  _count: {
+    select: {
+      HeartedSongs: true,
+      Comments: true,
+    },
+  },
 } as const;
 
 // Pattern cho user profile

@@ -1,11 +1,8 @@
-import { Songs, Users, Prisma } from "@prisma/client";
 import { DataTable } from "./data-table";
 import { columns } from "./colums";
 import { prisma } from "@/utils/prisma";
 import { currentUser } from "@clerk/nextjs/server";
-import { pinata } from "@/utils/config";
 import SimpleMusicPlayer from "@/components/song-profile/simple-music-player";
-import GlobalAudioPlayer from "@/components/song-profile/global-audio-player";
 import { Suspense } from "react";
 import Loading from "@/components/ui/loading";
 import { unstable_cache } from "next/cache";
@@ -45,7 +42,7 @@ const getCachedUserSongs = unstable_cache(
   },
   ["user-songs"],
   {
-    revalidate: 300, // 5 phút
+    revalidate: 3600, // 1 giờ
     tags: ["songs", "user-songs"],
   }
 );
@@ -79,7 +76,7 @@ export default async function Page() {
   // Performance optimization: Batch create access links
   const { musicUrls, imageUrls } = await createBatchAccessLinks(
     data.Songs,
-    60
+    3600
   ); // 2 hours
 
   // Transform song data với URLs đã được tạo sẵn

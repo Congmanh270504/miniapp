@@ -6,11 +6,14 @@ import { auth } from "@clerk/nextjs/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
 import { songForSearch } from "@/lib/prisma-includes";
+import { createBatchAccessLinksImages } from "@/lib/song-utils";
+import { unstable_cache } from "next/cache";
 
 // Validation schema
 const searchSchema = z.object({
   q: z.string().min(1).max(100),
   limit: z.number().min(1).max(20).optional().default(10),
+  fullResults: z.boolean().optional().default(false), // New parameter for full results
 });
 
 // Rate limiting per user
@@ -18,6 +21,94 @@ const limiter = rateLimit({
   interval: 60 * 1000, // 1 minute
   uniqueTokenPerInterval: 500, // Max 500 unique users per minute
 });
+
+// Cached search function for songs
+const getCachedSearchSongs = (query: string, limit?: number) => {
+  const cacheKey = `search-songs-${query}-${limit || "unlimited"}`;
+
+  return unstable_cache(
+    async () => {
+      const songs = await prisma.songs.findMany({
+        where: {
+          OR: [
+            { title: { contains: query, mode: "insensitive" } },
+            { artist: { contains: query, mode: "insensitive" } },
+            { description: { contains: query, mode: "insensitive" } },
+          ],
+        },
+        include: songForSearch,
+        take: limit,
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      if (!songs || songs.length === 0) {
+        return { songs: [], imageUrls: [] };
+      }
+
+      // Use batch processing for images
+      const { imageUrls } = await createBatchAccessLinksImages(songs, 3600);
+
+      return {
+        songs: songs.map((song, index) => ({
+          ...song,
+          imageUrl: imageUrls[index] || null,
+          commentsCount: song._count?.Comments || 0,
+          heartedCount: song._count?.HeartedSongs || 0,
+        })),
+        imageUrls,
+      };
+    },
+    [cacheKey],
+    {
+      revalidate: 3600, // 1 hour cache for search results
+      tags: ["search", "songs", cacheKey],
+    }
+  )();
+};
+
+// Cached search function for users
+const getCachedSearchUsers = (query: string, limit: number) => {
+  const cacheKey = `search-users-${query}-${limit}`;
+
+  return unstable_cache(
+    async () => {
+      const client = await clerkClient();
+
+      const { data } = await client.users.getUserList({
+        query: query,
+        limit: limit,
+      });
+
+      if (!data || data.length === 0) {
+        return [];
+      }
+
+      // Filter users based on search query
+      const filteredUsers = data.filter((user) => {
+        const searchableText = [
+          user.firstName,
+          user.lastName,
+          user.username,
+          user.emailAddresses[0]?.emailAddress,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return searchableText.includes(query.toLowerCase());
+      });
+
+      return filteredUsers;
+    },
+    [cacheKey],
+    {
+      revalidate: 180, // 3 minutes cache for users (shorter because user data changes more frequently)
+      tags: ["search", "users", cacheKey],
+    }
+  )();
+};
 
 export async function GET(request: NextRequest) {
   try {
@@ -41,107 +132,34 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const rawQuery = searchParams.get("q");
     const rawLimit = searchParams.get("limit");
+    const rawFullResults = searchParams.get("fullResults");
 
     const validatedInput = searchSchema.parse({
       q: rawQuery,
       limit: rawLimit ? parseInt(rawLimit) : undefined,
+      fullResults: rawFullResults === "true",
     });
 
     // 4. Sanitize input
     const sanitizedQuery = validatedInput.q.trim();
 
-    console.log(
-      "Search API called with query:",
+    // Use cached search function for better performance
+    const { songs: songsWithImages } = await getCachedSearchSongs(
       sanitizedQuery,
-      "by user:",
-      userId
+      validatedInput.fullResults ? undefined : Math.min(validatedInput.limit, 6)
     );
 
-    const client = await clerkClient();
-
-    console.log("Starting search for:", sanitizedQuery);
-
-    // Search for songs với security (Users model chỉ có clerkId, thông tin user lấy từ Clerk)
-    const songs = await prisma.songs.findMany({
-      where: {
-        OR: [
-          { title: { contains: sanitizedQuery, mode: "insensitive" } },
-          { artist: { contains: sanitizedQuery, mode: "insensitive" } },
-          { description: { contains: sanitizedQuery, mode: "insensitive" } },
-        ],
-      },
-      include: songForSearch, // Sử dụng pattern ngắn gọn
-      take: Math.min(validatedInput.limit, 6), // Sử dụng validated limit, max 6
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    console.log("Found songs:", songs.length);
-
-    // Get song images from Pinata - simplified approach
-    const songsWithImages = await Promise.all(
-      songs.map(async (song) => {
-        try {
-          // Sử dụng pattern từ getSongsDataPinata
-          const imageUrl = await pinata.gateways.private.createAccessLink({
-            cid: song.Image.cid,
-            expires: 3600, // 1 hour
-          });
-          return {
-            ...song,
-            imageUrl,
-          };
-        } catch (error) {
-          console.error(
-            "Error fetching song image for",
-            song.title,
-            ":",
-            error
-          );
-          return {
-            ...song,
-            imageUrl: null,
-          };
-        }
-      })
+    // Use cached search function for users
+    const filteredUsers = await getCachedSearchUsers(
+      sanitizedQuery,
+      validatedInput.fullResults ? 100 : Math.min(validatedInput.limit, 10)
     );
-    if (!songsWithImages || songsWithImages.length === 0) {
-      console.log("No songs found with images for query:", sanitizedQuery);
-    }
-
-    console.log("Songs with images:", songsWithImages.length);
-
-    // Get user data from Clerk với security
-    const { data } = await client.users.getUserList({
-      query: sanitizedQuery,
-      limit: Math.min(validatedInput.limit, 10), // Giới hạn số lượng
-    });
-
-    let filteredUsers: any[] = [];
-
-    if (data && data.length > 0) {
-      // Filter users based on search query
-      filteredUsers = data.filter((user) => {
-        const searchableText = [
-          user.firstName,
-          user.lastName,
-          user.username,
-          user.emailAddresses[0]?.emailAddress,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
-
-        return searchableText.includes(sanitizedQuery.toLowerCase());
-      });
-    }
-
-    console.log("Filtered users:", filteredUsers.length);
 
     const result = {
       songs: songsWithImages,
-      users: filteredUsers.slice(0, Math.min(validatedInput.limit, 4)), // Sử dụng validated limit
+      users: validatedInput.fullResults
+        ? filteredUsers
+        : filteredUsers.slice(0, Math.min(validatedInput.limit, 4)), // Conditional user limit
     };
 
     return NextResponse.json(result);

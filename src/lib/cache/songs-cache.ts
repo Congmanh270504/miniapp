@@ -60,7 +60,7 @@ export const getCachedUserMostUpload = unstable_cache(
 
 // Cached function để lấy songs với image URLs
 export const getCachedSongsWithImages = unstable_cache(
-  async (page: number = 1, limit: number = 20, imageExpires: number = 3600) => {
+  async (skip: number = 0, limit: number = 20, imageExpires: number = 3600) => {
     // Lấy songs data
     const songs = await prisma.songs.findMany({
       include: songForList,
@@ -68,8 +68,11 @@ export const getCachedSongsWithImages = unstable_cache(
         createdAt: "desc",
       },
       take: limit,
-      skip: (page - 1) * limit,
+      skip: skip,
     });
+    if (!songs || songs.length === 0) {
+      return { songs: [], imageUrls: [], hasMore: false };
+    }
 
     // Tạo image URLs
     const { imageUrls } = await createBatchAccessLinksImages(
@@ -80,6 +83,7 @@ export const getCachedSongsWithImages = unstable_cache(
     return {
       songs,
       imageUrls,
+      hasMore: songs.length === limit, // Kiểm tra xem còn dữ liệu để load
     };
   },
   ["cached-songs-with-images"],

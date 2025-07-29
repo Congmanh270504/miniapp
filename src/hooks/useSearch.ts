@@ -13,6 +13,8 @@ interface SearchSong {
   Users: {
     clerkId: string;
   };
+  commentsCount: number;
+  heartedCount: number;
 }
 
 interface SearchUser {
@@ -30,12 +32,20 @@ interface SearchResponse {
   users: SearchUser[];
 }
 
-const fetchSearchResults = async (query: string): Promise<SearchResponse> => {
+const fetchSearchResults = async (
+  query: string,
+  fullResults = false
+): Promise<SearchResponse> => {
   if (!query || query.trim().length < 1) {
     return { songs: [], users: [] };
   }
 
-  const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+  const searchParams = new URLSearchParams({
+    q: query,
+    ...(fullResults && { fullResults: "true" }),
+  });
+
+  const response = await fetch(`/api/search?${searchParams.toString()}`);
 
   if (!response.ok) {
     // Handle specific error statuses
@@ -54,10 +64,10 @@ const fetchSearchResults = async (query: string): Promise<SearchResponse> => {
   return response.json();
 };
 
-export const useSearch = (query: string) => {
+export const useSearch = (query: string, fullResults = false) => {
   return useQuery({
-    queryKey: ["search", query],
-    queryFn: () => fetchSearchResults(query),
+    queryKey: ["search", query, fullResults],
+    queryFn: () => fetchSearchResults(query, fullResults),
     enabled: query.trim().length >= 1,
     staleTime: 10 * 1000, // Giảm từ 30s xuống 10s để fresh hơn
     refetchOnWindowFocus: false,
