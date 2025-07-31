@@ -181,7 +181,7 @@ const SearchResults = ({ query }: SearchResultsProps) => {
             Users (<span className="text-red-600">{users.length}</span>)
           </h2>
 
-          <div className="grid gap-4">
+          <div className="grid gap-4 grid-cols-2">
             {users.map((user, index) => (
               <motion.div
                 key={user.id}
@@ -190,7 +190,7 @@ const SearchResults = ({ query }: SearchResultsProps) => {
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
                 <Link
-                  href={`/user/${user.clerkId}`}
+                  href={`/${user.clerkId}/tracks`}
                   className="block p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   <div className="flex items-center gap-4">

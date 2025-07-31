@@ -67,16 +67,7 @@ const getCachedTrendingSongs = unstable_cache(
         return [];
       }
 
-      // Performance optimization: Batch create access links với timeout
-      const { imageUrls } = await Promise.race([
-        createBatchAccessLinksImages(songs, 60), // 1 hour
-        new Promise<{ imageUrls: string[] }>((_, reject) =>
-          setTimeout(
-            () => reject(new Error("Timeout creating access links")),
-            30000
-          )
-        ),
-      ]);
+      const { imageUrls } = await createBatchAccessLinksImages(songs, 3600);
 
       // Transform song data với URLs đã được tạo sẵn
       const processedData = transformSongDataWithUrls(songs, imageUrls);

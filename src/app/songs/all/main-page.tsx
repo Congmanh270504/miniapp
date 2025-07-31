@@ -10,14 +10,19 @@ import SplitText from "@/components/ui/react-bits/text-animations/SplitText/Spli
 interface MainPageProps {
   initialSongData: SongWithPinataImage[];
   hasMore: boolean;
+  title?: string; // Optional prop for additional text
 }
 
-export default function MainPage({ initialSongData, hasMore }: MainPageProps) {
+export default function MainPage({
+  initialSongData,
+  hasMore,
+  title,
+}: MainPageProps) {
   const [filteredData, setFilteredData] =
     useState<SongWithPinataImage[]>(initialSongData);
   const [isPending, setIsPending] = useState(false);
   const [isOutOfSongs, setIsOutOfSongs] = useState(hasMore);
-  console.log(isOutOfSongs);
+
   const handleFilterChange = (newFilteredData: SongWithPinataImage[]) => {
     setFilteredData(newFilteredData);
   };
@@ -26,7 +31,7 @@ export default function MainPage({ initialSongData, hasMore }: MainPageProps) {
     setIsPending(true);
     try {
       const request = await fetch(
-        `/api/songs/load-more?skip=${filteredData.length}&take=10`
+        `/api/songs/load-more?skip=${filteredData.length}&take=5`
       );
       const data = await request.json();
       if (!request.ok) {
@@ -48,7 +53,7 @@ export default function MainPage({ initialSongData, hasMore }: MainPageProps) {
   }, [filteredData]);
 
   return (
-    <div className="w-full mx-auto px-8">
+    <div className="w-full mx-auto px-8 mb-4 py-2">
       <div className="flex justify-between items-center my-5 ">
         {/* Left side - empty for balance */}
         <div className="w-48"></div>
@@ -59,7 +64,7 @@ export default function MainPage({ initialSongData, hasMore }: MainPageProps) {
             <div className="relative px-3 py-1 text-sm font-medium rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
               <span className="relative z-10">
                 <SplitText
-                  text="All songs"
+                  text={title ? title : "All songs"}
                   className="text-6xl italic text-center text-[#670D2F] px-3"
                   delay={100}
                   duration={0.6}
@@ -86,7 +91,7 @@ export default function MainPage({ initialSongData, hasMore }: MainPageProps) {
         </div>
       </div>
       <HoverEffect songData={filteredData} />
-      <div className="flex justify-self-center mb-4">
+      <div className="flex justify-center mb-4">
         {isPending ? (
           <span className="loading loading-spinner loading-xl"></span>
         ) : (

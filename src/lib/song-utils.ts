@@ -310,10 +310,10 @@ export function transformSongDataWithUrls(
     fileCid: string;
     createdAt: Date;
     Image?: { cid: string } | null;
-    Genre: { name: string };
-    Users: { clerkId: string };
-    HeartedSongs: Array<any>;
-    Comments: Array<any>;
+    Genre?: { name: string };
+    Users?: { clerkId: string };
+    HeartedSongs?: Array<any>;
+    Comments?: Array<any>;
   }>,
   imageUrls: string[]
 ): SongWithPinataImage[] {
@@ -323,16 +323,16 @@ export function transformSongDataWithUrls(
     slug: song.slug,
     fileCid: song.fileCid,
     artist: song.artist,
-    clerkId: song.Users.clerkId || "",
+    clerkId: song.Users?.clerkId || "",
     description: song.description,
     imageFile: {
       cid: song.Image?.cid || "",
       url: imageUrls[index] || "",
     },
-    genre: song.Genre.name,
+    genre: song.Genre?.name || "",
     createdAt: song.createdAt,
-    hearted: song.HeartedSongs,
-    comments: song.Comments,
+    hearted: song.HeartedSongs || [],
+    comments: song.Comments || [],
   }));
 }
 
