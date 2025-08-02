@@ -125,7 +125,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <Suspense fallback={<Loading />}>
-      <div className="flex w-full h-full p-4 gap-2 ">
+      <div className="grid grid-cols-1 w-full h-full p-4 gap-2 md:grid-cols-2 ">
         <MusicPlayerWrapper
           currentSongData={currentSongInPlaylist}
           songs={playlistData}

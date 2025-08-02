@@ -13,6 +13,7 @@ import {
   Settings2,
   SquareTerminal,
   Music,
+  Info,
 } from "lucide-react";
 
 import {
@@ -150,9 +151,9 @@ const data = {
       icon: PieChart,
     },
     {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+      name: "About",
+      url: "/about",
+      icon: Info,
     },
   ],
 };

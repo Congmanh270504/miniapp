@@ -80,8 +80,8 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
             </header>
             <div className="w-full h-[calc(100vh-var(--spacing)*16)] ">
               {children}
+              <Footer />
             </div>
-            {/* <Footer /> */}
           </SidebarInset>
         </SidebarProvider>
         <Toaster richColors closeButton position="bottom-right" />

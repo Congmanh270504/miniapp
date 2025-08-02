@@ -12,14 +12,6 @@ export default function Custom404() {
     <div className="min-h-screen bg-sidebar flex items-center justify-center px-4">
       <div className="w-full text-center justify-items-center">
         <div className="mb-8">
-          {/* <div className="relative">
-            <h1 className="text-9xl font-bold text-gray-200 dark:text-gray-700 select-none">
-              404
-            </h1>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Music className="w-24 h-24 text-purple-500 animate-pulse" />
-            </div>
-          </div> */}
           <FuzzyText
             baseIntensity={0.5}
             hoverIntensity={0.6}

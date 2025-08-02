@@ -19,7 +19,7 @@ const experiences = [
     title: "Manage your music files",
     company: "Music Dashboard",
     description:
-      "Organize your music collection with powerful management tools. Create playlists, edit track information, manage genres, and control who can access your music library.",
+      "Organize your music collection with powerful management tools. Create songs pretty simple, edit track information",
     icon: Settings,
     iconColor: "text-pink-600",
     dotColor: "bg-pink-500",
@@ -34,7 +34,7 @@ const experiences = [
     dotColor: "bg-purple-500",
   },
   {
-    title: "Comment on songs you love",
+    title: "Comment on songs you like",
     company: "Music Community",
     description:
       "Engage with the music community! Leave comments on songs, share your thoughts about tracks, and connect with other music lovers who share your musical taste.",

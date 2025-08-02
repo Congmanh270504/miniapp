@@ -12,47 +12,35 @@ const footerData = {
       links: [
         { name: "All Songs", href: "/songs" },
         { name: "Favorites", href: "/songs/favorites" },
-        { name: "Trending Now", href: "/trending" },
-        { name: "New Releases", href: "/new-releases" },
-      ],
-    },
-    {
-      title: "Features",
-      links: [
-        { name: "Upload Music", href: "/songs/upload" },
-        { name: "Create Playlist", href: "/playlists/create" },
       ],
     },
     {
       title: "Account",
       links: [
-        { name: "Profile Settings", href: "/profile" },
-        { name: "Subscription", href: "/subscription" },
+        { name: "Profile Settings", href: "/user-profile" },
+        { name: "Subscription", href: "/#" },
+      ],
+    },
+    {
+      title: "Features",
+      links: [
+        { name: "Upload Your Music", href: "/songs/create" },
+        { name: "Music Discovery", href: "/songs/all" },
+        { name: "Artist Dashboard", href: "/you/tracks" },
+        { name: "Planned Features", href: "/planned-features" },
       ],
     },
     {
       title: "Community",
-      subSections: [
-        {
-          title: "For Artists",
-          links: [
-            { name: "Upload Your Music", href: "/artists/upload" },
-            { name: "Artist Dashboard", href: "/artists/dashboard" },
-          ],
-        },
-        {
-          title: "For Listeners",
-          links: [
-            { name: "Music Discovery", href: "/discover" },
-            { name: "Social Features", href: "/social" },
-          ],
-        },
+      links: [
+        { name: "About", href: "/about" },
+        { name: "Blog", href: "/#" },
       ],
     },
     {
       title: "Support & Company",
       links: [
-        { name: "Help Center", href: "/help" },
+        { name: "Help Center", href: "/#" },
         { name: "Contact Support", href: "/support" },
       ],
       subSections: [
@@ -78,7 +66,7 @@ export default function Footer() {
             {/* Contact Information - Left Side */}
             <div className="col-span-1">
               <h3 className="text-sm font-medium text-gray-900 mb-4">
-                Contact Us
+                Contact Me
               </h3>
               <ul className="space-y-3">
                 <li className="flex items-center space-x-3">
@@ -96,13 +84,13 @@ export default function Footer() {
                     href="mailto:contact@company.com"
                     className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
                   >
-                    contact@company.com
+                    trancongmanh270504@gmail.com
                   </Link>
                 </li>
                 <li className="flex items-center space-x-3">
                   <MapPin className="h-4 w-4 text-blue-600" />
                   <span className="text-sm text-gray-600">
-                    123 Innovation Drive, Tech City, TC 12345
+                    Somewhere on Earth :)
                   </span>
                 </li>
               </ul>
@@ -176,8 +164,8 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <p className="text-sm text-gray-500">
-                Copyright © {new Date().getFullYear()} MusicApp Inc. All rights
-                reserved.
+                Copyright © {new Date().getFullYear()} Cong Manh's MusicApp .
+                All rights reserved.
               </p>
               <div className="flex flex-wrap items-center space-x-4">
                 <Link
@@ -208,12 +196,6 @@ export default function Footer() {
                   Legal
                 </Link>
                 <span className="text-sm text-gray-300">|</span>
-                <Link
-                  href="#"
-                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
-                >
-                  Site Map
-                </Link>
               </div>
             </div>
             <div className="text-sm text-gray-500 flex items-center gap-2">

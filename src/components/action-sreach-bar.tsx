@@ -104,7 +104,7 @@ function ActionSearchBar() {
       router.push(`/songs/${result.slug}`);
     } else {
       // It's a user
-      router.push(`/user/${result.clerkId}`);
+      router.push(`/${result.clerkId}/tracks`);
     }
     handleClear();
   };
