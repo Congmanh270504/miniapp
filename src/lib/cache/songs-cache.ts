@@ -132,3 +132,46 @@ export const getCachedTrendingSongs = unstable_cache(
     tags: ["songs", "trending", "home"],
   }
 );
+export const getCachedHeartedSongs = unstable_cache(
+  async (clerkId: string, imageExpires: number = 3600) => {
+    const userDb = await prisma.users.findUnique({
+      where: { clerkId },
+      include: {
+        HeartedSongs: {
+          include: {
+            Songs: {
+              include: songForList,
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 10, // Lấy 20 bài để có đủ cho next/prev
+        },
+      },
+    });
+
+    if (!userDb || !userDb.HeartedSongs.length) {
+      return { heartedSongs: [], imageUrls: [], hasMore: false };
+    }
+
+    const songs = userDb.HeartedSongs.map((item) => item.Songs);
+
+    // Tạo image URLs
+    const { imageUrls } = await createBatchAccessLinksImages(
+      songs,
+      imageExpires
+    );
+
+    return {
+      heartedSongs: songs,
+      imageUrls,
+      hasMore: userDb.HeartedSongs.length === 10,
+    };
+  },
+  ["hearted-songs"],
+  {
+    revalidate: 1800, // 30 phút
+    tags: ["songs", "hearted-songs"],
+  }
+);
