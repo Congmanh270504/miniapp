@@ -1,4 +1,3 @@
-import { DataTable } from "./data-table";
 import { columns } from "./colums";
 import { prisma } from "@/utils/prisma";
 import { currentUser } from "@clerk/nextjs/server";
@@ -6,9 +5,10 @@ import SimpleMusicPlayer from "@/components/song-profile/simple-music-player";
 import { Suspense } from "react";
 import Loading from "@/components/ui/loading";
 import { unstable_cache } from "next/cache";
-import { songForListFast } from "@/lib/prisma-includes";
+import { songForListFast, songsForTracks } from "@/lib/prisma-includes";
 import { Metadata } from "next";
 import { createBatchAccessLinks, transformSongData } from "@/lib/song-utils";
+import { DataTable } from "@/components/data-table/data-table";
 
 // Metadata for SEO optimization
 export const metadata: Metadata = {
@@ -21,10 +21,10 @@ export const metadata: Metadata = {
   },
 };
 
-// Cached function để lấy user songs (cache 5 phút)
-const getCachedUserSongs = unstable_cache(
+// Cached function để lấy user songs với URLs (comprehensive cache)
+const getCachedUserSongsWithUrls = unstable_cache(
   async (clerkId: string) => {
-    return await prisma.users.findFirst({
+    const userData = await prisma.users.findFirst({
       where: {
         clerkId: clerkId,
       },
@@ -32,18 +32,30 @@ const getCachedUserSongs = unstable_cache(
         id: true,
         clerkId: true,
         Songs: {
-          include: songForListFast, // Sử dụng pattern nhanh (không có Comments)
+          include: songsForTracks,
           orderBy: {
             createdAt: "desc",
           },
         },
       },
     });
+
+    if (!userData || !userData.Songs.length) {
+      return { userData: null, musicUrls: [], imageUrls: [] };
+    }
+
+    // Batch create access links và cache chung
+    const { musicUrls, imageUrls } = await createBatchAccessLinks(
+      userData.Songs,
+      7200 // 2 hours cache for URLs
+    );
+
+    return { userData, musicUrls, imageUrls };
   },
-  ["user-songs"],
+  ["user-songs-with-urls"],
   {
-    revalidate: 3600, // 1 giờ
-    tags: ["songs", "user-songs"],
+    revalidate: 3600, // 1 hour cache
+    tags: ["songs", "user-songs", "urls"],
   }
 );
 
@@ -57,10 +69,12 @@ export default async function Page() {
     );
   }
 
-  // Sử dụng cached function
-  const data = await getCachedUserSongs(user.id);
+  // Sử dụng comprehensive cached function
+  const { userData, musicUrls, imageUrls } = await getCachedUserSongsWithUrls(
+    user.id
+  );
 
-  if (!data || !data.Songs.length) {
+  if (!userData || !userData.Songs.length) {
     return (
       <div className="container mx-auto py-10">
         <div className="text-center">
@@ -73,19 +87,13 @@ export default async function Page() {
     );
   }
 
-  // Performance optimization: Batch create access links
-  const { musicUrls, imageUrls } = await createBatchAccessLinks(
-    data.Songs,
-    3600
-  ); // 2 hours
-
-  // Transform song data với URLs đã được tạo sẵn
-  const songData = transformSongData(data.Songs, musicUrls, imageUrls);
+  // Transform song data với pre-cached URLs
+  const songData = transformSongData(userData.Songs, musicUrls, imageUrls);
   return (
     <Suspense fallback={<Loading />}>
       <div className="container mx-auto py-10 flex flex-col gap-4 ">
         <DataTable columns={columns} data={songData} />
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-900 rounded-lg shadow-lg">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-900 rounded-lg ">
           <SimpleMusicPlayer songs={songData} />
         </div>
       </div>

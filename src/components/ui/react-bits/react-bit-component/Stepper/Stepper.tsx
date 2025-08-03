@@ -69,7 +69,6 @@ export default function Stepper({
   };
 
   const handleBack = () => {
-    console.log("Back button clicked, currentStep:", currentStep);
     if (currentStep > 1) {
       setDirection(-1);
       updateStep(currentStep - 1);
@@ -90,7 +89,7 @@ export default function Stepper({
 
   return (
     <div
-      className="flex min-h-full flex-1 flex-col items-center justify-center p-4 sm:aspect-[4/3] md:aspect-[2/1] relative z-[100]"
+      className="flex h-full flex-1 flex-col items-center justify-center p-4 sm:aspect-[4/3] md:aspect-[2/1] relative z-[100]"
       {...rest}
     >
       <div className="inline-block mb-2">
@@ -99,7 +98,6 @@ export default function Stepper({
             <SplitText
               text="Steps upload file songs"
               className="text-6xl italic text-center text-[#670D2F] px-3 "
-              // className="text-6xl italic text-center text-gray-700 px-3"
               delay={100}
               duration={0.6}
               ease="power3.out"

@@ -56,8 +56,6 @@ export function TrackCell({ track }: TrackCellProps) {
       });
     }
     dispatch(setPlaySong({ id: track.songId, isPlaying: true }));
-
-    // setIsPlaying(!playSong.isPlaying);
   };
 
   return (

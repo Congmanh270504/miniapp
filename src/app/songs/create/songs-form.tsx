@@ -414,32 +414,6 @@ export default function SongForm({
             />
             <FormField
               control={form.control}
-              name="album"
-              render={({ field }) => (
-                <FormItem className="col-span-12 @5xl:col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
-                  <FormLabel className="flex shrink-0">Album</FormLabel>
-
-                  <div className="w-full">
-                    <FormControl>
-                      <div className="relative w-full">
-                        <Input
-                          key="text-input-3"
-                          placeholder="http://localhost:3000/songs"
-                          type="text"
-                          className=""
-                          disabled={isPending}
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">

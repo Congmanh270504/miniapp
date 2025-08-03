@@ -37,7 +37,6 @@ export default function MainPage({
       if (!request.ok) {
         throw new Error(data.error || "Failed to load more songs");
       }
-      console.log(data.songs);
 
       if (!data.hasMore) {
         setIsOutOfSongs(false);

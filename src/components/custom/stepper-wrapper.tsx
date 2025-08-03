@@ -20,16 +20,10 @@ import Link from "next/link";
 export function StepperWrapper() {
   return (
     <div
-      className="w-full relative z-[100] mt-[15em]"
+      className="w-full h-full relative z-[100] mt-8 md:mt-[15em] px-4 pb-8 "
       style={{ position: "relative", zIndex: 100 }}
     >
-      <Stepper
-        initialStep={1}
-        backButtonText="Previous"
-        nextButtonText="Next"
-        onStepChange={(step) => console.log("Step changed to:", step)}
-        onFinalStepCompleted={() => console.log("Stepper completed!")}
-      >
+      <Stepper initialStep={1} backButtonText="Previous" nextButtonText="Next">
         {/* Step 1: Sign In */}
         <Step>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
@@ -72,7 +66,7 @@ export function StepperWrapper() {
             </div>
 
             <div className="flex justify-center">
-              <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8 border">
+              <div className="w-full max-w-md h-full bg-white rounded-lg shadow-lg p-8 border border-gray-200">
                 <div className="text-center mb-6">
                   <h3 className="text-2xl font-bold text-gray-800 mb-2">
                     Welcome back

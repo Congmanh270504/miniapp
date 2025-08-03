@@ -1,26 +1,14 @@
-import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { SocialLinks } from "@/components/custom/social-links";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Timeline } from "@/components/ui/timeline";
-import { prisma } from "@/utils/prisma";
-import {
-  ProcessedSongsData,
-  SongWithPinataImage,
-} from "../../types/song-types";
+
 import { TrendingSongs } from "@/components/custom/trending-songs";
 import { StepperWrapper } from "@/components/custom/stepper-wrapper";
 import TiltedCard from "@/components/ui/react-bits/react-bit-component/TiltedCard/TiltedCard";
 import RotatingText from "@/components/ui/react-bits/text-animations/RotatingText/RotatingText";
-import { unstable_cache } from "next/cache";
-import { songForListFast } from "@/lib/prisma-includes";
-import {
-  createBatchAccessLinks,
-  createBatchAccessLinksImages,
-  transformSongDataFull,
-  transformSongDataWithUrls,
-} from "@/lib/song-utils";
+
 import { Metadata } from "next";
 import { Suspense } from "react";
 import { getCachedTrendingSongs } from "@/lib/cache/songs-cache";
@@ -52,7 +40,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Cached function để lấy trending songs với error handling
 
 // Loading component for trending songs
 const TrendingSongsLoader = () => (
@@ -188,9 +175,8 @@ export default async function Page() {
               <div className="w-1.5 h-1.5 rounded-full bg-white/60 animate-pulse"></div>
             </div>
           </div>
-
-          <StepperWrapper />
         </section>
+        <StepperWrapper />
 
         <section className="py-12 mt-[15em] relative w-full overflow-hidden">
           <Suspense fallback={<TrendingSongsLoader />}>

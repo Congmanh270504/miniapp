@@ -36,6 +36,18 @@ export const songForList = {
   },
 } as const;
 
+export const songsForTracks = {
+  Image: true,
+  Genre: true,
+  Users: true,
+  _count: {
+    select: {
+      HeartedSongs: true,
+      Comments: true,
+    },
+  },
+} as const;
+
 // Pattern cho performance cao (không có Comments)
 export const songForListFast = {
   Image: true,

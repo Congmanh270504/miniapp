@@ -272,10 +272,13 @@ export function transformSongData(
     createdAt: Date;
     Image?: { cid: string } | null;
     Genre: { name: string };
-    HeartedSongs: Array<any>;
+    _count: {
+      HeartedSongs: number;
+      Comments: number;
+    };
   }>,
   musicUrls: string[],
-  imageUrls: string[]
+  imageUrls: string[],
 ) {
   return songs.map((song, index) => ({
     songId: song.id,
@@ -293,7 +296,9 @@ export function transformSongData(
     },
     genre: song.Genre.name,
     createdAt: song.createdAt,
-    hearted: song.HeartedSongs.length,
+    hearted: song._count.HeartedSongs,
+    comments: song._count.Comments,
+  
   }));
 }
 

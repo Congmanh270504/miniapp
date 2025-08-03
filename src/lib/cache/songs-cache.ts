@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/utils/prisma";
-import { songForList, songForListFast } from "@/lib/prisma-includes";
+import { songForList, songForListFast, songsForTracks } from "@/lib/prisma-includes";
 import {
   createBatchAccessLinksImages,
   transformSongDataWithUrls,
@@ -8,15 +8,15 @@ import {
 import { SongWithPinataImage } from "../../../types/song-types";
 
 // Cached function để lấy all songs với pagination
-export const getCachedSongs = unstable_cache(
-  async (page: number = 1, limit: number = 20) => {
+export const getCachedSongsTracks = unstable_cache(
+  async (take: number = 10, skip: number = 0) => {
     return await prisma.songs.findMany({
-      include: songForList,
+      include: songsForTracks,
       orderBy: {
         createdAt: "desc",
       },
-      take: limit,
-      skip: (page - 1) * limit,
+      take: take,
+      skip: skip,
     });
   },
   ["all-songs"],

@@ -98,7 +98,7 @@ export default function Footer() {
               {/* Social Media */}
               <div className="mt-8">
                 <h3 className="text-sm font-medium text-gray-900 mb-4">
-                  Follow Us
+                  Follow Me
                 </h3>
                 <SocialLinks />
               </div>
