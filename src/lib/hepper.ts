@@ -8,6 +8,9 @@ export function toSlug(str: string) {
     .replace(/\-+/g, "-") // bỏ trùng dấu -
     .replace(/^\-+|\-+$/g, ""); // bỏ - ở đầu/cuối
 }
+export function getRandomColor() {
+  return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+}
 export function convertToVNDay(date: Date | string): string {
   // Handle both Date objects and ISO string dates
   const dateObj = typeof date === "string" ? new Date(date) : date;

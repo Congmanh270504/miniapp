@@ -40,7 +40,6 @@ export const metadata: Metadata = {
   },
 };
 
-
 // Loading component for trending songs
 const TrendingSongsLoader = () => (
   <div className="mb-12 rounded">
@@ -175,8 +174,8 @@ export default async function Page() {
               <div className="w-1.5 h-1.5 rounded-full bg-white/60 animate-pulse"></div>
             </div>
           </div>
+          <StepperWrapper />
         </section>
-        <StepperWrapper />
 
         <section className="py-12 mt-[15em] relative w-full overflow-hidden">
           <Suspense fallback={<TrendingSongsLoader />}>

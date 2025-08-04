@@ -1,4 +1,3 @@
-import { DataTable } from "@/components/data-table/data-table";
 import Loading from "@/components/ui/loading";
 import {
   getCachedSongsTracks,
@@ -9,28 +8,53 @@ import React, { Suspense } from "react";
 import { columns } from "./colums";
 import SimpleMusicPlayer from "@/components/song-profile/simple-music-player";
 import { unstable_cache } from "next/cache";
-import { getUserByIdList } from "@/lib/actions/user";
+import { DataTable } from "./data-table";
+import { getRandomColor } from "@/lib/hepper";
 
-// Cache function for admin songs with images
+// Cache function for admin songs with pagination
 const getCachedAdminSongs = unstable_cache(
-  async () => {
-    const songs = await getCachedSongsTracks(12, 0); // Get more songs for admin
+  async (page: number = 1, pageSize: number = 6) => {
+    const offset = (page - 1) * pageSize;
+    const songs = await getCachedSongsTracks(pageSize, offset);
+
     if (!songs || songs.length === 0) {
-      return { songs: [], musicUrls: [], imageUrls: [] };
+      return {
+        songs: [],
+        musicUrls: [],
+        imageUrls: [],
+        hasMore: false,
+        totalPages: 0,
+      };
     }
 
-    const { musicUrls, imageUrls } = await createBatchAccessLinks(songs, 7200); // 2 hours cache
-    return { songs, musicUrls, imageUrls };
+    const { musicUrls, imageUrls } = await createBatchAccessLinks(songs, 7200);
+
+    // Get total count for pagination (you might need to add this to getCachedSongsTracks)
+    const totalSongs = await getCachedSongsTracks(1000, 0); // Get total count
+    const totalPages = Math.ceil((totalSongs?.length || 0) / pageSize);
+    const hasMore = page < totalPages;
+
+    return {
+      songs,
+      musicUrls,
+      imageUrls,
+      hasMore,
+      totalPages,
+      currentPage: page,
+    };
   },
   ["admin-songs-with-urls"],
   {
-    revalidate: 3600, // 1 hour cache
+    revalidate: 3600,
     tags: ["admin", "songs", "urls"],
   }
 );
 
-const Page = async () => {
-  const { songs, musicUrls, imageUrls } = await getCachedAdminSongs();
+const Page = async ({ searchParams }: { searchParams: { page?: string } }) => {
+  const params = await searchParams;
+  const currentPage = parseInt(params.page || "1", 10);
+  const { songs, musicUrls, imageUrls, hasMore, totalPages } =
+    await getCachedAdminSongs(currentPage, 6);
 
   if (!songs || songs.length === 0) {
     return (
@@ -46,11 +70,23 @@ const Page = async () => {
   }
 
   const songData = transformSongData(songs, musicUrls, imageUrls);
+  const randomColors = getRandomColor();
 
   return (
     <Suspense fallback={<Loading />}>
       <div className="container relative h-full mx-auto py-10 flex flex-col gap-4 mb-4">
-        <DataTable columns={columns} data={songData} />
+        <div className="flex items-center justify-between self-center">
+          <h1 className="text-2xl font-bold" style={{ color: randomColors }}>
+            Songs Management
+          </h1>
+        </div>
+        <DataTable
+          columns={columns}
+          data={songData}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          hasMore={hasMore}
+        />
         <div className="absolute bottom-0 left-0 right-0 p-4 dark:bg-gray-900 rounded-lg ">
           <SimpleMusicPlayer songs={songData} />
         </div>

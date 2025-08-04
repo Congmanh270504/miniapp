@@ -131,55 +131,81 @@ export default function EditSongForm({ song }: EditSongFormProps) {
         method: "POST",
         body: data,
       });
+
+      if (!uploadFile.ok) {
+        throw new Error("Upload failed");
+      }
+
       const response = await uploadFile.json();
+
+      if (!response.imagesCid) {
+        throw new Error(response.message || "No image CID returned");
+      }
+
       return response;
     } catch (error) {
+      console.error("Upload error:", error);
       toast.error("Error uploading file");
+      throw error;
     }
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsPending(true);
-      if (user?.id) {
-        let imagesCid = song.Image.cid;
 
-        // If new image is uploaded, upload it
-        if (values.songsImages) {
+      if (!user?.id) {
+        toast.error("User not authenticated");
+        setIsPending(false);
+        return;
+      }
+
+      let imagesCid = song.Image.cid;
+
+      // If new image is uploaded, upload it
+      if (values.songsImages) {
+        try {
           const fileUpload = await handleFileUpload(values.songsImages);
-          if (!fileUpload.imagesCid) {
-            setIsPending(false);
-            toast.error(fileUpload?.message || "Failed to upload image");
-            return;
-          }
           imagesCid = fileUpload.imagesCid;
-          //   if (fileUpload?.imagesCid) {
-          //   }
-        }
-
-        const req = await updateSong(
-          song.id,
-          {
-            title: values.title,
-            slug: values.slug,
-            artistName: values.artistName,
-            description: values.description,
-            genreId: values.genreId,
-          },
-          imagesCid
-        );
-
-        if (req.ok) {
-          toast.success(req.message || "Song updated successfully");
-          router.push(`/songs/${values.slug}`);
-        } else {
-          toast.error(req.message || "Failed to update song");
+          toast.success("Image uploaded successfully");
+        } catch (error) {
+          setIsPending(false);
+          return; // Stop execution if image upload fails
         }
       }
-      setIsPending(false);
+
+      const req = await updateSong(
+        song.id,
+        {
+          title: values.title,
+          slug: values.slug,
+          artistName: values.artistName,
+          description: values.description,
+          genreId: values.genreId,
+        },
+        imagesCid
+      );
+
+      if (req.ok) {
+        toast.success(req.message || "Song updated successfully");
+        // Reset form to clear any uploaded files
+        form.reset({
+          title: values.title,
+          slug: values.slug,
+          artistName: values.artistName,
+          description: values.description,
+          genreId: values.genreId,
+          songsImages: undefined, // Clear uploaded image
+        });
+        router.push(`/songs/${values.slug}`);
+      } else {
+        toast.error(req.message || "Failed to update song");
+      }
     } catch (error) {
-      setIsPending(false);
+      console.error("Submit error:", error);
       toast.error("Failed to update song");
+    } finally {
+      setIsPending(false);
     }
   }
 
@@ -207,6 +233,8 @@ export default function EditSongForm({ song }: EditSongFormProps) {
                       field={field}
                       isPending={isPending}
                       currentImageCid={song.Image.cid}
+                      title={song.title}
+                      key={form.formState.submitCount} // Force re-render after submit
                     />
                   </FormControl>
                   <FormMessage />

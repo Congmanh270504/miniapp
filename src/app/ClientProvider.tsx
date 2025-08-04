@@ -78,10 +78,10 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
                 <ActionSearchBar />
               </div>
             </header>
-            <div className="w-full h-[calc(100vh-var(--spacing)*16)] ">
-              {children}
-              <Footer />
-            </div>
+            <main className="flex-1 w-full overflow-auto">{children}</main>
+
+            {/* Footer - Luôn ở cuối */}
+            <Footer />
           </SidebarInset>
         </SidebarProvider>
         <Toaster richColors closeButton position="bottom-right" />

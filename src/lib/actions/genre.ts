@@ -1,5 +1,6 @@
 "use server";
 import { prisma } from "@/utils/prisma";
+import { revalidateTag } from "next/cache";
 
 export async function createManyGenres() {
   const genres = [
@@ -91,4 +92,79 @@ export async function getGenreById(id: string) {
   return prisma.genres.findUnique({
     where: { id },
   });
+}
+
+export async function createGenre(data: {
+  name: string;
+  description?: string;
+}) {
+  try {
+    const existingGenre = await prisma.genres.findFirst({
+      where: { name: data.name },
+    });
+    if (existingGenre) {
+      return {
+        ok: false,
+        message: "Genre with this name already exists",
+      };
+    }
+    await prisma.genres.create({
+      data,
+    });
+
+    // Revalidate cache after successful creation
+    revalidateTag("admin-genres-with-count");
+    revalidateTag("admin");
+    revalidateTag("genres");
+
+    return {
+      ok: true,
+      message: "Genre created successfully",
+    };
+  } catch (error) {
+    console.error("Error creating genre:", error);
+    throw new Error("Failed to create genre");
+  }
+}
+
+export async function updateGenre(
+  id: string,
+  data: {
+    name: string;
+    description?: string;
+  }
+) {
+  try {
+    // Check if another genre with the same name exists (excluding current genre)
+    const existingGenre = await prisma.genres.findFirst({
+      where: {
+        name: data.name,
+        NOT: { id },
+      },
+    });
+    if (existingGenre) {
+      return {
+        ok: false,
+        message: "Genre with this name already exists",
+      };
+    }
+
+    await prisma.genres.update({
+      where: { id },
+      data,
+    });
+
+    // Revalidate cache after successful update
+    revalidateTag("admin-genres-with-count");
+    revalidateTag("admin");
+    revalidateTag("genres");
+
+    return {
+      ok: true,
+      message: "Genre updated successfully",
+    };
+  } catch (error) {
+    console.error("Error updating genre:", error);
+    throw new Error("Failed to update genre");
+  }
 }

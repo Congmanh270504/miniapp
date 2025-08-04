@@ -36,7 +36,7 @@ import DeleteSongDialog from "@/app/songs/delete-song-dialog";
 import { useState } from "react";
 import { deletedSong } from "@/lib/actions/songs";
 import { toast } from "sonner";
-import { TrackCell } from "@/components/data-table/track-cell";
+import { TrackCell } from "@/app/you/tracks/track-cell";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // Component wrapper for actions cell

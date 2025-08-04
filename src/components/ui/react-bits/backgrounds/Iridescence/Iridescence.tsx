@@ -1,5 +1,4 @@
 "use client";
-import AudioUpload from "@/components/custom/audio-upload";
 import { Renderer, Program, Mesh, Color, Triangle } from "ogl";
 import { useEffect, useRef } from "react";
 
@@ -146,11 +145,7 @@ export default function Iridescence({
 
   return (
     <div ref={ctnDom} className="w-full h-full" {...rest}>
-      {children || (
-        <div className="absolute top-20 inset-0 h-fit 2xl:top-28">
-          <AudioUpload />
-        </div>
-      )}
+      {children}
     </div>
   );
 }

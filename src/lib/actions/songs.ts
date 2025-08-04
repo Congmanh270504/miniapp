@@ -91,24 +91,19 @@ export async function createSong(
   }
 }
 
-export async function getSongsDataPinata(fileCid: string, imageCid: string) {
+export async function getSongsDataPinata(imageCid: string) {
   try {
-    const musicUrl = await pinata.gateways.private.createAccessLink({
-      cid: fileCid,
-      expires: 3600, // 1 hour
-    });
+    const imageUrl = await pinata.gateways.private
+      .createAccessLink({
+        cid: imageCid,
+        expires: 3600, // 1 hour
+      })
+      .optimizeImage({
+        fit: "cover",
+        format: "webp",
+      });
 
-    const imageUrl = await pinata.gateways.private.createAccessLink({
-      cid: imageCid,
-      expires: 3600, // 1 hour
-    });
-    const imageTitle = await pinata.files.private.list().cid(imageCid);
-
-    return {
-      musicUrl,
-      imageUrl,
-      imageTitle: imageTitle.files[0].name, // Lấy tên file từ danh sách
-    };
+    return imageUrl;
   } catch (error) {
     console.error("Error fetching song data:", error);
     return null;

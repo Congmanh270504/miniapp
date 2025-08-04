@@ -9,8 +9,7 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  // Protect all routes starting with `/admin`
-  // if (isProtectedRoute(req)) await auth.protect();
+  
   if (
     isAdminRoute(req) &&
     (await auth()).sessionClaims?.metadata?.role !== "admin"

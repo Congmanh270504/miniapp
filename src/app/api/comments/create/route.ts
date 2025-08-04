@@ -4,7 +4,6 @@ export async function POST(request: NextRequest) {
   try {
     const { comment, songId, userId } = await request.json();
 
-    console.log(comment, songId, userId);
     if (!comment || !songId || !userId) {
       return NextResponse.json(
         { error: "Comments data is required" },

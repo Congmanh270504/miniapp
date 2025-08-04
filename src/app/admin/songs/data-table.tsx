@@ -20,21 +20,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DataTableFilter } from "./data-table-filter";
 import { DataTablePagination } from "./data-table-pagination";
 import { useState } from "react";
-import { UserDataTableFilter } from "@/app/admin/users/user-data-table-fillter";
-import { GenresDataTableFilter } from "@/app/admin/genres/genres-data-table-fillter";
-import { GenresDataTablePagination } from "@/app/admin/genres/genres-data-table-pagination";
+import { DataTableFilter } from "@/components/data-table/data-table-filter";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  dataPage: string;
+  currentPage?: number;
+  totalPages?: number;
+  hasMore?: boolean;
 }
 export function DataTable<TData, TValue>({
   columns,
   data,
-  dataPage,
+  currentPage = 1,
+  totalPages = 1,
+  hasMore = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -66,18 +67,7 @@ export function DataTable<TData, TValue>({
   });
   return (
     <div className="w-full p-4">
-      {(() => {
-        switch (dataPage) {
-          case "users":
-            return <UserDataTableFilter table={table} />;
-          case "tracks":
-            return <DataTableFilter table={table} />;
-          case "genres":
-            return <GenresDataTableFilter table={table} />;
-          default:
-            return null;
-        }
-      })()}
+      <DataTableFilter table={table} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -128,11 +118,13 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      {dataPage === "genres" ? (
-        <GenresDataTablePagination table={table} />
-      ) : (
-        <DataTablePagination table={table} />
-      )}
+
+      <DataTablePagination
+        table={table}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        hasMore={hasMore}
+      />
     </div>
   );
 }
