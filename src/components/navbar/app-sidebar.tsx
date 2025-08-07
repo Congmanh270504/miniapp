@@ -13,6 +13,7 @@ import {
   Settings2,
   SquareTerminal,
   Music,
+  MessageCircleCode,
   Info,
 } from "lucide-react";
 
@@ -30,10 +31,7 @@ import { NavProjects } from "./nav-projects";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 import NavUser from "./nav-user";
-import { Suspense } from "react";
-import ClientOnly from "../ClientOnly";
 
-// This is sample data.
 const data = {
   teams: [
     {
@@ -146,9 +144,9 @@ const data = {
       icon: Frame,
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
+      name: "Reviews",
+      url: "/reviews",
+      icon: MessageCircleCode,
     },
     {
       name: "About",

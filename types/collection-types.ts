@@ -132,3 +132,25 @@ export type SongWithSlug = {
   HeartedSongs: HeartedSongsType;
   Comments: CommentsType[];
 };
+
+export type ReviewsRepliesType = {
+  id: string;
+  userId: string;
+  reviewId: string;
+  reply: string;
+  createdAt: Date;
+  updatedAt: Date;
+  Users?: UsersType;
+  Reviews?: ReviewType;
+};
+
+export type ReviewType = {
+  id: string;
+  userId: string;
+  comment: string;
+  rating: number;
+  createdAt: Date;
+  updatedAt: Date;
+  Users?: UsersType;
+  ReviewsReplies?: ReviewsRepliesType[];
+};

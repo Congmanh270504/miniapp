@@ -21,7 +21,6 @@ export default function SongLimitPage() {
   return (
     <div className="min-h-screen container mx-auto bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
       <div className="w-full space-y-6 max-w-7xl mx-auto">
-        {/* Main Content Card */}
         <Limit
           children={
             <Card className="group hover:shadow-xl transition-all duration-500 hover:-translate-y-2 border-2 hover:border-orange-500/30">

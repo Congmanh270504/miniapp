@@ -75,11 +75,14 @@ export function StepperWrapper() {
                 </div>
 
                 <div className="space-y-4">
-                  <Button className="w-full bg-black text-white hover:bg-gray-800">
+                  <Button className="w-full bg-[#332D56] text-white hover:bg-gray-800">
                     Continue with Google
                   </Button>
-                  <Button className="w-full bg-blue-600 text-white hover:bg-blue-700">
+                  <Button className="w-full bg-[#320A6B] text-white hover:bg-blue-700">
                     Continue with GitHub
+                  </Button>
+                  <Button className="w-full bg-[#113F67] text-white hover:bg-blue-700">
+                    Continue with Facebook
                   </Button>
 
                   <div className="relative">

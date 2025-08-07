@@ -322,12 +322,6 @@ export function CommentSection({
               : c
           )
         );
-        console.log(
-          "Replying to comment:",
-          commentId,
-          "with content:",
-          newComment
-        );
         try {
           const request = await fetch("/api/replies/create", {
             method: "POST",
@@ -344,6 +338,16 @@ export function CommentSection({
             toast.success("Reply added successfully");
           } else {
             toast.error("Failed to add reply");
+            setComments((prev) =>
+              prev.map((c) =>
+                c.id === commentId
+                  ? {
+                      ...c,
+                      replies: c.replies?.filter((r) => r.id !== reply.id),
+                    }
+                  : c
+              )
+            );
             return;
           }
         } catch (error) {
