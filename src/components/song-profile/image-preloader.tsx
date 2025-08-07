@@ -1,17 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { ProcessedSongsData } from "../../../types/song-types";
+import { ProcessedSongSlugPinata } from "../../../types/song-types";
 
 interface ImagePreloaderProps {
-  songs: ProcessedSongsData;
+  songs: ProcessedSongSlugPinata[];
   currentSongId: string;
 }
 
-/**
- * Component để preload images của bài hát tiếp theo và trước đó
- * Giúp tăng tốc độ loading khi chuyển bài hát
- */
 export function ImagePreloader({ songs, currentSongId }: ImagePreloaderProps) {
   useEffect(() => {
     const currentIndex = songs.findIndex(

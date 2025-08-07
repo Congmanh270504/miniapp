@@ -2,13 +2,14 @@ import { redirect } from "next/navigation";
 import { SearchUsers } from "./SearchUsers";
 import { clerkClient } from "@clerk/nextjs/server";
 import { removeRole, setRole } from "./_actions";
-import { checkRole } from "../../../utils/role";
+import { checkRole } from "../../lib/actions/role";
 
 interface PageProps {
   searchParams: Promise<{ search?: string }>;
 }
 
 export default async function Page({ searchParams }: PageProps) {
+  
   if (!checkRole("admin")) {
     redirect("/");
   }

@@ -102,7 +102,6 @@ export async function getSongsDataPinata(imageCid: string) {
         fit: "cover",
         format: "webp",
       });
-
     return imageUrl;
   } catch (error) {
     console.error("Error fetching song data:", error);
@@ -153,6 +152,7 @@ export async function deletedSong(song: SongWithUrls) {
     return { ok: false, message: "Failed to delete song" };
   }
 }
+
 export async function updateSong(
   songId: string,
   data: {
@@ -217,10 +217,12 @@ export async function updateSong(
       if (!currentSong) {
         return { ok: false, message: "Song not found" };
       }
+
       // delete image in pinata clound
       const filesImage = await pinata.files.private
         .list()
         .cid(currentSong.Image.cid);
+      console.log(filesImage);
 
       await pinata.files.private.delete([filesImage.files[0].id]);
 

@@ -1,6 +1,8 @@
 "use server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { SongWithIncludes } from "../../../types/song-types";
+import { prisma } from "@/utils/prisma";
+import { ok } from "assert";
 
 type Comment = {
   id: string;
@@ -84,5 +86,45 @@ function calculateTimeAgo(date: Date | string): string {
     return `${diffInHours}h ago`;
   } else {
     return `${diffInDays}d ago`;
+  }
+}
+
+export async function deleteComment(commentId: string) {
+  try {
+    const deleteComment = await prisma.comments.delete({
+      where: {
+        id: commentId,
+      },
+    });
+    if (!deleteComment) {
+      return { ok: false, message: "Failed to delete comment" };
+    }
+    return {
+      ok: true,
+      message: "Comment deleted successfully",
+    };
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    throw new Error("Failed to delete comment");
+  }
+}
+
+export async function deleteReplyComment(replyId: string) {
+  try {
+    const deleteComment = await prisma.commentsReplies.delete({
+      where: {
+        id: replyId,
+      },
+    });
+    if (!deleteComment) {
+      return { ok: false, message: "Failed to delete reply comment" };
+    }
+    return {
+      ok: true,
+      message: "Reply comment deleted successfully",
+    };
+  } catch (error) {
+    console.error("Error deleting reply comment:", error);
+    throw new Error("Failed to delete reply comment");
   }
 }

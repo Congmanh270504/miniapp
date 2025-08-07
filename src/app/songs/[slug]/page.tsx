@@ -6,10 +6,11 @@ import Loading from "@/components/ui/loading";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { unstable_cache } from "next/cache";
-import { songWithAllRelations } from "@/lib/prisma-includes";
+import { songSlug } from "@/lib/prisma-includes";
 import {
   createBatchAccessLinks,
   transformSongDataFull,
+  transformSongDataSlug,
 } from "@/lib/song-utils";
 import { getUserById } from "@/lib/actions/user";
 import MusicPlayerWrapper from "@/components/song-profile/music-player-wrapper";
@@ -18,7 +19,7 @@ import MusicPlayerWrapper from "@/components/song-profile/music-player-wrapper";
 const getCachedAllPlaylistSongs = unstable_cache(
   async () => {
     return await prisma.songs.findMany({
-      include: songWithAllRelations,
+      include: songSlug,
       orderBy: {
         createdAt: "desc",
       },
@@ -48,7 +49,7 @@ export default async function Page({ params }: PageProps) {
 
   const currentSong = await prisma.songs.findFirst({
     where: { slug: slug },
-    include: songWithAllRelations,
+    include: songSlug,
   });
 
   if (!currentSong) {
@@ -82,7 +83,7 @@ export default async function Page({ params }: PageProps) {
     3600
   );
 
-  const playlistData = transformSongDataFull(
+  const playlistData = transformSongDataSlug(
     allPlaylistSongs.slice(0, 10),
     imageUrls,
     musicUrls
@@ -125,7 +126,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <Suspense fallback={<Loading />}>
-      <div className="grid grid-cols-1 w-full h-full p-4 gap-2 md:grid-cols-2 ">
+      <div className="flex w-full h-[90vh] p-4 gap-2 max-md:flex-col ">
         <MusicPlayerWrapper
           currentSongData={currentSongInPlaylist}
           songs={playlistData}

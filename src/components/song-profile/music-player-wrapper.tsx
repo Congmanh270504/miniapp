@@ -3,11 +3,7 @@
 import { useState } from "react";
 import MusicPlayer from "./music-player";
 import PlaylistComment from "./playlist-comment";
-import {
-  ProcessedSongsData,
-  ProcessedSongWithPinata,
-  SongWithIncludes,
-} from "../../../types/song-types";
+import { ProcessedSongSlugPinata } from "../../../types/song-types";
 
 interface UserCreateSongInfo {
   clerkId: string;
@@ -16,8 +12,8 @@ interface UserCreateSongInfo {
 }
 
 interface MusicPlayerWrapperProps {
-  currentSongData: ProcessedSongWithPinata;
-  songs: ProcessedSongsData;
+  currentSongData: ProcessedSongSlugPinata;
+  songs: ProcessedSongSlugPinata[];
   heart: boolean;
   userCreateSongInfor: UserCreateSongInfo;
 }

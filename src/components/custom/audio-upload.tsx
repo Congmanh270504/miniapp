@@ -5,9 +5,11 @@ import { useDropzone } from "react-dropzone";
 import { Upload, FileAudio, X, CheckCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { parseBlob } from "music-metadata-browser";
 import SongForm from "@/app/songs/create/songs-form";
 import { toast } from "sonner";
+import Loading from "../ui/loading";
 
 interface UploadedFileData {
   file: File;
@@ -24,6 +26,7 @@ export default function AudioUpload() {
     useState<UploadedFileData | null>(null);
   const [error, setError] = useState("");
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Auto-delete timeout management
   const startAutoDeleteTimeout = useCallback((audioId: string) => {
@@ -59,6 +62,7 @@ export default function AudioUpload() {
   const uploadAudioFile = useCallback(
     async (file: File) => {
       try {
+        setIsUploading(true);
         const formData = new FormData();
         formData.append("audio", file);
 
@@ -102,6 +106,8 @@ export default function AudioUpload() {
 
         toast.error("Failed to upload audio file");
         throw error;
+      } finally {
+        setIsUploading(false);
       }
     },
     [startAutoDeleteTimeout]
@@ -112,13 +118,24 @@ export default function AudioUpload() {
       if (!file) return;
 
       try {
+        setIsUploading(true);
+
+        // Set initial loading state
+        setUploadedFileData({
+          file,
+          isUploading: true,
+          uploaded: false,
+          artist: "",
+          duration: 0,
+        });
+
         // Extract metadata first
         const metadata = await parseBlob(file);
         const artist = metadata.common.artist || "";
         const durationInSeconds = metadata.format.duration || 0;
         const duration = Math.floor(durationInSeconds);
 
-        // Set initial state with uploading status
+        // Update with metadata
         setUploadedFileData({
           file,
           isUploading: true,
@@ -133,6 +150,7 @@ export default function AudioUpload() {
         setError("Could not read metadata or upload failed");
         setUploadedFileData(null);
         toast.error("Failed to process audio file");
+        setIsUploading(false);
       }
     },
     [uploadAudioFile]
@@ -171,7 +189,7 @@ export default function AudioUpload() {
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
     accept: {
-      "audio/*": [".mp3", ".mp4"],
+      "audio/*": [".mp3", ".mp4", ".wav", ".flac", ".aiff", ".alac"],
     },
     maxSize: 50 * 1024 * 1024, // 50MB
     noClick: true,
@@ -185,7 +203,9 @@ export default function AudioUpload() {
       <div className="w-full mx-auto">
         {uploadedFileData && (
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-4">Uploaded Files:</h1>
+            <h1 className="text-4xl font-bold mb-4 text-[#333446]">
+              Uploaded Files:
+            </h1>
             <div className="space-y-2">
               <div className="flex items-center justify-between p-3 bg-gray-600 rounded-lg group transition-colors">
                 <div className="flex items-center space-x-3">
@@ -246,15 +266,17 @@ export default function AudioUpload() {
               onSubmitSuccess={handleFormSubmitSuccess}
             />
           </div>
+        ) : isUploading ? (
+          <Loading />
         ) : (
           <div>
             <div className="mb-8">
-              <h1 className="text-4xl font-bold mb-4">
+              <h1 className="text-4xl font-bold mb-4 text-[#333446]">
                 Upload your audio files.
               </h1>
               <p className="text-[#333446] text-lg">
-                For best quality, use WAV, FLAC, AIFF, or ALAC. The maximum file
-                size is 4GB uncompressed.{"  "}
+                For best quality, use MP3, MP4, WAV, FLAC, AIFF, or ALAC. The
+                maximum file size is 4GB uncompressed.{"  "}
                 <span className="text-blue-400 hover:text-blue-300 cursor-pointer">
                   Learn more.
                 </span>
@@ -289,7 +311,7 @@ export default function AudioUpload() {
                     onClick={open}
                     variant="secondary"
                     size="lg"
-                    className="bg-white text-black hover:bg-gray-200 font-medium px-8"
+                    className="bg-black text-white hover:bg-gray-600 font-medium px-8"
                   >
                     Choose files
                   </Button>

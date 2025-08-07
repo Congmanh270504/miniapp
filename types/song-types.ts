@@ -112,6 +112,7 @@ export interface ProcessedSongWithPinata {
   hearted: HeartedSong[];
   comments: Comment[];
 }
+export type ProcessedSongsData = ProcessedSongWithPinata[];
 
 export interface SongWithPinataImage {
   songId: string;
@@ -131,4 +132,23 @@ export interface SongWithPinataImage {
   comments: Comment[];
 }
 
-export type ProcessedSongsData = ProcessedSongWithPinata[];
+export interface ProcessedSongSlugPinata {
+  songId: string;
+  title: string;
+  slug: string;
+  artist: string;
+  clerkId: string; // Clerk ID của user tạo bài hát
+  description: string;
+  duration: number; // Duration in seconds
+  musicFile: {
+    cid: string;
+    url: string;
+  };
+  imageFile: {
+    cid: string;
+    url: string;
+  };
+  genre: string;
+  createdAt: Date;
+  hearted: HeartedSong[];
+}

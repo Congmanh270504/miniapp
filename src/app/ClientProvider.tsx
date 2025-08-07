@@ -36,6 +36,7 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
     return acc;
   }, []);
 
+
   return (
     <Provider store={store}>
       <QueryProvider>
@@ -78,10 +79,17 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
                 <ActionSearchBar />
               </div>
             </header>
-            <main className="flex-1 w-full overflow-auto">{children}</main>
+            <main className="flex-1 w-full h-full overflow-auto">
+              {children}
+            </main>
 
-            {/* Footer - Luôn ở cuối */}
+            {/* Footer - Chỉ hiển thị khi không phải trang đặc biệt */}
             <Footer />
+            {/* Sidebar inset for content */}
+
+            {/* <div className="w-full h-[calc(100vh-var(--spacing)*16)] ">
+              {children}
+            </div> */}
           </SidebarInset>
         </SidebarProvider>
         <Toaster richColors closeButton position="bottom-right" />

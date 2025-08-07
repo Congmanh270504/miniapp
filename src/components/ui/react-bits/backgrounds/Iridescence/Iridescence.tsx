@@ -51,6 +51,7 @@ interface IridescenceProps {
   amplitude?: number;
   mouseReact?: boolean;
   children?: React.ReactNode;
+  fullScreen?: boolean;
 }
 
 export default function Iridescence({
@@ -58,6 +59,7 @@ export default function Iridescence({
   speed = 1.0,
   amplitude = 0.1,
   mouseReact = true,
+  fullScreen = false,
   children,
   ...rest
 }: IridescenceProps) {
@@ -144,7 +146,13 @@ export default function Iridescence({
   }, [color, speed, amplitude, mouseReact]);
 
   return (
-    <div ref={ctnDom} className="w-full h-full" {...rest}>
+    <div
+      ref={ctnDom}
+      className={
+        fullScreen ? "fixed inset-0 w-full h-full z-[-1]" : "w-full h-full"
+      }
+      {...rest}
+    >
       {children}
     </div>
   );

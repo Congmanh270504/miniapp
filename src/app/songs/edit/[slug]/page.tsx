@@ -13,7 +13,7 @@ interface PageProps {
 
 const Page = async ({ params }: PageProps) => {
   const { slug } = await params;
-  
+
   const currentSong = await prisma.songs.findFirst({
     where: { slug: slug },
     include: {
@@ -39,17 +39,9 @@ const Page = async ({ params }: PageProps) => {
     );
   }
   return (
-    <Iridescence
-      color={[1, 1, 1]}
-      mouseReact={false}
-      amplitude={0.1}
-      speed={1.0}
-      children={
-        <div className="absolute top-1/5 inset-0 h-fit p-6">
-          <EditSongForm song={currentSong} />
-        </div>
-      }
-    />
+    <div className="h-full px-5 py-10 ">
+      <EditSongForm song={currentSong} />
+    </div>
   );
 };
 

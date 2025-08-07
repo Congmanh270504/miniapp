@@ -49,8 +49,10 @@ const getCachedAdminSongs = unstable_cache(
     tags: ["admin", "songs", "urls"],
   }
 );
-
-const Page = async ({ searchParams }: { searchParams: { page?: string } }) => {
+interface PageProps {
+  searchParams: Promise<{ page?: string }>;
+}
+const Page = async ({ searchParams }: PageProps) => {
   const params = await searchParams;
   const currentPage = parseInt(params.page || "1", 10);
   const { songs, musicUrls, imageUrls, hasMore, totalPages } =

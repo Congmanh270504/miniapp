@@ -101,7 +101,7 @@ model CommentsReplies {
   updatedAt DateTime @updatedAt
 
   Users Users @relation(fields: [userId], references: [id], name: "UserToReplies")
-  Comments Comments @relation(fields: [commentId], references: [id], name: "CommentToReplies")
+  Comments Comments @relation(fields: [commentId], references: [id], name: "CommentToReplies", onDelete: Cascade)
 }
 
 model Follows {

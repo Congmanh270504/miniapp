@@ -1,5 +1,14 @@
 // Shared Prisma include patterns để tái sử dụng across app
 
+
+//
+export const songSlug = {
+  Image: true,
+  Users: true,
+  Genre: true,
+  HeartedSongs: true,
+} as const;
+
 // Pattern cơ bản cho Songs với tất cả relations cần thiết
 export const songWithAllRelations = {
   Image: true,

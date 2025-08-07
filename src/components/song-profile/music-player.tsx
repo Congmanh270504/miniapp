@@ -7,10 +7,7 @@ import { Button } from "@/components/ui/button";
 import MusicControls from "./music-controls";
 import MusicProgressBar from "./music-progress-bar";
 import { ImagePreloader } from "./image-preloader";
-import {
-  ProcessedSongsData,
-  ProcessedSongWithPinata,
-} from "../../../types/song-types";
+import { ProcessedSongSlugPinata } from "../../../types/song-types";
 import { HeartButton } from "@/components/custom/heart-button";
 import ReactPlayer from "react-player";
 
@@ -20,13 +17,13 @@ export default function MusicPlayer({
   currentSongData,
   onSongChange,
 }: {
-  songs: ProcessedSongsData;
+  songs: ProcessedSongSlugPinata[];
   heart: boolean;
-  currentSongData: ProcessedSongWithPinata;
+  currentSongData: ProcessedSongSlugPinata;
   onSongChange?: (songId: string) => void;
 }) {
   const [currentSong, setCurrentSong] =
-    useState<ProcessedSongWithPinata>(currentSongData);
+    useState<ProcessedSongSlugPinata>(currentSongData);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(currentSongData.duration);

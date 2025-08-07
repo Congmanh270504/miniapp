@@ -1,20 +1,26 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, use } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Heart, MessageCircle, Send, MoreHorizontal } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Heart, MessageCircle, Send, MoreHorizontal, Flag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import BookmarkIcon from "@/components/custom/icon/bookmark-icon";
 import { MdOutlineInsertEmoticon } from "react-icons/md";
 import { useUser } from "@clerk/nextjs";
-import {
-  ProcessedSongWithPinata,
-  SongWithIncludes,
-} from "../../../types/song-types";
+import { ProcessedSongSlugPinata } from "../../../types/song-types";
 import Image from "next/image";
 import { toast } from "sonner";
+import { deleteComment, deleteReplyComment } from "@/lib/actions/comments";
 
 type Comment = {
   id: string;
@@ -35,12 +41,46 @@ export function CommentSection({
   currentSong,
   userCreate,
 }: {
-  currentSong: ProcessedSongWithPinata;
+  currentSong: ProcessedSongSlugPinata;
   userCreate: UserCreateSongInfor;
 }) {
   const { isSignedIn, user, isLoaded } = useUser();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkUserRole = async () => {
+      if (isSignedIn && isLoaded) {
+        try {
+          const response = await fetch("/api/user/role?role=admin");
+
+          if (response.ok) {
+            const data = await response.json();
+            setIsAdmin(data.hasRole);
+          } else {
+            setIsAdmin(false);
+          }
+        } catch (error) {
+          console.error("Error checking role:", error);
+          setIsAdmin(false);
+        }
+      }
+    };
+
+    checkUserRole();
+  }, [isSignedIn, isLoaded, user]);
+
+  useEffect(() => {
+    console.log("User role checked", isAdmin);
+  }, [isAdmin]);
+
   const [isPending, setIsPending] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [deleteDialog, setDeleteDialog] = useState({
+    isOpen: false,
+    commentId: "",
+    hasReplies: false,
+    repliesCount: 0,
+  });
 
   // Helper function to parse reply content and separate mention from text
   const parseReplyContent = (content: string, originalUsername: string) => {
@@ -67,22 +107,17 @@ export function CommentSection({
   useEffect(() => {
     const handleGetCommentsData = async () => {
       try {
-        const response = await fetch("/api/comments", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ comments: currentSong.comments }),
-        });
+        const response = await fetch(
+          "/api/comments?songId=" + currentSong.songId
+        );
 
-        if (!response.ok) {
+        if (response.status !== 200) {
           throw new Error("Failed to fetch comments");
         }
 
         const result = await response.json();
 
-        if (result.success && result.comments && result.comments.length > 0) {
-          console.log("Transformed comments:", result.comments);
+        if (result.status && result.comments && result.comments.length > 0) {
           setComments(result.comments);
         }
       } catch (error) {
@@ -90,10 +125,10 @@ export function CommentSection({
       }
     };
 
-    if (currentSong.comments && currentSong.comments.length > 0) {
+    if (currentSong) {
       handleGetCommentsData();
     }
-  }, [currentSong.comments]);
+  }, [currentSong]);
 
   const [expandedComments, setExpandedComments] = useState<Set<string>>(
     new Set(["2"])
@@ -101,6 +136,7 @@ export function CommentSection({
   const [newComment, setNewComment] = useState("");
   const commentInputRef = useRef<HTMLInputElement>(null);
   const [currentCommentId, setCurrentCommentId] = useState<string>("");
+
   const toggleReplies = (commentId: string) => {
     setExpandedComments((prev) => {
       const updated = new Set(prev);
@@ -120,8 +156,8 @@ export function CommentSection({
   };
   const handleAddComment = useCallback(async () => {
     if (newComment.trim() && comments) {
-      const comment: Comment = {
-        id: `new-${Date.now()}`,
+      const tempComment: Comment = {
+        id: `temp-${Date.now()}`, // Đổi từ 'new-' thành 'temp-' để phân biệt
         username: user?.fullName || "user",
         avatarUrl: user?.imageUrl || "/user.png",
         content: newComment,
@@ -130,8 +166,9 @@ export function CommentSection({
         replies: [],
       };
 
-      setComments([...comments, comment]);
-
+      // Hiển thị comment tạm thời ngay lập tức
+      setComments([...comments, tempComment]);
+      const tempId = tempComment.id;
       try {
         setIsPending(true);
         const request = await fetch("/api/comments/create", {
@@ -146,13 +183,30 @@ export function CommentSection({
           }),
         });
         if (request.status === 200) {
+          const response = await request.json();
+          console.log(response);
+
           toast.success("Comment added successfully");
+          setComments((prevComments) =>
+            prevComments.map((c) =>
+              c.id === tempId
+                ? { ...c, id: response.comments.id } // Thay fake ID bằng real ID
+                : c
+            )
+          );
         } else {
           toast.error("Failed to add comment");
+          setComments((prevComments) =>
+            prevComments.filter((c) => c.id !== tempId)
+          );
           return;
         }
       } catch (error) {
         console.error("Error adding comment:", error);
+        setComments((prevComments) =>
+          prevComments.filter((c) => c.id !== tempId)
+        );
+        toast.error("Failed to add comment");
       } finally {
         setNewComment("");
         setIsPending(false);
@@ -160,9 +214,94 @@ export function CommentSection({
     }
   }, [newComment, comments, user]);
 
-  useEffect(() => {
-    console.log(newComment);
-  }, [newComment]);
+  const handleDeleteComment = useCallback(
+    async (commentId: string) => {
+      if (comments) {
+        // Tìm comment để kiểm tra có replies không
+        const commentToDelete = comments.find((c) => c.id === commentId);
+        const hasReplies =
+          commentToDelete?.replies && commentToDelete.replies.length > 0;
+
+        if (hasReplies) {
+          // Mở dialog xác nhận nếu có replies
+          setDeleteDialog({
+            isOpen: true,
+            commentId,
+            hasReplies: true,
+            repliesCount: commentToDelete?.replies?.length || 0,
+          });
+        } else {
+          // Xóa trực tiếp nếu không có replies
+          await executeDeleteComment(commentId);
+        }
+      }
+    },
+    [comments]
+  );
+
+  const executeDeleteComment = useCallback(
+    async (commentId: string) => {
+      if (comments) {
+        setIsPending(true);
+        setComments((prev) => prev.filter((c) => c.id !== commentId));
+        try {
+          const request = await deleteComment(commentId);
+          if (request.ok) {
+            toast.success(request.message || "Comment deleted successfully");
+          } else {
+            toast.error(request.message || "Failed to delete comment");
+            return;
+          }
+        } catch (error) {
+          console.error("Error deleting comment:", error);
+        } finally {
+          setIsPending(false);
+        }
+      }
+    },
+    [comments]
+  );
+
+  const handleConfirmDelete = useCallback(async () => {
+    await executeDeleteComment(deleteDialog.commentId);
+    setDeleteDialog({
+      isOpen: false,
+      commentId: "",
+      hasReplies: false,
+      repliesCount: 0,
+    });
+  }, [deleteDialog.commentId, executeDeleteComment]);
+
+  const handleDeleteReplyComment = useCallback(
+    async (replyId: string, commentId: string) => {
+      if (comments) {
+        setIsPending(true);
+        setComments((prev) =>
+          prev.map((c) =>
+            c.id === commentId
+              ? { ...c, replies: c.replies?.filter((r) => r.id !== replyId) }
+              : c
+          )
+        );
+        try {
+          const request = await deleteReplyComment(replyId);
+          if (request.ok) {
+            toast.success(
+              request.message || "Reply comment deleted successfully"
+            );
+          } else {
+            toast.error(request.message || "Failed to delete reply comment");
+            return;
+          }
+        } catch (error) {
+          console.error("Error deleting reply:", error);
+        } finally {
+          setIsPending(false);
+        }
+      }
+    },
+    [comments, user]
+  );
 
   const handleReply = useCallback(
     async (commentId: string) => {
@@ -183,6 +322,12 @@ export function CommentSection({
               : c
           )
         );
+        console.log(
+          "Replying to comment:",
+          commentId,
+          "with content:",
+          newComment
+        );
         try {
           const request = await fetch("/api/replies/create", {
             method: "POST",
@@ -191,7 +336,7 @@ export function CommentSection({
             },
             body: JSON.stringify({
               reply: newComment,
-              commentId,
+              commentId: commentId,
               userId: user?.id,
             }),
           });
@@ -288,13 +433,27 @@ export function CommentSection({
                     </div>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 flex-shrink-0 inline-flex items-center justify-center rounded-md  font-medium  shadow-neutral-500/20 transition active:scale-95"
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
+                <div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 flex-shrink-0 inline-flex items-center justify-center rounded-md  font-medium  shadow-neutral-500/20 transition active:scale-95"
+                  >
+                    <Heart className="h-4 w-4" />
+                  </Button>
+                  {isAdmin ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 flex-shrink-0 inline-flex items-center justify-center rounded-md  font-medium  shadow-neutral-500/20 transition active:scale-95"
+                      onClick={() => handleDeleteComment(comment.id)}
+                    >
+                      <Flag className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    ""
+                  )}
+                </div>
               </div>
 
               {comment.replies && comment.replies.length > 0 && (
@@ -365,13 +524,29 @@ export function CommentSection({
                               </div>
                             </div>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 flex-shrink-0 inline-flex items-center justify-center rounded-md  font-medium  shadow-neutral-500/20 transition active:scale-95 "
-                          >
-                            <Heart className="h-4 w-4" />
-                          </Button>
+                          <div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 flex-shrink-0 inline-flex items-center justify-center rounded-md  font-medium  shadow-neutral-500/20 transition active:scale-95"
+                            >
+                              <Heart className="h-4 w-4" />
+                            </Button>
+                            {isAdmin ? (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 flex-shrink-0 inline-flex items-center justify-center rounded-md  font-medium  shadow-neutral-500/20 transition active:scale-95"
+                                onClick={() =>
+                                  handleDeleteReplyComment(reply.id, comment.id)
+                                }
+                              >
+                                <Flag className="h-4 w-4" />
+                              </Button>
+                            ) : (
+                              ""
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -467,6 +642,45 @@ export function CommentSection({
           </Button>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialog.isOpen}
+        onOpenChange={(open) =>
+          setDeleteDialog((prev) => ({ ...prev, isOpen: open }))
+        }
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Comment</DialogTitle>
+            <DialogDescription>
+              {deleteDialog.hasReplies
+                ? `This comment has ${deleteDialog.repliesCount} ${
+                    deleteDialog.repliesCount === 1 ? "reply" : "replies"
+                  }. Deleting this comment will also delete all its replies. This action cannot be undone.`
+                : "Are you sure you want to delete this comment? This action cannot be undone."}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() =>
+                setDeleteDialog((prev) => ({ ...prev, isOpen: false }))
+              }
+              disabled={isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={isPending}
+            >
+              {isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

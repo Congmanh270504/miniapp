@@ -449,7 +449,7 @@ export default function SongForm({
                 <Button
                   key="button-0"
                   id="button-0"
-                  className="w-full"
+                  className="w-full cursor-pointer"
                   type="button"
                   variant="outline"
                   onClick={onReset}
@@ -463,7 +463,7 @@ export default function SongForm({
                 <Button
                   key="submit-button-0"
                   id="submit-button-0"
-                  className="w-full bg-gray-600 hover:bg-gray-500"
+                  className="w-full bg-gray-600 hover:bg-gray-500 cursor-pointer"
                   type="submit"
                   variant="default"
                   disabled={isPending}

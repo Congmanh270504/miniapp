@@ -3,13 +3,16 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { Heart } from "lucide-react";
 import Link from "next/link";
-import { ProcessedSongsData } from "../../../types/song-types";
+import {
+  ProcessedSongsData,
+  ProcessedSongSlugPinata,
+} from "../../../types/song-types";
 import { useLazyLoading } from "@/hooks/useLazyLoading";
 import OptimizedImage from "@/components/ui/optimized-image";
 import { FaHeart } from "react-icons/fa";
 
 interface LazyPlaylistProps {
-  initialPlaylist: ProcessedSongsData;
+  initialPlaylist: ProcessedSongSlugPinata[];
   currentSongId: string;
   onCurrentSongChange?: (songId: string) => void;
 }

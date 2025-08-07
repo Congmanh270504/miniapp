@@ -1,6 +1,7 @@
 import { pinata } from "@/utils/config";
 import {
   ProcessedSongsData,
+  ProcessedSongSlugPinata,
   SongWithPinataImage,
 } from "../../types/song-types";
 
@@ -278,7 +279,7 @@ export function transformSongData(
     };
   }>,
   musicUrls: string[],
-  imageUrls: string[],
+  imageUrls: string[]
 ) {
   return songs.map((song, index) => ({
     songId: song.id,
@@ -298,7 +299,6 @@ export function transformSongData(
     createdAt: song.createdAt,
     hearted: song._count.HeartedSongs,
     comments: song._count.Comments,
-  
   }));
 }
 
@@ -383,5 +383,45 @@ export function transformSongDataFull(
     createdAt: song.createdAt,
     hearted: song.HeartedSongs,
     comments: song.Comments,
+  }));
+}
+
+export function transformSongDataSlug(
+  songs: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    artist: string;
+    description: string;
+    fileCid: string;
+    createdAt: Date;
+    duration: number;
+    Image?: { cid: string } | null;
+    Genre: { name: string };
+    Users: { clerkId: string };
+    HeartedSongs: Array<any>;
+  }>,
+  imageUrls: string[],
+  musicUrls: string[]
+): ProcessedSongSlugPinata[] {
+  return songs.map((song, index) => ({
+    songId: song.id,
+    title: song.title,
+    slug: song.slug,
+    artist: song.artist,
+    clerkId: song.Users.clerkId || "",
+    description: song.description,
+    duration: song.duration,
+    musicFile: {
+      cid: song.fileCid,
+      url: musicUrls[index] || "",
+    },
+    imageFile: {
+      cid: song.Image?.cid || "",
+      url: imageUrls[index] || "",
+    },
+    genre: song.Genre.name,
+    createdAt: song.createdAt,
+    hearted: song.HeartedSongs,
   }));
 }

@@ -1,7 +1,7 @@
 "use server";
 
 import { clerkClient } from "@clerk/nextjs/server";
-import { checkRole } from "../../../utils/role";
+import { checkRole } from "../../lib/actions/role";
 
 export async function setRole(formData: FormData) {
   const client = await clerkClient();

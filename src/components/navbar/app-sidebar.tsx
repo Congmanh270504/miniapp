@@ -176,14 +176,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <div
           className={`flex items-center space-x-2 ${state ? "" : "ml-[7px]"}`}
         >
-          <Switch
+          {/* <Switch
             id="theme-mode"
             onClick={() => {
               isLight ? setTheme("dark") : setTheme("light");
               setIsLight(!isLight);
             }}
-          />
-          <Label
+          /> */}
+          {/* <Label
             htmlFor="theme-mode"
             className={`transition-opacity duration-200 ${
               state === "collapsed"
@@ -192,7 +192,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             }`}
           >
             {isLight ? "Dark" : "Light"} Mode
-          </Label>
+          </Label> */}
         </div>
         <NavUser />
       </SidebarFooter>

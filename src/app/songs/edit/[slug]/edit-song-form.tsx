@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -60,8 +60,12 @@ interface EditSongFormProps {
 export default function EditSongForm({ song }: EditSongFormProps) {
   const dispatch = useDispatch<AppDispatch>();
   const genres = useSelector((state: RootState) => state.genreSlice);
-  const { user } = useUser();
   const router = useRouter();
+
+  // State for uploaded image file CID
+  const [imageCid, setImageCid] = useState<string>("");
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const formTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     dispatch(fetchGenres());
@@ -118,60 +122,22 @@ export default function EditSongForm({ song }: EditSongFormProps) {
     return () => subscription.unsubscribe();
   }, [form]);
 
-  useEffect(() => {
-    console.log("Current song image:", form.getValues());
-  }, [form]);
+  // Handlers for upload callbacks
+  const handleImageUploaded = (cid: string) => {
+    setImageCid(cid);
+  };
 
-  const handleFileUpload = async (file: File) => {
-    try {
-      const data = new FormData();
-      data.set("images", file);
-
-      const uploadFile = await fetch("/api/uploadFiles/edit", {
-        method: "POST",
-        body: data,
-      });
-
-      if (!uploadFile.ok) {
-        throw new Error("Upload failed");
-      }
-
-      const response = await uploadFile.json();
-
-      if (!response.imagesCid) {
-        throw new Error(response.message || "No image CID returned");
-      }
-
-      return response;
-    } catch (error) {
-      console.error("Upload error:", error);
-      toast.error("Error uploading file");
-      throw error;
-    }
+  const handleUploadStatusChange = (uploading: boolean) => {
+    setIsUploading(uploading);
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsPending(true);
 
-      if (!user?.id) {
-        toast.error("User not authenticated");
-        setIsPending(false);
-        return;
-      }
-
-      let imagesCid = song.Image.cid;
-
-      // If new image is uploaded, upload it
-      if (values.songsImages) {
-        try {
-          const fileUpload = await handleFileUpload(values.songsImages);
-          imagesCid = fileUpload.imagesCid;
-          toast.success("Image uploaded successfully");
-        } catch (error) {
-          setIsPending(false);
-          return; // Stop execution if image upload fails
-        }
+      // Clear the timeout since we're submitting
+      if (formTimeoutRef.current) {
+        clearTimeout(formTimeoutRef.current);
       }
 
       const req = await updateSong(
@@ -183,19 +149,18 @@ export default function EditSongForm({ song }: EditSongFormProps) {
           description: values.description,
           genreId: values.genreId,
         },
-        imagesCid
+        imageCid !== "" ? imageCid : undefined
       );
 
       if (req.ok) {
         toast.success(req.message || "Song updated successfully");
-        // Reset form to clear any uploaded files
         form.reset({
           title: values.title,
           slug: values.slug,
           artistName: values.artistName,
           description: values.description,
           genreId: values.genreId,
-          songsImages: undefined, // Clear uploaded image
+          songsImages: undefined,
         });
         router.push(`/songs/${values.slug}`);
       } else {
@@ -212,6 +177,7 @@ export default function EditSongForm({ song }: EditSongFormProps) {
   function onReset() {
     form.reset();
     form.clearErrors();
+    setImageCid("");
   }
 
   return (
@@ -234,7 +200,8 @@ export default function EditSongForm({ song }: EditSongFormProps) {
                       isPending={isPending}
                       currentImageCid={song.Image.cid}
                       title={song.title}
-                      key={form.formState.submitCount} // Force re-render after submit
+                      onImageUploaded={handleImageUploaded}
+                      onUploadStatusChange={handleUploadStatusChange}
                     />
                   </FormControl>
                   <FormMessage />
@@ -424,11 +391,16 @@ export default function EditSongForm({ song }: EditSongFormProps) {
                     className="w-full bg-gray-600 hover:bg-gray-500"
                     type="submit"
                     variant="default"
-                    disabled={isPending}
+                    disabled={isPending || isUploading}
                   >
                     {isPending ? (
                       <div className="flex items-center gap-2">
                         Updating{" "}
+                        <span className="loading loading-dots loading-sm"></span>
+                      </div>
+                    ) : isUploading ? (
+                      <div className="flex items-center gap-2">
+                        Uploading image...
                         <span className="loading loading-dots loading-sm"></span>
                       </div>
                     ) : (

@@ -1,8 +1,9 @@
 "use client";
-import React, { useCallback, useState, useEffect, useRef } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { ImageIcon, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
+import { useFileUpload } from "@/hooks/useFileUpload";
 import { getSongsDataPinata } from "@/lib/actions/songs";
 import { toast } from "sonner";
 
@@ -11,21 +12,35 @@ const UploadImageSongEdit = ({
   isPending,
   currentImageCid,
   title,
+  onImageUploaded,
+  onUploadStatusChange,
 }: {
   field: any;
   isPending: boolean;
   currentImageCid: string;
   title: string;
+  onImageUploaded?: (cid: string) => void;
+  onUploadStatusChange?: (uploading: boolean) => void;
 }) => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<File[]>([]);
+  const [currentFile, setCurrentFile] = useState<File | null>(null);
   const [currentImage, setCurrentImage] = useState<{
     url: string;
     title: string;
   }>({ url: "", title: "" });
-  const [isDeleting, setIsDeleting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const {
+    uploadedFile,
+    isUploading,
+    error,
+    uploadWithDebounce,
+    clearFile,
+    cancelAutoDelete,
+  } = useFileUpload({
+    endpoint: "/api/uploadFiles/image",
+    autoDeleteDelay: 20 * 60 * 1000, // 20 minutes
+    debounceDelay: 3000, // 3 seconds debounce for image changes
+  });
   // Load current image when component mounts
   useEffect(() => {
     if (currentImageCid) {
@@ -43,91 +58,46 @@ const UploadImageSongEdit = ({
       if (file) {
         const imageUrl = URL.createObjectURL(file);
         setUploadedImage(imageUrl);
-        setFileName([file]);
+        setCurrentFile(file);
         field.onChange(file);
+
+        // Upload with debounce to avoid multiple uploads when user changes image quickly
+        uploadWithDebounce(file, "image");
       }
     },
-    [field]
+    [field, uploadWithDebounce]
   );
+
+  // Effect to handle upload completion
+  useEffect(() => {
+    if (uploadedFile?.cid && onImageUploaded) {
+      onImageUploaded(uploadedFile.cid);
+    }
+  }, [uploadedFile, onImageUploaded]);
+
+  // Effect to handle upload errors
+  useEffect(() => {
+    if (error) {
+      toast.error(`Upload failed: ${error}`);
+    }
+  }, [error]);
+
+  // Effect to handle upload status changes
+  useEffect(() => {
+    if (onUploadStatusChange) {
+      onUploadStatusChange(isUploading);
+    }
+  }, [isUploading, onUploadStatusChange]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
       "image/*": [".jpeg", ".jpg", ".png"],
     },
+    maxSize: 10 * 1024 * 1024, // 10 MB
     multiple: false,
+    maxFiles: 1,
   });
-
-  const removeImage = () => {
-    if (uploadedImage) {
-      URL.revokeObjectURL(uploadedImage);
-    }
-    setUploadedImage(null);
-    setFileName([]);
-    field.onChange(undefined);
-  };
-
-  const deleteCurrentImageAndSelectNew = async () => {
-    try {
-      setIsDeleting(true);
-
-      // If there's an uploaded image, just remove it and open file picker
-      if (uploadedImage) {
-        removeImage();
-        triggerFileSelect();
-        return;
-      }
-
-      // If it's the current image from database, delete it from Pinata
-      if (currentImageCid) {
-        const response = await fetch("/api/uploadFiles/delete", {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id: currentImageCid }),
-        });
-
-        if (response.ok) {
-          toast.success("Current image deleted successfully");
-          // Clear current image
-          setCurrentImage({ url: "", title: "" });
-          // Open file picker to select new image
-          triggerFileSelect();
-        } else {
-          toast.error("Failed to delete current image");
-        }
-      }
-    } catch (error) {
-      console.error("Error deleting image:", error);
-      toast.error("Error deleting image");
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const triggerFileSelect = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files[0]) {
-      const file = files[0];
-      const imageUrl = URL.createObjectURL(file);
-      setUploadedImage(imageUrl);
-      setFileName([file]);
-      field.onChange(file);
-    }
-    // Reset input value để có thể chọn lại cùng file
-    event.target.value = "";
-  };
-
-  const displayImage = uploadedImage || currentImage.url;
-  const displayName = fileName[0]?.name || "Current image";
-  const currentImageTitle = currentImage.title || title;
 
   return (
     <div className="w-full h-full">
@@ -136,48 +106,31 @@ const UploadImageSongEdit = ({
         className={`h-full border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center text-center transition-colors cursor-pointer relative ${
           isDragActive
             ? "border-blue-400 bg-blue-400/10"
-            : displayImage
+            : uploadedImage || currentImage.url
             ? "border-gray-600"
             : "border-gray-600 hover:border-gray-500"
         }`}
       >
-        <input {...getInputProps()} />
-        {/* Hidden file input for manual trigger */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileSelect}
-          style={{ display: "none" }}
-        />
+        <input {...getInputProps()} disabled={isPending || isUploading} />
 
-        {displayImage ? (
+        {uploadedImage || currentImage.url ? (
           <div className="relative w-full">
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteCurrentImageAndSelectNew();
-              }}
-              disabled={isPending || isDeleting}
-              variant="secondary"
-              size="sm"
-              className={`absolute top-2 right-2 z-10 h-8 w-8 p-0 ${
-                isPending || isDeleting ? "bg-red-400" : "bg-red-600"
-              } hover:bg-black/70 border-none`}
-            >
-              {isDeleting ? (
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              ) : (
-                <X className="h-4 w-4 text-white" />
-              )}
-            </Button>
             <img
-              src={displayImage}
-              alt={displayName}
-              className="w-full h-auto max-h-96 object-contain rounded-md"
+              src={uploadedImage || currentImage.url}
+              alt={currentFile?.name || currentImage.title || title}
+              className={`w-full h-auto max-h-96 object-contain rounded-md transition-opacity duration-300 ${
+                isUploading ? "opacity-50" : "opacity-100"
+              }`}
             />
+            {isUploading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-md">
+                <div className="text-white text-sm font-medium bg-black/50 px-3 py-1 rounded">
+                  Uploading...
+                </div>
+              </div>
+            )}
             <p className="text-black text-sm mt-2 truncate">
-              {uploadedImage ? displayName : currentImageTitle}
+              {uploadedImage ? currentFile?.name : currentImage.title || title}
             </p>
           </div>
         ) : (

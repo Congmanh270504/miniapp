@@ -3,10 +3,7 @@
 import React from "react";
 import { CommentSection } from "./comment-section";
 import LazyPlaylist from "./lazy-playlist";
-import {
-  ProcessedSongsData,
-  SongWithIncludes,
-} from "../../../types/song-types";
+import { ProcessedSongSlugPinata } from "../../../types/song-types";
 
 interface UserCreateSongInfo {
   clerkId: string;
@@ -19,7 +16,7 @@ const PlaylistComment = ({
   currentSong,
   userCreateSongInfor,
 }: {
-  songs: ProcessedSongsData;
+  songs: ProcessedSongSlugPinata[];
   currentSong: string;
   userCreateSongInfor: UserCreateSongInfo;
 }) => {
@@ -43,8 +40,6 @@ const PlaylistComment = ({
         <div className="w-full h-full relative bg-white rounded-lg shadow animate-fade-down animate-once animate-duration-500 animate-delay-500 animate-ease-linear animate-normal ">
           <CommentSection
             currentSong={currentSongData}
-            // description={currentSongData.description}
-            // commentData={currentSongData.comments}
             userCreate={userCreateSongInfor}
           />
         </div>
