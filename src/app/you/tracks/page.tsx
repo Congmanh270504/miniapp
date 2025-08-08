@@ -93,7 +93,7 @@ export default async function Page() {
     <Suspense fallback={<Loading />}>
       <div className="container mx-auto py-10 flex flex-col gap-4 ">
         <DataTable columns={columns} data={songData} dataPage="tracks"/>
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-900 rounded-lg ">
+        <div className="p-4 bg-white dark:bg-gray-900 rounded-lg ">
           <SimpleMusicPlayer songs={songData} />
         </div>
       </div>
