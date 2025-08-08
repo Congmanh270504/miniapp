@@ -250,8 +250,8 @@ export default function MusicPlayer({
       </div>
 
       {/* Album Art - Optimized with loading states */}
-      <div className="flex-1 flex flex-col">
-        <div className="flex-1 w-full relative justify-items-center mx-auto">
+      <div className="flex-1 flex flex-col" >
+        <div className="flex-1 w-full h-full relative justify-items-center mx-auto">
           {/* Loading skeleton */}
           {isImageLoading && (
             <div className="absolute inset-0 m-4 rounded-[2em] flex items-center justify-center ">

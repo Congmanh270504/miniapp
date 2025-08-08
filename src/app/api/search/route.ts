@@ -32,6 +32,7 @@ const getCachedSearchSongs = (query: string, limit?: number) => {
         where: {
           OR: [
             { title: { contains: query, mode: "insensitive" } },
+            { slug: { contains: query, mode: "insensitive" } },
             { artist: { contains: query, mode: "insensitive" } },
             { description: { contains: query, mode: "insensitive" } },
           ],

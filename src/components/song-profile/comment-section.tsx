@@ -400,7 +400,7 @@ export function CommentSection({
       </div>
 
       {/* Comments section */}
-      <div className="h-10 grow overflow-y-auto p-2 no-scrollbar">
+      <div className="h-full grow overflow-y-auto p-2 no-scrollbar">
         {comments && comments.length > 0 ? (
           comments.map((comment) => (
             <div key={comment.id} className="mb-4">
@@ -566,7 +566,7 @@ export function CommentSection({
 
       {/* Post actions */}
       <div className=" bg-white shadow-lg mt-auto dark:bg-black">
-        <div className="p-4 border-t">
+        {/* <div className="p-4 border-t">
           <div className="flex items-center mb-3">
             <Button
               variant="ghost"
@@ -598,7 +598,7 @@ export function CommentSection({
             <span className="font-semibold">236,806 others</span>
           </div>
           <div className="text-xs text-gray-500 mb-3">1 day ago</div>
-        </div>
+        </div> */}
 
         <div className="flex items-center gap-2 p-4 border-t">
           <Avatar className="h-8 w-8 rounded-lg">

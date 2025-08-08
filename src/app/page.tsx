@@ -86,7 +86,7 @@ async function TrendingSongsSection() {
 
 export default async function Page() {
   return (
-    <div className="min-h-screen flex flex-col ">
+    <div className="h-full flex flex-col ">
       <div className="flex-1 p-4">
         <section className="relative min-h-screen overflow-hidden">
           <div className="absolute inset-0 z-0">
@@ -174,6 +174,9 @@ export default async function Page() {
               <div className="w-1.5 h-1.5 rounded-full bg-white/60 animate-pulse"></div>
             </div>
           </div>
+        </section>
+
+        <section>
           <StepperWrapper />
         </section>
 

@@ -37,7 +37,6 @@ const Page = async () => {
   const songData = transformSongDataWithUrls(data, imageUrls);
 
   const userUploadedSongs = await getCachedUserMostUpload();
-  console.log("Users list", userUploadedSongs);
 
   const { users } = await getUserByIdList(userUploadedSongs);
 

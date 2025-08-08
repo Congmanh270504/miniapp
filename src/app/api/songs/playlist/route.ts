@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     const { musicUrls, imageUrls } = await createBatchAccessLinks(songs);
 
     // Transform data
-    const playlistData = transformSongDataFull(songs, musicUrls, imageUrls);
+    const playlistData = transformSongDataFull(songs, imageUrls, musicUrls);
 
     return NextResponse.json({
       songs: playlistData,

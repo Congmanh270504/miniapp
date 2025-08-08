@@ -100,12 +100,12 @@ export default function LazyPlaylist({
     <div className="rounded-lg text-black h-full flex flex-col ">
       <div className="flex items-center justify-between p-4 pb-2 flex-shrink-0">
         <h2 className="text-lg font-bold dark:text-white">My Favorites</h2>
-        <a
-          href="#"
+        <Link
+          href="/songs/all"
           className="text-xs font-medium text-[#332D56] hover:underline dark:text-white"
         >
           See All
-        </a>
+        </Link>
       </div>
       <div
         className="flex-1 space-y-1 p-2 overflow-y-auto no-scrollbar"

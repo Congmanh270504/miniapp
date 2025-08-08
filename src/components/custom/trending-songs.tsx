@@ -62,12 +62,14 @@ export const TrendingSongs: React.FC<TrendingSongsProps> = ({ songData }) => {
             <span className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 animate-pulse shadow-lg hover:shadow-xl"></span>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          className="absolute right-0 text-gray-400 text-sm hover:text-gray-700"
-        >
-          Show all
-        </Button>
+        <Link href="/songs/all">
+          <Button
+            variant="ghost"
+            className="absolute right-0 text-gray-400 text-sm hover:text-gray-700"
+          >
+            Show all
+          </Button>
+        </Link>
       </div>
 
       <div className="relative px-16">

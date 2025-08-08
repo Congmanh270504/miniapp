@@ -53,7 +53,7 @@ export const PopularArtists: React.FC<PopularArtistsProps> = ({
           <div className="relative px-3 py-1 text-sm font-medium rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-4">
             <span className="relative z-10">
               <SplitText
-                text="Popular user upload"
+                text="Popular users upload"
                 className="text-6xl italic text-center text-[#670D2F] px-3"
                 delay={100}
                 duration={0.6}
@@ -69,12 +69,6 @@ export const PopularArtists: React.FC<PopularArtistsProps> = ({
             <span className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 animate-pulse shadow-lg hover:shadow-xl"></span>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          className="absolute right-0 text-gray-400 text-sm hover:text-gray-700"
-        >
-          Show all
-        </Button>
       </div>
 
       <div className="relative px-16">
