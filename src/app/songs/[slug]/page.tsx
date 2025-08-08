@@ -75,7 +75,10 @@ export default async function Page({ params }: PageProps) {
   const heart = heartedSongs ? true : false;
 
   // Lấy tất cả bài hát cho playlist theo thứ tự cố định - cached
-  const allPlaylistSongs = await getCachedAllPlaylistSongs();
+  const allPlaylistSongs = await getCachedAllPlaylistSongs().then((songs) => [
+    currentSong,
+    ...songs,
+  ]);
 
   // Tạo access links cho tất cả bài hát
   const { musicUrls, imageUrls } = await createBatchAccessLinks(

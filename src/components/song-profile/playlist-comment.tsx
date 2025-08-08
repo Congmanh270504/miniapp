@@ -33,7 +33,7 @@ const PlaylistComment = ({
 
   return (
     <div className="w-[35%] flex flex-col gap-2 ">
-      <div className="h-1/3 shadow-lg border border-gray-100 rounded-lg animate-fade-down animate-once animate-duration-500 animate-ease-linear animate-normal dark:border-gray-700">
+      <div className="h-1/3 shadow-lg border overflow-hidden border-gray-100 rounded-lg animate-fade-down animate-once animate-duration-500 animate-ease-linear animate-normal dark:border-gray-700">
         <LazyPlaylist initialPlaylist={songs} currentSongId={currentSong} />
       </div>
       <div className="flex-1 h-2/3 overflow-hidden shadow-lg border border-gray-100 rounded-lg dark:border-gray-700">

@@ -12,28 +12,28 @@ interface SocialLink {
 
 const socialLinks: SocialLink[] = [
   {
-    href: "https://facebook.com",
+    href: "https://www.facebook.com/tran.cong.manh.388739",
     icon: Facebook,
     label: "Follow us on Facebook",
     hoverColor: "hover:border-blue-600",
     iconColor: "text-blue-600",
   },
   {
-    href: "https://github.com",
+    href: "https://github.com/Congmanh270504",
     icon: Github,
     label: "Follow us on GitHub",
     hoverColor: "hover:border-gray-800",
     iconColor: "text-gray-800",
   },
   {
-    href: "https://instagram.com",
+    href: "https://www.instagram.com/congmanh270504",
     icon: Instagram,
     label: "Follow us on Instagram",
     hoverColor: "hover:border-pink-500",
     iconColor: "text-pink-500",
   },
   {
-    href: "mailto:contact@company.com",
+    href: "mailto:trancongmanh270504@gmail.com?subject=Hello&body=Hi there!",
     icon: Mail,
     label: "Send us an email",
     hoverColor: "hover:border-red-500",
