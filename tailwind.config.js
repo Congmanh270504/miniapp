@@ -6,9 +6,6 @@ module.exports = {
     ],
     theme: {
         extend: {
-            screens: {
-                '4k': '2500px', // breakpoint cho màn hình lớn hơn 24 inch
-            },
             keyframes: {
                 shine: {
                     '0%': { 'background-position': '100%' },
