@@ -149,7 +149,7 @@ export function StepperWrapper() {
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
                   <p className="text-gray-700 text-base xl:text-lg">
-                    Maximum file size: 4GB uncompressed
+                    Maximum file size: 4.5MB uncompressed
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
@@ -169,7 +169,7 @@ export function StepperWrapper() {
                   </h1>
                   <p className="text-[#333446] text-lg">
                     For best quality, use WAV, FLAC, AIFF, or ALAC. The maximum
-                    file size is 4GB uncompressed.{" "}
+                    file size is 4.5MB uncompressed.{" "}
                     <span className="text-blue-400 hover:text-blue-300 cursor-pointer">
                       Learn more.
                     </span>
@@ -241,7 +241,7 @@ export function StepperWrapper() {
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
                   <p className="text-gray-700 text-base xl:text-lg">
-                    Maximum file size: 10MB
+                    Maximum file size: 4.5MB
                   </p>
                 </div>
                 <div className="flex items-start gap-3">

@@ -18,7 +18,6 @@ const Page = async () => {
     },
   });
 
-  console.log(totalSongs);
   if (totalSongs >= 20) {
     return <SongLimitPage />;
   }

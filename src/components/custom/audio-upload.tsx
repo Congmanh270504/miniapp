@@ -276,7 +276,7 @@ export default function AudioUpload() {
               </h1>
               <p className="text-[#333446] text-lg">
                 For best quality, use MP3, MP4, WAV, FLAC, AIFF, or ALAC. The
-                maximum file size is 4GB uncompressed.{"  "}
+                maximum file size is 4.5MB uncompressed.{"  "}
                 <span className="text-blue-400 hover:text-blue-300 cursor-pointer">
                   Learn more.
                 </span>
