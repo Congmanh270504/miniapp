@@ -250,7 +250,7 @@ export default function MusicPlayer({
       </div>
 
       {/* Album Art - Optimized with loading states */}
-      <div className="flex-1 flex flex-col" >
+      <div className="flex-1 flex flex-col">
         <div className="flex-1 w-full h-full relative justify-items-center mx-auto">
           {/* Loading skeleton */}
           {isImageLoading && (
@@ -282,8 +282,8 @@ export default function MusicPlayer({
         </div>
 
         {/* Song Info */}
-        <div className="text-center flex flex-col gap-1 px-2 py-2 min-[2100px]:py-6">
-          <h1 className="text-6xl italic text-center text-[#670D2F] px-3 ">
+        <div className="text-center flex flex-col gap-1 px-2 py-2 ">
+          <h1 className="text-4xl italic text-center text-[#670D2F] px-3 ">
             {currentSong.title}
           </h1>
 

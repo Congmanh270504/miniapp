@@ -84,7 +84,7 @@ export const TrendingSongs: React.FC<TrendingSongsProps> = ({ songData }) => {
             {songData.map((song, index) => (
               <CarouselItem
                 key={index}
-                className="pl-4 basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
+                className="pl-4 basis-1/3 lg:basis-1/4 xl:basis-1/5"
               >
                 <Link href={`/songs/${song.slug}`}>
                   <Card

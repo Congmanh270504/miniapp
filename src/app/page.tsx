@@ -101,7 +101,7 @@ export default async function Page() {
               <div className="inline-block">
                 <div className="relative px-3 py-1 text-sm font-medium rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-4">
                   <span className="relative z-10">
-                    Software Engineer & Creative Developer
+                    Software Engineer & Creative Developer (In feature)
                   </span>
                   <span className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 animate-pulse"></span>
                 </div>
@@ -111,7 +111,7 @@ export default async function Page() {
                   Hi, I'm
                 </div>
                 <RotatingText
-                  texts={["Công Mạnh!", "Funny", "Patient", "Love sports"]}
+                  texts={["Công Mạnh!", "From Việt Nam", "Patient", "Love sports"]}
                   mainClassName="px-2 sm:px-2 md:px-3 text-[#320A6B] overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg"
                   staggerFrom={"last"}
                   initial={{ y: "100%" }}
@@ -140,7 +140,7 @@ export default async function Page() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500"
+                  className="border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500"
                 >
                   Contact Me
                 </Button>

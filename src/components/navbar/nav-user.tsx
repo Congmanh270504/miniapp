@@ -9,6 +9,7 @@ import {
   LogOutIcon,
   Sparkles,
   User,
+  UserPen,
 } from "lucide-react";
 import {
   ClerkProvider,
@@ -38,6 +39,7 @@ import { useUser } from "@clerk/nextjs";
 import { Suspense, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import ClientOnly from "../ClientOnly";
+import Link from "next/link";
 
 export default function NavUser() {
   const { isMobile, state } = useSidebar();
@@ -118,26 +120,30 @@ export default function NavUser() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
-                    <Sparkles />
-                    Upgrade to Pro
+                    <Link
+                      href="/user-profile"
+                      className="flex items-center gap-1"
+                    >
+                      <UserPen className="h-5 w-5" />
+                      View Profile
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
                     <Sparkles />
-                    View Profile
+                    Upgrade to Pro (Coming Soon)
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
-                <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
                     <CreditCard />
-                    Billing
+                    Billing (Coming Soon)
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Bell />
-                    Notifications
+                    Notifications (Coming Soon)
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />

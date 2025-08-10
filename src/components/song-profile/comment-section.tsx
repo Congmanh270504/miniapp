@@ -69,10 +69,6 @@ export function CommentSection({
     checkUserRole();
   }, [isSignedIn, isLoaded, user]);
 
-  useEffect(() => {
-    console.log("User role checked", isAdmin);
-  }, [isAdmin]);
-
   const [isPending, setIsPending] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [deleteDialog, setDeleteDialog] = useState({
@@ -184,8 +180,6 @@ export function CommentSection({
         });
         if (request.status === 200) {
           const response = await request.json();
-          console.log(response);
-
           toast.success("Comment added successfully");
           setComments((prevComments) =>
             prevComments.map((c) =>

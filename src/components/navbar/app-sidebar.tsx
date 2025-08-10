@@ -15,6 +15,7 @@ import {
   Music,
   MessageCircleCode,
   Info,
+  BrainCog,
 } from "lucide-react";
 
 import {
@@ -31,6 +32,7 @@ import { NavProjects } from "./nav-projects";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 import NavUser from "./nav-user";
+import { url } from "inspector";
 
 const data = {
   teams: [
@@ -139,11 +141,6 @@ const data = {
   ],
   projects: [
     {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
       name: "Reviews",
       url: "/reviews",
       icon: MessageCircleCode,
@@ -152,6 +149,11 @@ const data = {
       name: "About",
       url: "/about",
       icon: Info,
+    },
+    {
+      name: "Coming soon",
+      url: "/coming-soon",
+      icon: BrainCog,
     },
   ],
 };
@@ -163,9 +165,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [isLight, setIsLight] = React.useState(true);
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+      {/* <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
-      </SidebarHeader>
+      </SidebarHeader> */}
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />

@@ -6,10 +6,10 @@ const isProtectedRoute = createRouteMatcher([
   "(.*)create(.*)",
   "/you(.*)",
   "/hearted-songs(.*)",
+  "/user-profile(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  
   if (
     isAdminRoute(req) &&
     (await auth()).sessionClaims?.metadata?.role !== "admin"

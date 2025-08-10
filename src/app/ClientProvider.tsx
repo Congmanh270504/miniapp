@@ -36,7 +36,6 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
     return acc;
   }, []);
 
-
   return (
     <Provider store={store}>
       <QueryProvider>

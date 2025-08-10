@@ -1,6 +1,10 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/utils/prisma";
-import { songForList, songForListFast, songsForTracks } from "@/lib/prisma-includes";
+import {
+  songForList,
+  songForListFast,
+  songsForTracks,
+} from "@/lib/prisma-includes";
 import {
   createBatchAccessLinksImages,
   transformSongDataWithUrls,
@@ -107,7 +111,7 @@ export const getCachedTrendingSongs = unstable_cache(
           { HeartedSongs: { _count: "desc" } }, // Thêm sort theo popularity
           { Comments: { _count: "desc" } }, // Thêm sort theo comments
         ],
-        take: 8,
+        take: 7,
       });
 
       if (!songs.length) {
@@ -122,7 +126,6 @@ export const getCachedTrendingSongs = unstable_cache(
       return processedData;
     } catch (error) {
       console.error("❌ Error in getCachedTrendingSongs:", error);
-      // Return empty array instead of throwing to prevent page crash
       return [];
     }
   },

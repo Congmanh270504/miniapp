@@ -92,22 +92,6 @@ export function ReviewList({
     });
   };
 
-  const handleDeleteComment = (commentId: string) => {
-    const commentToDelete = comments.find((c) => c.id === commentId);
-    const hasReplies =
-      commentToDelete?.replies && commentToDelete.replies.length > 0;
-
-    if (hasReplies) {
-      setDeleteDialog({
-        isOpen: true,
-        commentId,
-        hasReplies: true,
-        repliesCount: commentToDelete?.replies?.length || 0,
-      });
-    } else {
-      executeDeleteComment(commentId);
-    }
-  };
 
   const executeDeleteComment = (commentId: string) => {
     setComments((prev) => prev.filter((c) => c.id !== commentId));

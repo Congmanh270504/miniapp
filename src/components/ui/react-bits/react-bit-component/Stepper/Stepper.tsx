@@ -96,7 +96,7 @@ export default function Stepper({
         <div className="relative px-3 py-1 text-sm font-medium rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-4">
           <span className="relative z-10">
             <SplitText
-              text="Steps upload file songs"
+              text="Steps to upload song files"
               className="text-6xl italic text-center text-[#670D2F] px-3 "
               delay={100}
               duration={0.6}

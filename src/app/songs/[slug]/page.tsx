@@ -17,13 +17,18 @@ import MusicPlayerWrapper from "@/components/song-profile/music-player-wrapper";
 
 // Cached function để lấy tất cả songs cho playlist (cache 5 phút) - theo thứ tự cố định
 const getCachedAllPlaylistSongs = unstable_cache(
-  async () => {
+  async (unless: string) => {
     return await prisma.songs.findMany({
       include: songSlug,
+      where: {
+        NOT: {
+          id: unless,
+        },
+      },
+      take: 20, // Lấy 20 bài để có đủ cho next/prev
       orderBy: {
         createdAt: "desc",
       },
-      take: 20, // Lấy 20 bài để có đủ cho next/prev
     });
   },
   ["all-playlist-songs"],
@@ -75,10 +80,9 @@ export default async function Page({ params }: PageProps) {
   const heart = heartedSongs ? true : false;
 
   // Lấy tất cả bài hát cho playlist theo thứ tự cố định - cached
-  const allPlaylistSongs = await getCachedAllPlaylistSongs().then((songs) => [
-    currentSong,
-    ...songs,
-  ]);
+  const allPlaylistSongs = await getCachedAllPlaylistSongs(currentSong.id).then(
+    (songs) => [currentSong, ...songs]
+  );
 
   // Tạo access links cho tất cả bài hát
   const { musicUrls, imageUrls } = await createBatchAccessLinks(
