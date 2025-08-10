@@ -35,7 +35,8 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
     acc.push(url);
     return acc;
   }, []);
-
+  const truncate = (str: string, max = 10) =>
+    str.length > max ? `${str.slice(0, max)}...` : str;
   return (
     <Provider store={store}>
       <QueryProvider>
@@ -60,11 +61,11 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
                         <BreadcrumbItem>
                           {index !== breadcrumbItems.length - 1 ? (
                             <BreadcrumbLink href={url} className="capitalize">
-                              {pathArray[index]}
+                              {truncate(pathArray[index], 10)}
                             </BreadcrumbLink>
                           ) : (
                             <BreadcrumbPage className="capitalize">
-                              {pathArray[index]}
+                              {truncate(pathArray[index], 10)}
                             </BreadcrumbPage>
                           )}
                         </BreadcrumbItem>

@@ -85,7 +85,7 @@ export const PopularArtists: React.FC<PopularArtistsProps> = ({
                 key={index}
                 className="pl-4 basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
               >
-                <Link href={`/artists/${artist.clerkId}`}>
+                <Link href={`/${artist.clerkId}/tracks`}>
                   <Card
                     className="h-full shadow-lg transition-colors cursor-pointer group"
                     onMouseEnter={() => setHoveredArtist(artist.clerkId)}

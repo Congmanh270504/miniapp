@@ -49,20 +49,20 @@ const features: Feature[] = [
     accentClass: "from-amber-400 to-orange-500",
   },
   {
-    title: "User Dashboard",
-    description:
-      "A central place to manage uploads, insights, stats, and account settings.",
-    status: "Planned",
-    icon: LayoutDashboard,
-    accentClass: "from-violet-500 to-fuchsia-500",
-  },
-  {
     title: "Mobile-first UI/UX",
     description:
       "Responsive, touch-friendly design optimized for smartphones with smooth gestures and accessible.",
     status: "Planned",
     icon: Smartphone,
     accentClass: "from-rose-500 to-violet-500",
+  },
+  {
+    title: "User Dashboard",
+    description:
+      "A central place to manage uploads, insights, stats, and account settings.",
+    status: "Planned",
+    icon: LayoutDashboard,
+    accentClass: "from-violet-500 to-fuchsia-500",
   },
   {
     title: "Performance Boost",
