@@ -34,7 +34,7 @@ const Page = async ({ params }: PageProps) => {
             <span className="relative z-10">
               <SplitText
                 text="Search results"
-                className="text-6xl italic text-center text-[#670D2F] px-3"
+                className="text-6xl italic text-center text-[#670D2F] px-3 dark:text-gray-300"
                 delay={100}
                 duration={0.6}
                 ease="power3.out"
