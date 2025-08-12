@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronRight, User, type LucideIcon } from "lucide-react";
+import { useState, useEffect } from "react";
 
 import {
   Collapsible,
@@ -33,7 +34,16 @@ export function NavMain({
     }[];
   }[];
 }) {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Prevent hydration mismatch by not rendering auth-dependent content until mounted
+  const shouldShowUserSection = isMounted && isLoaded && isSignedIn;
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -69,7 +79,7 @@ export function NavMain({
             </SidebarMenuItem>
           </Collapsible>
         ))}
-        {isSignedIn && (
+        {shouldShowUserSection && (
           <Collapsible>
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>

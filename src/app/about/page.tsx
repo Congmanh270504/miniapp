@@ -76,7 +76,7 @@ export default function AboutPage() {
               <span>Building </span>
               <RotatingText
                 texts={["Innovative", "Modern", "Scalable", "Powerful"]}
-                mainClassName="px-2 sm:px-2 md:px-3 text-[#320A6B] overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg"
+                mainClassName="px-2 sm:px-2 md:px-3 text-[#320A6B] overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg dark:text-[#3B38A0]"
                 staggerFrom={"last"}
                 initial={{ y: "100%" }}
                 animate={{ y: 0 }}
@@ -110,7 +110,7 @@ export default function AboutPage() {
             }
           >
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-6 text-[#320A6B]">
+              <h2 className="text-4xl font-bold mb-6 text-[#320A6B] dark:text-[#3B38A0]">
                 About This Project
               </h2>
               <div className="w-24 h-1 bg-gradient-to-r from-primary to-purple-500 mx-auto mb-8"></div>
@@ -187,7 +187,7 @@ export default function AboutPage() {
       <section className="py-20 px-4 bg-muted/30 mt-[12em]">
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6 text-[#320A6B]">
+            <h2 className="text-4xl font-bold mb-6 text-[#320A6B] dark:text-[#3B38A0]">
               Why I built this web app?
             </h2>
             <p className="text-xl text-muted-foreground max-w-4xl mx-auto">

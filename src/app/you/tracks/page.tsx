@@ -9,6 +9,7 @@ import { songForListFast, songsForTracks } from "@/lib/prisma-includes";
 import { Metadata } from "next";
 import { createBatchAccessLinks, transformSongData } from "@/lib/song-utils";
 import { DataTable } from "@/components/data-table/data-table";
+import { DataTableTracks } from "./data-table-tracks";
 
 // Metadata for SEO optimization
 export const metadata: Metadata = {
@@ -23,7 +24,8 @@ export const metadata: Metadata = {
 
 // Cached function để lấy user songs với URLs (comprehensive cache)
 const getCachedUserSongsWithUrls = unstable_cache(
-  async (clerkId: string) => {
+  async (clerkId: string, page: number = 1, pageSize: number = 6) => {
+    const offset = (page - 1) * pageSize;
     const userData = await prisma.users.findFirst({
       where: {
         clerkId: clerkId,
@@ -33,6 +35,8 @@ const getCachedUserSongsWithUrls = unstable_cache(
         clerkId: true,
         Songs: {
           include: songsForTracks,
+          take: pageSize,
+          skip: offset,
           orderBy: {
             createdAt: "desc",
           },
@@ -41,8 +45,21 @@ const getCachedUserSongsWithUrls = unstable_cache(
     });
 
     if (!userData || !userData.Songs.length) {
-      return { userData: null, musicUrls: [], imageUrls: [] };
+      return {
+        userData: null,
+        musicUrls: [],
+        imageUrls: [],
+        hasMore: false,
+        totalPages: 0,
+      };
     }
+    const totalSongs = await prisma.songs.count({
+      where: {
+        userId: userData.id,
+      },
+    }); // Get total count
+    const totalPages = Math.ceil((totalSongs || 0) / pageSize);
+    const hasMore = page < totalPages;
 
     // Batch create access links và cache chung
     const { musicUrls, imageUrls } = await createBatchAccessLinks(
@@ -50,7 +67,14 @@ const getCachedUserSongsWithUrls = unstable_cache(
       7200 // 2 hours cache for URLs
     );
 
-    return { userData, musicUrls, imageUrls };
+    return {
+      userData,
+      musicUrls,
+      imageUrls,
+      hasMore,
+      totalPages,
+      currentPage: page,
+    };
   },
   ["user-songs-with-urls"],
   {
@@ -58,8 +82,12 @@ const getCachedUserSongsWithUrls = unstable_cache(
     tags: ["songs", "user-songs", "urls"],
   }
 );
-
-export default async function Page() {
+interface PageProps {
+  searchParams: Promise<{ page?: string }>;
+}
+export default async function Page({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const currentPage = parseInt(params.page || "1", 10);
   const user = await currentUser();
   if (!user) {
     return (
@@ -70,9 +98,8 @@ export default async function Page() {
   }
 
   // Sử dụng comprehensive cached function
-  const { userData, musicUrls, imageUrls } = await getCachedUserSongsWithUrls(
-    user.id
-  );
+  const { userData, musicUrls, imageUrls, hasMore, totalPages } =
+    await getCachedUserSongsWithUrls(user.id, currentPage, 6);
 
   if (!userData || !userData.Songs.length) {
     return (
@@ -89,11 +116,18 @@ export default async function Page() {
 
   // Transform song data với pre-cached URLs
   const songData = transformSongData(userData.Songs, musicUrls, imageUrls);
+
   return (
     <Suspense fallback={<Loading />}>
       <div className="container mx-auto py-10 flex flex-col gap-4 ">
-        <DataTable columns={columns} data={songData} dataPage="tracks"/>
-        <div className="p-4 bg-white dark:bg-gray-900 rounded-lg ">
+        <DataTableTracks
+          columns={columns}
+          data={songData}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          hasMore={hasMore}
+        />
+        <div className="p-4 bg-white dark:bg-gray-900 rounded-lg mx-[1em]">
           <SimpleMusicPlayer songs={songData} />
         </div>
       </div>

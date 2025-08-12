@@ -47,7 +47,7 @@ export const TrendingSongs: React.FC<TrendingSongsProps> = ({ songData }) => {
             <span className="relative z-10">
               <SplitText
                 text="Trending songs"
-                className="text-6xl italic text-center text-[#670D2F] px-3"
+                className="text-6xl italic text-center text-[#670D2F] px-3 dark:text-gray-300"
                 delay={100}
                 duration={0.6}
                 ease="power3.out"
@@ -65,7 +65,7 @@ export const TrendingSongs: React.FC<TrendingSongsProps> = ({ songData }) => {
         <Link href="/songs/all">
           <Button
             variant="ghost"
-            className="absolute right-0 text-gray-400 text-sm hover:text-gray-700"
+            className="absolute right-0 text-gray-400 text-sm hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
           >
             Show all
           </Button>

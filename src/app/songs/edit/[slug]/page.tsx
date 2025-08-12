@@ -11,6 +11,7 @@ import { Home, Music } from "lucide-react";
 import { redirect } from "next/navigation";
 import PermisstionDenined from "@/components/ui/permisstion-denined";
 import SongLimitPage from "@/components/ui/song-limit";
+import Custom404 from "@/app/not-found";
 
 interface PageProps {
   params: Promise<{
@@ -124,21 +125,8 @@ const Page = async ({ params }: PageProps) => {
   });
 
   if (!currentSong) {
-    return (
-      <div className="flex w-full h-full p-4 gap-2 ">
-        <div className="flex flex-col items-center justify-center w-full h-full">
-          <Image
-            src="/images/404.png"
-            alt="Not Found"
-            width={500}
-            height={500}
-          />
-          <h1 className="text-2xl font-bold">Song Not Found</h1>
-        </div>
-      </div>
-    );
+    return <Custom404 />;
   }
-
   return currentSong.userId === userDb.id ? (
     <div className="h-full px-5 py-10 ">
       <EditSongForm song={currentSong} />

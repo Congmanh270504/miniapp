@@ -83,7 +83,7 @@ export function TrackCell({ track }: TrackCellProps) {
         </Button>
       </div>
       <div className="flex flex-col min-w-0 flex-1">
-        <span className="font-medium text-gray-900 truncate">
+        <span className="font-medium text-gray-900 truncate dark:text-white ">
           {track.title}
         </span>
       </div>

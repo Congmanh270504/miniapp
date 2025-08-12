@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <div className="relative min-h-svh bg-white text-slate-900">
+    <div className="relative min-h-svh text-slate-900 dark:text-white">
       <AuroraBackground />
 
       <main className="relative z-10">

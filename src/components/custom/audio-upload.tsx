@@ -203,22 +203,22 @@ export default function AudioUpload() {
       <div className="w-full mx-auto">
         {uploadedFileData && (
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-4 text-[#333446]">
+            <h1 className="text-4xl font-bold mb-4 text-[#333446] dark:text-white">
               Uploaded Files:
             </h1>
             <div className="space-y-2">
               <div className="flex items-center justify-between p-3 bg-gray-600 rounded-lg group transition-colors">
                 <div className="flex items-center space-x-3">
                   <FileAudio className="w-5 h-5 text-blue-400" />
-                  <span className="text-white">
+                  <span className="text-white dark:text-white">
                     {uploadedFileData.file.name}
                   </span>
-                  <span className="text-gray-400 text-sm">
+                  <span className="text-gray-400 text-sm dark:text-gray-300">
                     ({(uploadedFileData.file.size / (1024 * 1024)).toFixed(2)}{" "}
                     MB)
                   </span>
                   {uploadedFileData.duration > 0 && (
-                    <span className="text-gray-400 text-sm">
+                    <span className="text-gray-400 text-sm dark:text-gray-300">
                       • {Math.floor(uploadedFileData.duration / 60)}:
                       {(uploadedFileData.duration % 60)
                         .toString()
@@ -230,7 +230,7 @@ export default function AudioUpload() {
                   {uploadedFileData.isUploading && (
                     <div className="flex items-center space-x-1">
                       <Clock className="w-4 h-4 text-blue-400 animate-spin" />
-                      <span className="text-blue-400 text-xs">
+                      <span className="text-blue-400 text-xs dark:text-blue-300">
                         Uploading...
                       </span>
                     </div>
@@ -238,7 +238,9 @@ export default function AudioUpload() {
                   {uploadedFileData.uploaded && (
                     <div className="flex items-center space-x-1">
                       <CheckCircle className="w-4 h-4 text-green-400" />
-                      <span className="text-green-400 text-xs">Uploaded</span>
+                      <span className="text-green-400 text-xs dark:text-green-300">
+                        Uploaded
+                      </span>
                     </div>
                   )}
                   <Button
@@ -271,15 +273,15 @@ export default function AudioUpload() {
         ) : (
           <div>
             <div className="mb-8">
-              <h1 className="text-4xl font-bold mb-4 text-[#333446]">
+              <h1 className="text-4xl font-bold mb-4 text-[#333446] dark:text-white">
                 Upload your audio files.
               </h1>
-              <p className="text-[#333446] text-lg">
+              <p className="text-[#333446] text-lg dark:text-gray-300">
                 For best quality, use MP3, MP4, WAV, FLAC, AIFF, or ALAC. The
                 maximum file size is 4.5MB uncompressed.{"  "}
-                <span className="text-blue-400 hover:text-blue-300 cursor-pointer">
+                {/* <span className="text-blue-400 hover:text-blue-300 cursor-pointer dark:text-blue-300 dark:hover:text-blue-200">
                   Learn more.
-                </span>
+                </span> */}
               </p>
             </div>
 
@@ -300,7 +302,7 @@ export default function AudioUpload() {
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-xl font-medium text-[#511D43]">
+                    <p className="text-xl font-medium text-[#511D43] dark:text-white">
                       {isDragActive
                         ? "Drop the audio files here..."
                         : "Drag and drop audio files to get started."}
@@ -311,7 +313,7 @@ export default function AudioUpload() {
                     onClick={open}
                     variant="secondary"
                     size="lg"
-                    className="bg-black text-white hover:bg-gray-600 font-medium px-8"
+                    className="bg-black text-white hover:bg-gray-600 font-medium px-8 dark:bg-white dark:text-black dark:hover:bg-gray-200"
                   >
                     Choose files
                   </Button>

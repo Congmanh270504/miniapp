@@ -111,8 +111,13 @@ export default async function Page() {
                   Hi, I'm
                 </div>
                 <RotatingText
-                  texts={["Công Mạnh!", "From Việt Nam", "Patient", "Love sports"]}
-                  mainClassName="px-2 sm:px-2 md:px-3 text-[#320A6B] overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg"
+                  texts={[
+                    "Công Mạnh!",
+                    "From Việt Nam",
+                    "Patient",
+                    "Love sports",
+                  ]}
+                  mainClassName="px-2 sm:px-2 md:px-3 text-[#320A6B] overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg dark:text-[#1A2A80]"
                   staggerFrom={"last"}
                   initial={{ y: "100%" }}
                   animate={{ y: 0 }}
@@ -166,12 +171,6 @@ export default async function Page() {
                 displayOverlayContent={true}
                 overlayContent={<p className="tilted-card-demo-text">Cmạnh</p>}
               />
-            </div>
-          </div>
-
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-            <div className="w-6 h-10 rounded-full border-2 border-white/20 flex justify-center items-start p-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-white/60 animate-pulse"></div>
             </div>
           </div>
         </section>

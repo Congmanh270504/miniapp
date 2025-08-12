@@ -14,6 +14,7 @@ import {
 } from "@/lib/song-utils";
 import { getUserById } from "@/lib/actions/user";
 import MusicPlayerWrapper from "@/components/song-profile/music-player-wrapper";
+import Custom404 from "@/app/not-found";
 
 // Cached function để lấy tất cả songs cho playlist (cache 5 phút) - theo thứ tự cố định
 const getCachedAllPlaylistSongs = unstable_cache(
@@ -25,7 +26,7 @@ const getCachedAllPlaylistSongs = unstable_cache(
           id: unless,
         },
       },
-      take: 20, // Lấy 20 bài để có đủ cho next/prev
+      take: 5, // Lấy 5 bài để có đủ cho next/prev
       orderBy: {
         createdAt: "desc",
       },
@@ -58,19 +59,7 @@ export default async function Page({ params }: PageProps) {
   });
 
   if (!currentSong) {
-    return (
-      <div className="flex w-full h-full p-4 gap-2 ">
-        <div className="flex flex-col items-center justify-center w-full h-full">
-          <Image
-            src="/images/404.png"
-            alt="Not Found"
-            width={500}
-            height={500}
-          />
-          <h1 className="text-2xl font-bold">Song Not Found</h1>
-        </div>
-      </div>
-    );
+    return <Custom404 />;
   }
 
   const heartedSongs = currentSong.HeartedSongs.find(
@@ -86,12 +75,12 @@ export default async function Page({ params }: PageProps) {
 
   // Tạo access links cho tất cả bài hát
   const { musicUrls, imageUrls } = await createBatchAccessLinks(
-    allPlaylistSongs.slice(0, 10), // Giới hạn lấy 10 bài để tránh quá tải
+    allPlaylistSongs, // Giới hạn lấy 10 bài để tránh quá tải
     3600
   );
 
   const playlistData = transformSongDataSlug(
-    allPlaylistSongs.slice(0, 10),
+    allPlaylistSongs,
     imageUrls,
     musicUrls
   );

@@ -6,7 +6,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const songId = searchParams.get("songId");
-    console.log("Fetching comments for songId:", songId);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "20");
 
     if (!songId || songId === "") {
       return NextResponse.json(
@@ -14,6 +15,14 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const skip = (page - 1) * limit;
+
+    // Get total count for pagination info
+    const totalComments = await prisma.comments.count({
+      where: { songId: songId },
+    });
+
     const comments = await prisma.comments.findMany({
       where: { songId: songId },
       include: {
@@ -24,6 +33,11 @@ export async function GET(request: NextRequest) {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip: skip,
+      take: limit,
     });
 
     if (!comments) {
@@ -38,6 +52,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       status: 200,
       comments: transformedComments,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalComments / limit),
+        totalComments: totalComments,
+        hasMore: skip + comments.length < totalComments,
+      },
     });
   } catch (error) {
     console.error("Error fetching comments:", error);

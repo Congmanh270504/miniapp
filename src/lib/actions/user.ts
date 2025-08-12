@@ -23,7 +23,7 @@ export async function getUserByIdList(userIds: string[]) {
     // Get the user's full Backend User object
     const users = await client.users.getUserList({
       userId: userIds,
-      limit: 6,
+      limit: 8,
     });
 
     return { users, error: null };

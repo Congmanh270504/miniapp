@@ -32,7 +32,7 @@ export function StepperWrapper() {
                 <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
                   1
                 </div>
-                <h2 className="text-3xl xl:text-4xl font-bold text-black">
+                <h2 className="text-3xl xl:text-4xl font-bold text-black dark:text-white">
                   Sign In with Clerk
                 </h2>
               </div>
@@ -40,25 +40,25 @@ export function StepperWrapper() {
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Create an account or sign in to your existing account
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Choose from multiple authentication methods
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Secure and fast authentication process
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Access all features after signing in
                   </p>
                 </div>
@@ -71,7 +71,9 @@ export function StepperWrapper() {
                   <h3 className="text-2xl font-bold text-gray-800 mb-2">
                     Welcome back
                   </h3>
-                  <p className="text-gray-600">Sign in to your account</p>
+                  <p className="text-gray-600 dark:text-muted-foreground">
+                    Sign in to your account
+                  </p>
                 </div>
 
                 <div className="space-y-4">
@@ -117,7 +119,7 @@ export function StepperWrapper() {
                 <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
                   2
                 </div>
-                <h2 className="text-3xl xl:text-4xl font-bold text-black">
+                <h2 className="text-3xl xl:text-4xl font-bold text-black dark:text-white">
                   Upload Audio File
                 </h2>
               </div>
@@ -125,7 +127,7 @@ export function StepperWrapper() {
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Navigate to{" "}
                     <Link href="/songs/create">
                       <span className="bg-purple-100 px-2 py-1 rounded text-purple-700 font-mono hover:underline">
@@ -136,25 +138,25 @@ export function StepperWrapper() {
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Drag and drop your audio file into the drop zone
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Supported formats: WAV, FLAC, AIFF, ALAC, MP3
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Maximum file size: 4.5MB uncompressed
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Click "Choose files" for manual selection
                   </p>
                 </div>
@@ -167,7 +169,7 @@ export function StepperWrapper() {
                   <h1 className="text-4xl font-bold mb-4">
                     Upload your audio files.
                   </h1>
-                  <p className="text-[#333446] text-lg">
+                  <p className="text-[#333446] text-lg dark:text-muted-foreground">
                     For best quality, use WAV, FLAC, AIFF, or ALAC. The maximum
                     file size is 4.5MB uncompressed.{" "}
                     <span className="text-blue-400 hover:text-blue-300 cursor-pointer">
@@ -186,7 +188,7 @@ export function StepperWrapper() {
                       </div>
 
                       <div className="space-y-2">
-                        <p className="text-xl font-medium text-[#511D43]">
+                        <p className="text-xl font-medium text-[#511D43] dark:text-muted-foreground">
                           Drag and drop audio files to get started.
                         </p>
                       </div>
@@ -214,7 +216,7 @@ export function StepperWrapper() {
                 <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
                   3
                 </div>
-                <h2 className="text-3xl xl:text-4xl font-bold text-black">
+                <h2 className="text-3xl xl:text-4xl font-bold text-black dark:text-white">
                   Upload Cover Image
                 </h2>
               </div>
@@ -222,31 +224,31 @@ export function StepperWrapper() {
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Upload a cover image for your song
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Supported formats: JPEG, PNG, JPG
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Recommended size: 1400x1400 pixels
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Maximum file size: 4.5MB
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700 text-base xl:text-lg">
+                  <p className="text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                     Square images work best
                   </p>
                 </div>
@@ -259,7 +261,7 @@ export function StepperWrapper() {
                   <h1 className="text-4xl font-bold mb-4">
                     Upload cover image.
                   </h1>
-                  <p className="text-[#333446] text-lg">
+                  <p className="text-[#333446] text-lg dark:text-muted-foreground">
                     Add a visual representation of your song. Square images work
                     best.{" "}
                     <span className="text-blue-400 hover:text-blue-300 cursor-pointer">
@@ -278,7 +280,7 @@ export function StepperWrapper() {
                       </div>
 
                       <div className="space-y-2">
-                        <p className="text-xl font-medium text-[#511D43]">
+                        <p className="text-xl font-medium text-[#511D43] dark:text-muted-foreground">
                           Drag and drop image files here.
                         </p>
                       </div>
@@ -310,12 +312,12 @@ export function StepperWrapper() {
                     <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
                       4
                     </div>
-                    <h2 className="text-3xl xl:text-4xl font-bold text-black">
+                    <h2 className="text-3xl xl:text-4xl font-bold text-black dark:text-white">
                       Fill Song Details
                     </h2>
                   </div>
                   <div className="space-y-4">
-                    <h3 className="text-xl xl:text-2xl font-semibold text-gray-800 mb-4">
+                    <h3 className="text-xl xl:text-2xl font-semibold text-gray-800 mb-4 dark:text-white">
                       Form Field Guide
                     </h3>
 
@@ -323,10 +325,10 @@ export function StepperWrapper() {
                       <div className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
                         <div>
-                          <p className="font-medium text-gray-700 text-base xl:text-lg">
+                          <p className="font-medium text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                             Fill all required fields
                           </p>
-                          <p className="text-sm xl:text-base text-gray-600">
+                          <p className="text-sm xl:text-base text-gray-600 dark:text-muted-foreground">
                             Ensure all required fields are completed before
                             submitting
                           </p>
@@ -336,10 +338,10 @@ export function StepperWrapper() {
                       <div className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
                         <div>
-                          <p className="font-medium text-gray-700 text-base xl:text-lg">
+                          <p className="font-medium text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                             Submit form
                           </p>
-                          <p className="text-sm xl:text-base text-gray-600">
+                          <p className="text-sm xl:text-base text-gray-600 dark:text-muted-foreground">
                             Make sure none filed is null and have error messages
                           </p>
                         </div>
@@ -348,10 +350,10 @@ export function StepperWrapper() {
                       <div className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
                         <div>
-                          <p className="font-medium text-gray-700 text-base xl:text-lg">
+                          <p className="font-medium text-gray-700 text-base xl:text-lg dark:text-muted-foreground">
                             Handle error
                           </p>
-                          <p className="text-sm xl:text-base text-gray-600">
+                          <p className="text-sm xl:text-base text-gray-600 dark:text-muted-foreground">
                             After submitting, if successful, you will be
                             redirected to the song details page. If there are
                             errors, they will be displayed at the right bottom
@@ -368,7 +370,7 @@ export function StepperWrapper() {
                   <div className="space-y-6 ">
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-white">
                           Song Title
                         </label>
                         <div className="relative">
@@ -378,14 +380,14 @@ export function StepperWrapper() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-white">
                           Artist Name
                         </label>
                         <Input placeholder="TWICE" />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-white">
                           Genre
                         </label>
                         <Select>
@@ -400,17 +402,17 @@ export function StepperWrapper() {
                   <div className="space-y-6 flex flex-col justify-between h-full">
                     <div className="space-y-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          URL Slug
+                        <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-white">
+                          Slug
                         </label>
                         <Input placeholder="what-is-love" />
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-gray-500 mt-1 dark:text-muted-foreground">
                           This will be used in the URL for your song
                         </p>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-white">
                           Description
                         </label>
                         <Textarea
@@ -425,7 +427,7 @@ export function StepperWrapper() {
                       <Button variant="outline" className="w-full">
                         Cancel
                       </Button>
-                      <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                      <Button className="w-full bg-purple-600 hover:bg-purple-700 dark:text-white">
                         Submit
                       </Button>
                     </div>

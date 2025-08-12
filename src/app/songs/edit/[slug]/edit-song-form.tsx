@@ -209,7 +209,7 @@ export default function EditSongForm({ song }: EditSongFormProps) {
               )}
             />
 
-            <div className="grid grid-cols-12 gap-4 text-black">
+            <div className="grid grid-cols-12 gap-4 text-black dark:text-white">
               <div className="col-span-12 col-start-auto justify-self-center">
                 <TypographyH2 text="Edit song information" />
               </div>
@@ -219,7 +219,7 @@ export default function EditSongForm({ song }: EditSongFormProps) {
                 name="title"
                 render={({ field }) => (
                   <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
-                    <FormLabel className="flex shrink-0 text-black">
+                    <FormLabel className="flex shrink-0 text-black dark:text-white">
                       Song title
                     </FormLabel>
                     <div className="w-full">
@@ -243,7 +243,7 @@ export default function EditSongForm({ song }: EditSongFormProps) {
                 render={({ field }) => (
                   <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                     <div className="flex gap-1.5 w-full">
-                      <FormLabel className="flex shrink-0 text-black">
+                      <FormLabel className="flex shrink-0 text-black dark:text-white">
                         Slug
                       </FormLabel>
                       <Tooltip>
@@ -251,7 +251,9 @@ export default function EditSongForm({ song }: EditSongFormProps) {
                           <Info className="w-4 h-4 text-gray-500" />
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>URL-friendly version of the title</p>
+                          <p className="dark:text-white">
+                            URL-friendly version of the title
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -264,7 +266,7 @@ export default function EditSongForm({ song }: EditSongFormProps) {
                           {...field}
                         />
                       </FormControl>
-                      <FormDescription className="text-sm text-gray-600 mt-1 ml-1">
+                      <FormDescription className="text-sm text-gray-600 mt-1 ml-1 dark:text-gray-300">
                         This will be used in the URL for your song
                       </FormDescription>
                       <FormMessage />
@@ -278,7 +280,7 @@ export default function EditSongForm({ song }: EditSongFormProps) {
                 name="artistName"
                 render={({ field }) => (
                   <FormItem className="col-span-6 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
-                    <FormLabel className="flex shrink-0 text-black">
+                    <FormLabel className="flex shrink-0 text-black dark:text-white">
                       Artist
                     </FormLabel>
                     <div className="w-full">
@@ -302,7 +304,7 @@ export default function EditSongForm({ song }: EditSongFormProps) {
                 render={({ field }) => (
                   <FormItem className="col-span-6 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                     <div className="flex gap-1.5 w-full">
-                      <FormLabel className="flex shrink-0 text-black">
+                      <FormLabel className="flex shrink-0 text-black dark:text-white">
                         Genre
                       </FormLabel>
                       <Tooltip>
@@ -310,7 +312,9 @@ export default function EditSongForm({ song }: EditSongFormProps) {
                           <Info className="w-4 h-4 text-gray-500" />
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Select the genre that best fits your song</p>
+                          <p className="dark:text-white">
+                            Select the genre that best fits your song
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -345,7 +349,7 @@ export default function EditSongForm({ song }: EditSongFormProps) {
                 render={({ field }) => (
                   <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                     <div className="flex gap-1.5 w-full">
-                      <FormLabel className="flex shrink-0 text-black">
+                      <FormLabel className="flex shrink-0 text-black dark:text-white">
                         Description
                       </FormLabel>
                       <Tooltip>
@@ -353,7 +357,9 @@ export default function EditSongForm({ song }: EditSongFormProps) {
                           <Info className="w-4 h-4 text-gray-500" />
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Brief description of your song</p>
+                          <p className="dark:text-white">
+                            Brief description of your song
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -375,7 +381,7 @@ export default function EditSongForm({ song }: EditSongFormProps) {
               <div className="col-span-6 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                 <div className="w-full">
                   <Button
-                    className="w-full"
+                    className="w-full dark:text-white"
                     type="button"
                     variant="outline"
                     onClick={() => router.back()}
@@ -388,7 +394,7 @@ export default function EditSongForm({ song }: EditSongFormProps) {
               <div className="col-span-6 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                 <div className="w-full">
                   <Button
-                    className="w-full bg-gray-600 hover:bg-gray-500"
+                    className="w-full bg-gray-600 hover:bg-gray-500 dark:text-white"
                     type="submit"
                     variant="default"
                     disabled={isPending || isUploading}

@@ -23,7 +23,7 @@ const socialLinks: SocialLink[] = [
     icon: Github,
     label: "Follow us on GitHub",
     hoverColor: "hover:border-gray-800",
-    iconColor: "text-gray-800",
+    iconColor: "text-gray-800 dark:text-gray-400",
   },
   {
     href: "https://www.instagram.com/congmanh270504",

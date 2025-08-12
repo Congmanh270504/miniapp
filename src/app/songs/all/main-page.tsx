@@ -64,7 +64,7 @@ export default function MainPage({
               <span className="relative z-10">
                 <SplitText
                   text={title ? title : "All songs"}
-                  className="text-6xl italic text-center text-[#670D2F] px-3"
+                  className="text-6xl italic text-center text-[#670D2F] px-3 dark:text-gray-300"
                   delay={100}
                   duration={0.6}
                   ease="power3.out"

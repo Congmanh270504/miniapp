@@ -165,15 +165,15 @@ const UploadAudioSong = ({
 
             <div className="flex flex-col items-center justify-center py-8">
               <Music className="w-16 h-16 text-white stroke-1 mb-4" />
-              <p className="text-white text-lg font-medium mb-2">
+              <p className="text-white text-lg font-medium mb-2 dark:text-white">
                 {currentFile.name}
               </p>
               {duration > 0 && (
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-400 text-sm dark:text-gray-300">
                   Duration: {formatDuration(duration)}
                 </p>
               )}
-              <p className="text-gray-500 text-xs mt-2">
+              <p className="text-gray-500 text-xs mt-2 dark:text-gray-400">
                 Size: {(currentFile.size / (1024 * 1024)).toFixed(2)} MB
               </p>
             </div>
@@ -183,13 +183,13 @@ const UploadAudioSong = ({
             <div className="mb-4 justify-items-center">
               <Music className="w-16 h-16 text-white stroke-1" />
             </div>
-            <p className="text-white text-lg font-medium mb-2">
+            <p className="text-white text-lg font-medium mb-2 dark:text-white">
               {isDragActive ? "Drop the audio file here" : "Add audio file"}
             </p>
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-400 text-sm dark:text-gray-300">
               Drag & drop an audio file here, or click to select
             </p>
-            <p className="text-gray-500 text-xs mt-1">
+            <p className="text-gray-500 text-xs mt-1 dark:text-gray-400">
               Supports: MP3, WAV, FLAC, M4A, AAC (Max: 50MB)
             </p>
           </div>

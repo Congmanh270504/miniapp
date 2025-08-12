@@ -26,7 +26,7 @@ export function Hero() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.05 }}
-        className="bg-gradient-to-b from-slate-900 to-slate-700 bg-clip-text text-4xl font-bold leading-tight text-transparent sm:text-5xl md:text-6xl"
+        className="bg-gradient-to-b from-slate-900 to-slate-700 bg-clip-text text-4xl font-bold leading-tight text-transparent sm:text-5xl md:text-6xl dark:from-slate-800 dark:to-slate-600"
       >
         A new era for music and community
       </motion.h1>
@@ -35,7 +35,7 @@ export function Hero() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
-        className="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg"
+        className="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg dark:text-slate-400"
       >
         I{"'"}m crafting features to help you connect, share, and grow: realtime
         chat, follow creators you love, a powerful dashboard, bigger uploads,

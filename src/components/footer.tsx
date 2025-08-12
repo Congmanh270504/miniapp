@@ -58,14 +58,14 @@ const footerData = {
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-gray-200 mt-auto">
+    <footer className="bg-white border-t border-gray-200 mt-auto dark:bg-black dark:text-white">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="py-12 lg:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Contact Information - Left Side */}
             <div className="col-span-1">
-              <h3 className="text-sm font-medium text-gray-900 mb-4">
+              <h3 className="text-sm font-medium text-gray-900 mb-4 dark:text-white">
                 Contact Me
               </h3>
               <ul className="space-y-3">
@@ -73,7 +73,7 @@ export default function Footer() {
                   <Phone className="h-4 w-4 text-green-600" />
                   <Link
                     href="tel:+1234567890"
-                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors dark:text-muted-foreground"
                   >
                     +1 (234) 567-8900
                   </Link>
@@ -82,14 +82,14 @@ export default function Footer() {
                   <Mail className="h-4 w-4 text-red-500" />
                   <Link
                     href="mailto:contact@company.com"
-                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors dark:text-muted-foreground"
                   >
                     trancongmanh270504@gmail.com
                   </Link>
                 </li>
                 <li className="flex items-center space-x-3">
                   <MapPin className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-gray-600 dark:text-muted-foreground">
                     Somewhere on Earth :)
                   </span>
                 </li>
@@ -97,7 +97,7 @@ export default function Footer() {
 
               {/* Social Media */}
               <div className="mt-8">
-                <h3 className="text-sm font-medium text-gray-900 mb-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-4 dark:text-white">
                   Follow Me
                 </h3>
                 <SocialLinks />
@@ -109,7 +109,7 @@ export default function Footer() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 {footerData.sections.map((section, index) => (
                   <div key={index} className="col-span-1">
-                    <h3 className="text-sm font-medium text-gray-900 mb-4">
+                    <h3 className="text-sm font-medium text-gray-900 mb-4 dark:text-white">
                       {section.title}
                     </h3>
                     {section.links && (
@@ -118,7 +118,7 @@ export default function Footer() {
                           <li key={linkIndex}>
                             <Link
                               href={link.href}
-                              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                              className="text-sm text-gray-600 hover:text-gray-900 transition-colors dark:text-muted-foreground"
                             >
                               {link.name}
                             </Link>
@@ -133,7 +133,7 @@ export default function Footer() {
                           key={subIndex}
                           className={subIndex > 0 ? "mt-8" : "mt-8"}
                         >
-                          <h3 className="text-sm font-medium text-gray-900 mb-4">
+                          <h3 className="text-sm font-medium text-gray-900 mb-4 dark:text-white">
                             {subSection.title}
                           </h3>
                           <ul className="space-y-3">
@@ -141,7 +141,7 @@ export default function Footer() {
                               <li key={linkIndex}>
                                 <Link
                                   href={link.href}
-                                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors dark:text-muted-foreground"
                                 >
                                   {link.name}
                                 </Link>
@@ -163,42 +163,42 @@ export default function Footer() {
         <div className="py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-muted-foreground">
                 Copyright © {new Date().getFullYear()} Cong Manh's MusicApp .
                 All rights reserved.
               </p>
               <div className="flex flex-wrap items-center space-x-4">
                 <Link
                   href="#"
-                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors dark:text-muted-foreground"
                 >
                   Privacy Policy
                 </Link>
                 <span className="text-sm text-gray-300">|</span>
                 <Link
                   href="#"
-                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors dark:text-muted-foreground"
                 >
                   Terms of Use
                 </Link>
                 <span className="text-sm text-gray-300">|</span>
                 <Link
                   href="#"
-                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors dark:text-muted-foreground"
                 >
                   Sales and Refunds
                 </Link>
                 <span className="text-sm text-gray-300">|</span>
                 <Link
                   href="#"
-                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors dark:text-muted-foreground"
                 >
                   Legal
                 </Link>
                 <span className="text-sm text-gray-300">|</span>
               </div>
             </div>
-            <div className="text-sm text-gray-500 flex items-center gap-2">
+            <div className="text-sm text-gray-500 flex items-center gap-2 dark:text-muted-foreground">
               Việt Nam | <VN className="w-4 h-4" />
             </div>
           </div>

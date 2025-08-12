@@ -10,6 +10,7 @@ import SimpleMusicPlayer from "@/components/song-profile/simple-music-player";
 import { unstable_cache } from "next/cache";
 import { DataTable } from "./data-table";
 import { getRandomColor } from "@/lib/hepper";
+import { prisma } from "@/utils/prisma";
 
 // Cache function for admin songs with pagination
 const getCachedAdminSongs = unstable_cache(
@@ -29,9 +30,8 @@ const getCachedAdminSongs = unstable_cache(
 
     const { musicUrls, imageUrls } = await createBatchAccessLinks(songs, 7200);
 
-    // Get total count for pagination (you might need to add this to getCachedSongsTracks)
-    const totalSongs = await getCachedSongsTracks(1000, 0); // Get total count
-    const totalPages = Math.ceil((totalSongs?.length || 0) / pageSize);
+    const totalSongs = await prisma.songs.count(); // Get total count
+    const totalPages = Math.ceil((totalSongs || 0) / pageSize);
     const hasMore = page < totalPages;
 
     return {

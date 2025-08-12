@@ -32,7 +32,7 @@ export const getCachedSongsTracks = unstable_cache(
 
 // Cached function để lấy user upload nhiều nhất
 export const getCachedUserMostUpload = unstable_cache(
-  async (limit: number = 10) => {
+  async (limit: number = 8) => {
     const usersWithMostSongs = await prisma.users.findMany({
       select: {
         id: true,

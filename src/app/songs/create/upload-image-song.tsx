@@ -51,7 +51,6 @@ const UploadImageSong = ({
   useEffect(() => {
     if (uploadedFile?.cid && onImageUploaded) {
       onImageUploaded(uploadedFile.cid);
-      toast.success("Image uploaded successfully!");
     }
   }, [uploadedFile, onImageUploaded]);
 

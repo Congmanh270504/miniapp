@@ -113,14 +113,11 @@ export function Timeline() {
                     text={experience.title}
                     disabled={false}
                     speed={3}
-                    className="text-xl font-bold text-gray-800"
+                    className="text-xl font-bold text-gray-800 dark:text-gray-200"
                   />
-                  {/* <h3 className="text-xl font-bold text-gray-800">
-                    {experience.title}
-                  </h3> */}
                 </motion.div>
                 <motion.div
-                  className="text-gray-600 mb-4 text-sm"
+                  className="text-gray-600 mb-4 text-sm dark:text-gray-400"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{
@@ -132,7 +129,7 @@ export function Timeline() {
                   {experience.company}
                 </motion.div>
                 <motion.p
-                  className="text-gray-700"
+                  className="text-gray-700 dark:text-gray-300"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{

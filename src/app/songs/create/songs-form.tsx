@@ -172,7 +172,6 @@ export default function SongForm({
     setImageCid(cid);
   };
 
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsPending(true);
@@ -258,7 +257,7 @@ export default function SongForm({
             <div
               key="text-0"
               id="text-0"
-              className="col-span-12 col-start-auto justify-self-center"
+              className="col-span-12 col-start-auto justify-self-center dark:text-white"
             >
               <TypographyH2 text="Upload song file" />
             </div>
@@ -267,7 +266,7 @@ export default function SongForm({
               name="title"
               render={({ field }) => (
                 <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
-                  <FormLabel className="flex shrink-0 text-black">
+                  <FormLabel className="flex shrink-0 text-black dark:text-white">
                     Song title
                   </FormLabel>
 
@@ -303,7 +302,7 @@ export default function SongForm({
               render={({ field }) => (
                 <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                   <div className="flex gap-1.5 w-full">
-                    <FormLabel className="flex shrink-0 text-black">
+                    <FormLabel className="flex shrink-0 text-black dark:text-white">
                       Slug
                     </FormLabel>
                     <Tooltip>
@@ -311,7 +310,7 @@ export default function SongForm({
                         <Info className="size-4 text-muted-foreground cursor-help" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>
+                        <p className="dark:text-white">
                           URL-friendly version of the title (auto-generated)
                         </p>
                       </TooltipContent>
@@ -329,7 +328,7 @@ export default function SongForm({
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription className="text-sm text-gray-600 mt-1 ml-1">
+                    <FormDescription className="text-sm text-gray-600 mt-1 ml-1 dark:text-gray-300">
                       This will be used in the URL for your song
                     </FormDescription>
                     <FormMessage />
@@ -342,7 +341,9 @@ export default function SongForm({
               name="artistName"
               render={({ field }) => (
                 <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
-                  <FormLabel className="flex shrink-0">Artist</FormLabel>
+                  <FormLabel className="flex shrink-0 dark:text-white">
+                    Artist
+                  </FormLabel>
                   <div className="w-full">
                     <FormControl>
                       <div className="relative w-full">
@@ -369,13 +370,15 @@ export default function SongForm({
               render={({ field }) => (
                 <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                   <div className="flex gap-1.5 w-full">
-                    <FormLabel className="flex shrink-0">Genre</FormLabel>
+                    <FormLabel className="flex shrink-0 dark:text-white">
+                      Genre
+                    </FormLabel>
                     <Tooltip>
                       <TooltipTrigger>
                         <Info className="size-4 text-muted-foreground cursor-help" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Style of your song</p>
+                        <p className="dark:text-white">Style of your song</p>
                       </TooltipContent>
                     </Tooltip>
                   </div>
@@ -401,7 +404,7 @@ export default function SongForm({
                         </SelectContent>
                       </Select>
                     </FormControl>
-                    <FormDescription className="text-sm text-black mt-1 ml-1">
+                    <FormDescription className="text-sm text-black mt-1 ml-1 dark:text-gray-300">
                       {
                         genres.find((genre) => genre.id === field.value)
                           ?.description
@@ -418,7 +421,7 @@ export default function SongForm({
               render={({ field }) => (
                 <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                   <div className="flex gap-1.5 w-full">
-                    <FormLabel className="flex shrink-0">
+                    <FormLabel className="flex shrink-0 dark:text-white">
                       Description your song
                     </FormLabel>
                     <Tooltip>
@@ -426,7 +429,9 @@ export default function SongForm({
                         <Info className="size-4 text-muted-foreground cursor-help" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Maybe why you choose this song?</p>
+                        <p className="dark:text-white">
+                          Maybe why you choose this song?
+                        </p>
                       </TooltipContent>
                     </Tooltip>
                   </div>
@@ -449,7 +454,7 @@ export default function SongForm({
                 <Button
                   key="button-0"
                   id="button-0"
-                  className="w-full cursor-pointer"
+                  className="w-full cursor-pointer dark:text-white"
                   type="button"
                   variant="outline"
                   onClick={onReset}
@@ -463,7 +468,7 @@ export default function SongForm({
                 <Button
                   key="submit-button-0"
                   id="submit-button-0"
-                  className="w-full bg-gray-600 hover:bg-gray-500 cursor-pointer"
+                  className="w-full bg-gray-600 hover:bg-gray-500 cursor-pointer dark:text-white "
                   type="submit"
                   variant="default"
                   disabled={isPending}

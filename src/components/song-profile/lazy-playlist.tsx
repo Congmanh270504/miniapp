@@ -52,7 +52,7 @@ export default function LazyPlaylist({
     hasMore,
     loadMore,
   } = useLazyLoading({
-    initialData: initialPlaylist.slice(0, 10), // Chỉ hiển thị 10 bài đầu tiên
+    initialData: initialPlaylist,
     loadMoreFn: loadMoreSongs,
     take: 5,
   });

@@ -83,13 +83,7 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
               {children}
             </main>
 
-            {/* Footer - Chỉ hiển thị khi không phải trang đặc biệt */}
             <Footer />
-            {/* Sidebar inset for content */}
-
-            {/* <div className="w-full h-[calc(100vh-var(--spacing)*16)] ">
-              {children}
-            </div> */}
           </SidebarInset>
         </SidebarProvider>
         <Toaster richColors closeButton position="bottom-right" />
